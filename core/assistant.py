@@ -1,0 +1,408 @@
+"""Main Xeren Assistant Orchestrator (Phase 3 with DAG and Dual-Loop Verification)."""
+
+import time
+import uuid
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel, Field
+from config.settings import Settings, get_settings
+from memory.context import SessionMemory
+from memory.preferences import PreferencesManager
+from memory.semantic import SemanticMemoryStore
+from memory.storage import SQLiteSessionStorage
+from models.base import BaseLLMProvider, LLMMessage
+from models.provider import get_default_llm_provider
+from telemetry.analytics import AnalyticsTracker
+from telemetry.traces import TraceLogger, TraceRecord
+from tools.base import ToolResult
+from tools.registry import ToolRegistry, get_default_registry
+from tools.subagent_tool import SubagentTool
+from .controller import CancellationToken, ExecutionController, ExecutionResult
+from .dag import DAGAction, TaskGraph
+from .intent import Intent, IntentClassifier, IntentType
+from .planner import TaskPlanner
+from .verifier import SemanticVerificationResult, Verifier
+
+
+class AssistantResponse(BaseModel):
+  """User-facing response from Xeren Assistant."""
+
+  query: str
+  response_text: str
+  intent: Intent
+  execution_result: Optional[ExecutionResult] = None
+  semantic_verification: Optional[SemanticVerificationResult] = None
+  trace_id: str = ""
+  duration_ms: float = 0.0
+  success: bool = True
+  error: Optional[str] = None
+
+
+class XerenAssistant:
+  """The central AI assistant coordinating Intent, DAG Planning, Safety, Concurrent Execution, Dual-Loop Verification, and Memory."""
+
+  def __init__(
+      self,
+      settings: Optional[Settings] = None,
+      llm_provider: Optional[BaseLLMProvider] = None,
+      tool_registry: Optional[ToolRegistry] = None,
+      intent_classifier: Optional[IntentClassifier] = None,
+      planner: Optional[TaskPlanner] = None,
+      controller: Optional[ExecutionController] = None,
+      verifier: Optional[Verifier] = None,
+      session_memory: Optional[SessionMemory] = None,
+      session_storage: Optional[SQLiteSessionStorage] = None,
+      preferences_manager: Optional[PreferencesManager] = None,
+      semantic_memory: Optional[SemanticMemoryStore] = None,
+      trace_logger: Optional[TraceLogger] = None,
+      analytics_tracker: Optional[AnalyticsTracker] = None,
+  ):
+    self.settings = settings or get_settings()
+    self.llm_provider = llm_provider or get_default_llm_provider(self.settings)
+    self.tool_registry = tool_registry or get_default_registry(self.settings)
+
+    # Register SubagentTool if not already present
+    if not self.tool_registry.get_tool("subagent"):
+      self.tool_registry.register_tool(
+          SubagentTool(
+              llm_provider=self.llm_provider, tool_registry=self.tool_registry
+          )
+      )
+
+    self.intent_classifier = intent_classifier or IntentClassifier(
+        llm_provider=self.llm_provider
+    )
+    self.planner = planner or TaskPlanner(llm_provider=self.llm_provider)
+    self.verifier = verifier or Verifier(llm_provider=self.llm_provider)
+    self.controller = controller or ExecutionController(
+        tool_registry=self.tool_registry,
+        verifier=self.verifier,
+        max_steps=self.settings.max_steps_per_task,
+        max_retries=self.settings.max_retries_per_step,
+        task_timeout=self.settings.task_timeout_seconds,
+    )
+    self.session_memory = session_memory or SessionMemory()
+    self.session_storage = session_storage or SQLiteSessionStorage(
+        db_path=self.settings.db_path
+    )
+    self.preferences_manager = preferences_manager or PreferencesManager(
+        file_path=self.settings.preferences_path
+    )
+    self.semantic_memory = semantic_memory or SemanticMemoryStore(
+        db_path=self.settings.db_path
+    )
+    self.trace_logger = trace_logger or TraceLogger(
+        traces_dir=self.settings.traces_dir
+    )
+    self.analytics_tracker = analytics_tracker or AnalyticsTracker()
+
+  async def _format_response_text(
+      self,
+      intent: Intent,
+      exec_res: Optional[ExecutionResult],
+      query: str,
+      session_id: str = "default_session",
+  ) -> str:
+    """Formats a rich response based on intent, live LLM generation, or tool execution outputs."""
+    if not exec_res or not exec_res.step_records:
+      # If a live generative LLM is configured (not Mock), generate a natural conversational answer
+      from models.provider import GeminiProvider
+
+      if isinstance(self.llm_provider, GeminiProvider):
+        try:
+          system_prompt = (
+              "You are Xeren Assistant, a helpful, highly capable personal AI automation assistant. "
+              "Engage in friendly, professional conversation. If the user is asking to perform an action "
+              "without specifying parameters (like a GitHub repo, file name, or command), explain what you need "
+              "with concrete examples (e.g. 'owner/repo' for GitHub, 'filename.py' for files)."
+          )
+          context_msgs = self.session_memory.get_context(session_id).messages
+          llm_resp = await self.llm_provider.generate(
+              messages=context_msgs or [LLMMessage(role="user", content=query)],
+              system_instruction=system_prompt,
+              temperature=0.7,
+          )
+          if llm_resp.text and len(llm_resp.text.strip()) > 0:
+            return llm_resp.text.strip()
+        except Exception:
+          pass
+
+      # Contextual smart guidance for offline / mock mode
+      q_lower = query.lower().strip()
+      if intent.intent_type == IntentType.CHAT or any(
+          kw in q_lower for kw in ["hi", "hello", "help", "can you help"]
+      ):
+        return (
+            "Hello! I am Xeren Assistant, your personal AI automation assistant.\n\n"
+            "Here is what I can do for you:\n"
+            "• 📁 **Files**: `list files`, `read file main.py`, `search files config`\n"
+            "• 🐙 **GitHub**: `check repo owner/repo`, `read issues on owner/repo`\n"
+            "• 🌐 **Web**: `search web latest python release`\n"
+            "• 📋 **Tasks**: `list tasks`, `create task Write documentation`\n"
+            "• 💻 **Terminal**: `run echo hello`\n\n"
+            "*(Tip: Set `GEMINI_API_KEY` in `.env` to enable full autonomous generative reasoning!)*"
+        )
+      elif intent.intent_type == IntentType.GITHUB:
+        return (
+            "To inspect or search a GitHub repository, please provide the repository name in `owner/repo` format.\n\n"
+            "**Examples**:\n"
+            "• `check repo octocat/Hello-World`\n"
+            "• `read issues on fastapi/fastapi`\n"
+            "• `get commits for pallets/flask`"
+        )
+      elif intent.intent_type == IntentType.FILESYSTEM:
+        return (
+            "To inspect or modify files in your workspace, please specify the target path.\n\n"
+            "**Examples**:\n"
+            "• `read file main.py`\n"
+            "• `list files`\n"
+            "• `search files test`"
+        )
+      elif intent.intent_type == IntentType.TASKS:
+        return (
+            "To manage your local tasks, try:\n\n"
+            "• `list tasks`\n"
+            "• `create task Implement feature X`\n"
+            "• `update task 1 status completed`"
+        )
+      return (
+          f"I received your request: '{query}'. To execute actions, specify a file, GitHub repository (`owner/repo`), web search, or task.\n\n"
+          "*(Configure `GEMINI_API_KEY` in `.env` to enable open-ended natural conversation).* "
+      )
+
+    lines = []
+    for record in exec_res.step_records:
+      action = record.action
+      if not record.success:
+        lines.append(
+            f"❌ **Failed {action.tool_name}:{action.operation}**:"
+            f" {record.error}"
+        )
+        continue
+
+      repaired_badge = " *(Self-Healed via Replanner)*" if record.was_repaired else ""
+      data = record.tool_result.data if record.tool_result else None
+
+      if action.tool_name == "filesystem":
+        if action.operation == "read_file":
+          lines.append(
+              f"📄 **Read File `{data.get('path')}`** ({data.get('size_bytes')} bytes){repaired_badge}:\n```\n{data.get('content', '')}\n```"
+          )
+        elif action.operation in ["write_file", "create_file"]:
+          backup_msg = (
+              f" (Backup: `{data.get('backup_created')}`)"
+              if data.get("backup_created")
+              else ""
+          )
+          lines.append(
+              f"✍️ **Saved File `{data.get('path')}`** ({data.get('bytes_written')} bytes written){backup_msg}{repaired_badge}"
+          )
+        elif action.operation == "list_dir":
+          entries_summary = ", ".join(
+              [
+                  f"{e['name']}{'/' if e['is_dir'] else ''}"
+                  for e in data.get("entries", [])[:15]
+              ]
+          )
+          lines.append(
+              f"📁 **Directory `{data.get('directory')}`**:"
+              f" {entries_summary or 'Empty directory'}{repaired_badge}"
+          )
+        elif action.operation == "search_files":
+          matches = data.get("matches", [])
+          lines.append(
+              f"🔍 **Found {len(matches)} matches for '{data.get('query')}'**{repaired_badge}:\n"
+              + "\n".join([f"- `{m}`" for m in matches[:10]])
+          )
+
+      elif action.tool_name == "github":
+        if action.operation == "read_issues":
+          issues = data if isinstance(data, list) else []
+          lines.append(f"🐙 **GitHub Open Issues ({len(issues)})**{repaired_badge}:")
+          for iss in issues[:5]:
+            lines.append(
+                f"- [#{iss.get('number')}] **{iss.get('title')}** (by"
+                f" @{iss.get('user')})"
+            )
+        elif action.operation == "create_issue":
+          lines.append(
+              f"🐙 **Created GitHub Issue #{data.get('issue_number')}**:"
+              f" [{data.get('title')}]({data.get('html_url')}){repaired_badge}"
+          )
+        elif action.operation == "create_pr":
+          lines.append(
+              f"🐙 **Created Pull Request #{data.get('pr_number')}**:"
+              f" [{data.get('title')}]({data.get('html_url')}) ({data.get('head')} -> {data.get('base')}){repaired_badge}"
+          )
+        elif action.operation == "get_repo":
+          lines.append(
+              f"🐙 **Repository {data.get('full_name')}**:"
+              f" ⭐ {data.get('stars')} stars | 🍴 {data.get('forks')} forks |"
+              f" 📌 {data.get('open_issues_count')} open issues\n> "
+              f" {data.get('description') or 'No description'}{repaired_badge}"
+          )
+
+      elif action.tool_name == "web_search":
+        results = data.get("results", []) if isinstance(data, dict) else []
+        lines.append(f"🌐 **Web Search Results for '{data.get('query')}'**{repaired_badge}:")
+        for r in results[:3]:
+          lines.append(f"- **[{r.get('title')}]({r.get('url')})**\n  {r.get('snippet')}")
+
+      elif action.tool_name == "tasks":
+        if action.operation == "create_task":
+          lines.append(
+              f"✅ **Created Task #{data.get('task_id')}**: '{data.get('title')}'"
+              f" (Priority: {data.get('priority')}){repaired_badge}"
+          )
+        elif action.operation == "list_tasks":
+          tasks = data if isinstance(data, list) else []
+          lines.append(f"📋 **Current Tasks ({len(tasks)})**{repaired_badge}:")
+          for t in tasks[:10]:
+            lines.append(
+                f"- [#{t.get('id')}] **[{t.get('status')}]** {t.get('title')}"
+                f" ({t.get('priority')})"
+            )
+
+      elif action.tool_name == "shell":
+        stdout = data.get("stdout", "").strip()
+        stderr = data.get("stderr", "").strip()
+        output_display = (
+            stdout or stderr or "(Command executed with no terminal output)"
+        )
+        lines.append(
+            f"💻 **Shell Command `{data.get('command')}`** (Exit"
+            f" {data.get('exit_code')}){repaired_badge}:\n```\n{output_display}\n```"
+        )
+
+      elif action.tool_name == "http":
+        body_display = (
+            str(data.get("body"))[:1000]
+            if data
+            else "(Empty response)"
+        )
+        lines.append(
+            f"🌐 **HTTP {action.operation.upper()} `{data.get('url')}`**"
+            f" [{data.get('status_code')}]{repaired_badge}:\n```\n{body_display}\n```"
+        )
+
+      elif action.tool_name == "subagent":
+        agent_name = data.get("subagent_name", "Subagent").capitalize()
+        findings = data.get("findings", "")
+        lines.append(
+            f"🤖 **{agent_name} Autonomous Report**"
+            f" ({action.operation}){repaired_badge}:\n{findings}"
+        )
+
+    return (
+        "\n\n".join(lines)
+        if lines
+        else "Execution finished with no output data."
+    )
+
+  async def process_request(
+      self,
+      query: str,
+      session_id: str = "default_session",
+      cancellation_token: Optional[CancellationToken] = None,
+  ) -> AssistantResponse:
+    """Executes the full assistant pipeline from prompt to trace recording."""
+    start_total_time = time.perf_counter()
+    trace_id = str(uuid.uuid4())
+
+    # 1. Update session memory with user prompt
+    self.session_memory.add_message("user", query, session_id=session_id)
+    self.session_storage.save_message(
+        session_id, LLMMessage(role="user", content=query)
+    )
+
+    # 2. Intent Understanding
+    intent = await self.intent_classifier.classify(query)
+
+    # 3. DAG Task Planning
+    task_graph = await self.planner.plan_dag(query, intent)
+
+    # 4. Concurrent DAG Controller Execution
+    exec_result: Optional[ExecutionResult] = None
+    tools_used: List[str] = []
+
+    if task_graph.actions:
+      exec_result = await self.controller.execute_task_graph(
+          task_graph, cancellation_token=cancellation_token, user_query=query
+      )
+      tools_used = [act.tool_name for act in task_graph.actions]
+
+    # 5. Response Formatting
+    success = exec_result.success if exec_result else True
+    error_msg = exec_result.error if exec_result else None
+    response_text = await self._format_response_text(
+        intent, exec_res=exec_result, query=query, session_id=session_id
+    )
+
+    # 6. Loop-2 Semantic Verification
+    step_results_dict = {}
+    if exec_result:
+      for r in exec_result.step_records:
+        if r.tool_result:
+          step_results_dict[r.action.action_id] = r.tool_result
+
+    semantic_verif = await self.verifier.verify_semantic_response(
+        user_prompt=query,
+        response_text=response_text,
+        tool_results=step_results_dict,
+    )
+
+    # 7. Save assistant message to memory & index into Semantic Long-Term Store
+    self.session_memory.add_message(
+        "assistant", response_text, session_id=session_id
+    )
+    self.session_storage.save_message(
+        session_id, LLMMessage(role="assistant", content=response_text)
+    )
+
+    if success and semantic_verif.verified and len(query.strip()) > 3:
+      try:
+        await self.semantic_memory.add_memory(
+            content=f"User Query: {query}\nResolution: {response_text[:500]}",
+            category="conversation_experience",
+            metadata={"intent": intent.intent_type.value, "trace_id": trace_id},
+        )
+      except Exception:
+        pass
+
+    elapsed_ms = (time.perf_counter() - start_total_time) * 1000
+
+    # 8. Record Analytics & Structured Trace
+    self.analytics_tracker.record_request(
+        intent_type=intent.intent_type.value,
+        success=success and semantic_verif.verified,
+        tools_used=tools_used,
+    )
+
+    trace_record = TraceRecord(
+        trace_id=trace_id,
+        user_request=query,
+        intent=intent.model_dump(),
+        plan=[act.model_dump() for act in task_graph.actions],
+        tool_executions=(
+            [r.model_dump() for r in exec_result.step_records]
+            if exec_result
+            else []
+        ),
+        verification_results=[semantic_verif.model_dump()],
+        final_response=response_text,
+        total_duration_ms=elapsed_ms,
+        success=success and semantic_verif.verified,
+        error=error_msg,
+    )
+    self.trace_logger.log_trace(trace_record)
+
+    return AssistantResponse(
+        query=query,
+        response_text=response_text,
+        intent=intent,
+        execution_result=exec_result,
+        semantic_verification=semantic_verif,
+        trace_id=trace_id,
+        duration_ms=elapsed_ms,
+        success=success and semantic_verif.verified,
+        error=error_msg,
+    )

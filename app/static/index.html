@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xeren Assistant — Enterprise AI Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --bg-glass: rgba(255, 255, 255, 0.03);
+      --border-glow: rgba(0, 240, 255, 0.2);
+      --border-card: rgba(255, 255, 255, 0.08);
+      --cyan-glow: #00f0ff;
+      --accent-purple: #7928ca;
+      --accent-pink: #ff0080;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(121, 40, 202, 0.18) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(0, 240, 255, 0.15) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.06) 0px, transparent 50%);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-card);
+      backdrop-filter: blur(12px);
+      background: rgba(9, 13, 22, 0.85);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand { display: flex; align-items: center; gap: 0.75rem; }
+
+    .brand-logo {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--cyan-glow), var(--accent-purple));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+      font-weight: 800; color: #000; font-size: 1.2rem;
+    }
+
+    .brand-title {
+      font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em;
+      background: linear-gradient(to right, #fff, var(--cyan-glow));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .brand-badge {
+      font-size: 0.75rem; padding: 3px 10px; border-radius: 20px;
+      background: rgba(0, 240, 255, 0.12); border: 1px solid rgba(0, 240, 255, 0.35);
+      color: var(--cyan-glow); font-weight: 600;
+    }
+
+    .nav-tabs {
+      display: flex; gap: 0.5rem; background: rgba(0, 0, 0, 0.4);
+      padding: 4px; border-radius: 12px; border: 1px solid var(--border-card);
+    }
+
+    .nav-tab {
+      padding: 6px 14px; border-radius: 8px; font-size: 0.85rem;
+      font-weight: 600; color: var(--text-muted); cursor: pointer;
+      border: none; background: transparent; transition: all 0.2s;
+    }
+
+    .nav-tab.active {
+      background: rgba(0, 240, 255, 0.15); color: var(--cyan-glow);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+    }
+
+    .nav-stats { display: flex; gap: 1.5rem; align-items: center; }
+
+    .stat-pill {
+      font-size: 0.85rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .stat-pill strong { color: #fff; }
+
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 10px var(--accent-emerald);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .container {
+      max-width: 1440px; margin: 0 auto; padding: 1.5rem; flex: 1;
+      display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; width: 100%;
+    }
+
+    .main-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg); padding: 1.25rem;
+      backdrop-filter: blur(16px); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      position: relative;
+    }
+
+    .card-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: #fff;
+    }
+
+    .chat-container { display: flex; flex-direction: column; height: 480px; }
+
+    .chat-messages {
+      flex: 1; overflow-y: auto; display: flex; flex-direction: column;
+      gap: 1rem; padding-right: 0.5rem;
+    }
+
+    .message {
+      padding: 1rem; border-radius: var(--radius-md); max-width: 90%;
+      font-size: 0.95rem; line-height: 1.5;
+    }
+
+    .message.user {
+      background: linear-gradient(135deg, rgba(121, 40, 202, 0.25), rgba(0, 240, 255, 0.2));
+      border: 1px solid rgba(0, 240, 255, 0.35); align-self: flex-end; border-bottom-right-radius: 2px;
+    }
+
+    .message.assistant {
+      background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-card);
+      align-self: flex-start; border-bottom-left-radius: 2px; width: 100%;
+    }
+
+    .message pre {
+      background: rgba(0, 0, 0, 0.45); padding: 0.75rem; border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; overflow-x: auto;
+      margin-top: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .chat-input-row { display: flex; gap: 0.75rem; margin-top: 1rem; }
+
+    .chat-input {
+      flex: 1; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-card);
+      border-radius: var(--radius-md); padding: 0.85rem 1.25rem; color: #fff;
+      font-family: inherit; font-size: 0.95rem; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .chat-input:focus {
+      border-color: var(--cyan-glow); box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+    }
+
+    .btn-send {
+      background: linear-gradient(135deg, var(--cyan-glow), var(--accent-purple));
+      color: #000; font-weight: 700; border: none; border-radius: var(--radius-md);
+      padding: 0 1.5rem; cursor: pointer; display: flex; align-items: center;
+      gap: 0.5rem; transition: transform 0.15s, opacity 0.15s;
+    }
+    .btn-send:hover { transform: translateY(-1px); opacity: 0.9; }
+
+    .dag-graph { display: flex; gap: 1rem; overflow-x: auto; padding: 0.75rem 0; }
+
+    .dag-node {
+      background: rgba(0, 0, 0, 0.5); border: 1px solid var(--border-card);
+      border-radius: var(--radius-md); padding: 0.9rem; min-width: 220px;
+      display: flex; flex-direction: column; gap: 0.4rem;
+    }
+    .dag-node.success { border-color: var(--accent-emerald); }
+
+    .node-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 600; }
+    .node-op { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--cyan-glow); }
+    .node-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 12px; text-transform: uppercase; font-weight: 700; }
+    .badge-allowed { background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); }
+    .badge-ask { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); }
+    .badge-denied { background: rgba(244, 63, 94, 0.2); color: var(--accent-rose); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .task-item {
+      padding: 0.75rem; background: rgba(0, 0, 0, 0.3); border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 0.5rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center; z-index: 100;
+    }
+
+    .modal {
+      background: #111827; border: 1px solid var(--accent-amber);
+      border-radius: var(--radius-lg); width: 90%; max-width: 600px;
+      padding: 1.5rem; box-shadow: 0 0 30px rgba(245, 158, 11, 0.25);
+    }
+    .modal-header { display: flex; align-items: center; gap: 0.5rem; color: var(--accent-amber); font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; }
+    .modal-diff {
+      background: #000; padding: 1rem; border-radius: 8px; font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem; max-height: 250px; overflow-y: auto; margin: 1rem 0; border: 1px solid rgba(255, 255, 255, 0.1); white-space: pre-wrap;
+    }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem; }
+
+    .btn { padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: none; }
+    .btn-approve { background: var(--accent-emerald); color: #000; }
+    .btn-reject { background: rgba(244, 63, 94, 0.2); border: 1px solid var(--accent-rose); color: var(--accent-rose); }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .flame-bar {
+      background: linear-gradient(90deg, var(--cyan-glow), var(--accent-purple));
+      height: 24px; border-radius: 4px; display: flex; align-items: center;
+      padding: 0 8px; font-size: 0.75rem; font-weight: 700; color: #000; margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-logo">X</div>
+      <div><div class="brand-title">Xeren Assistant</div></div>
+      <span class="brand-badge">Phase 5 Production Multi-Agent Swarm</span>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchTab('chat')">💬 Orchestrator & DAG</button>
+      <button class="nav-tab" onclick="switchTab('swarm')">🤖 Multi-Agent Swarm</button>
+      <button class="nav-tab" onclick="switchTab('memory')">🧠 Semantic Memory</button>
+      <button class="nav-tab" onclick="switchTab('jobs')">⏰ Cron & Scheduler</button>
+      <button class="nav-tab" onclick="switchTab('flamegraph')">📊 Trace Flamegraph</button>
+    </div>
+
+    <div class="nav-stats">
+      <div class="stat-pill"><div class="status-dot"></div><span>Status: <strong>Enterprise Live</strong></span></div>
+      <div class="stat-pill"><span>Success: <strong id="stat-success-rate">100%</strong></span></div>
+      <div class="stat-pill"><span>Queries: <strong id="stat-total-queries">0</strong></span></div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Tab 1: Chat & Live DAG -->
+    <div class="main-panel tab-content active" id="tab-chat">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">⚡ Execution Graph (DAG Wave Scheduler)</div>
+          <span class="stat-pill" id="dag-wave-info">Idle</span>
+        </div>
+        <div class="dag-graph" id="dag-graph-container">
+          <div class="dag-node"><div class="node-header"><span>Ready for Task</span><span class="node-badge badge-allowed">Ready</span></div><div class="node-op">Waiting for instruction...</div></div>
+        </div>
+      </div>
+
+      <div class="card chat-container">
+        <div class="card-header"><div class="card-title">💬 Interactive AI Orchestrator</div></div>
+        <div class="chat-messages" id="chat-messages">
+          <div class="message assistant">
+            👋 <strong>Welcome to Xeren Assistant Enterprise Phase 5!</strong><br>
+            Equipped with Autonomous Multi-Agent Swarm Collaboration, Background Scheduled Cron Jobs, Long-Term Memory, and Flamegraph Observability.
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <input type="text" id="chat-input" class="chat-input" placeholder="Ask Xeren to execute workflows, inspect repositories, or audit code..." autocomplete="off">
+          <button class="btn-send" id="btn-send" onclick="sendQuery()">Execute Plan ➔</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Autonomous Multi-Agent Swarm -->
+    <div class="main-panel tab-content" id="tab-swarm">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🤖 Multi-Agent Swarm Collaboration</div>
+          <button class="btn btn-approve" onclick="launchSwarm()">Launch Swarm ➔</button>
+        </div>
+        <div class="chat-input-row" style="margin-top: 0; margin-bottom: 1rem;">
+          <input type="text" id="swarm-input" class="chat-input" placeholder="Enter high-level engineering goal (e.g. Build SQLite connection pooler with retry exponential backoff)...">
+        </div>
+        <div id="swarm-timeline" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 480px; overflow-y: auto;">
+          <div style="color: var(--text-muted); font-size: 0.9rem;">Click 'Launch Swarm' above to coordinate Researcher, Coder, and Reviewer subagents in consensus loop.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Semantic Memory Explorer -->
+    <div class="main-panel tab-content" id="tab-memory">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🧠 Long-Term Semantic Memory Explorer</div>
+          <button class="btn" style="background: rgba(0, 240, 255, 0.15); color: var(--cyan-glow); border: 1px solid rgba(0,240,255,0.3);" onclick="loadMemories()">Search Memory</button>
+        </div>
+        <div class="chat-input-row" style="margin-top: 0; margin-bottom: 1rem;">
+          <input type="text" id="memory-search-input" class="chat-input" placeholder="Search episodic memories by semantic concept or keyword..." onkeyup="if(event.key==='Enter') loadMemories()">
+        </div>
+        <div id="memory-results" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 480px; overflow-y: auto;">
+          <div style="color: var(--text-muted); font-size: 0.9rem;">Type a query above to search past experiences.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Background Cron & Scheduler -->
+    <div class="main-panel tab-content" id="tab-jobs">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">⏰ Persistent Scheduled Background Jobs</div>
+          <button class="btn btn-approve" onclick="addSampleJob()">+ Schedule Repo Watcher</button>
+        </div>
+        <div id="jobs-list" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 480px; overflow-y: auto;">
+          <div style="color: var(--text-muted); font-size: 0.9rem;">Loading background jobs...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 5: Flamegraph Visualizer -->
+    <div class="main-panel tab-content" id="tab-flamegraph">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📊 Execution Latency Flamegraph</div>
+          <button class="btn" style="background: rgba(255,255,255,0.08); color: #fff;" onclick="loadFlamegraph()">Refresh Traces</button>
+        </div>
+        <div id="flamegraph-container" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 480px; overflow-y: auto;">
+          <div style="color: var(--text-muted); font-size: 0.9rem;">Execute queries in the chat tab to view latency breakdown.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side Panel (Telemetry & Tasks) -->
+    <div class="side-panel">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 Local Task Queue</div>
+          <button class="btn" style="background: rgba(255,255,255,0.08); color: #fff; padding: 4px 8px; font-size: 0.75rem;" onclick="loadTasks()">Refresh</button>
+        </div>
+        <div id="tasks-list" style="max-height: 240px; overflow-y: auto;">
+          <div style="color: var(--text-muted); font-size: 0.85rem;">Loading tasks...</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">🛠️ Tool & Swarm Ecosystem</div></div>
+        <div id="tools-list" style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.4rem;">
+          <div class="task-item"><span>🤖 Multi-Agent Swarm</span> <span class="node-badge badge-allowed">Consensus</span></div>
+          <div class="task-item"><span>⏰ Persistent Scheduler</span> <span class="node-badge badge-allowed">SQLite Cron</span></div>
+          <div class="task-item"><span>🧠 Semantic Memory</span> <span class="node-badge badge-allowed">Vector</span></div>
+          <div class="task-item"><span>💻 Sandboxed Shell</span> <span class="node-badge badge-ask">ASK Mode</span></div>
+          <div class="task-item"><span>📁 Filesystem</span> <span class="node-badge badge-allowed">Sandboxed</span></div>
+          <div class="task-item"><span>🐙 GitHub</span> <span class="node-badge badge-allowed">Read/Write</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Approval Modal -->
+  <div class="modal-overlay" id="approval-modal">
+    <div class="modal">
+      <div class="modal-header"><span>⚠️ Action Requires Human-In-The-Loop Approval</span></div>
+      <p id="modal-desc" style="font-size: 0.9rem; color: #d1d5db; margin-bottom: 0.5rem;"></p>
+      <div class="modal-diff" id="modal-diff"></div>
+      <div class="modal-actions">
+        <button class="btn btn-reject" onclick="resolveApproval(false)">Reject Action</button>
+        <button class="btn btn-approve" onclick="resolveApproval(true)">Approve & Execute</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentApprovalId = null;
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabName).classList.add('active');
+      event.target.classList.add('active');
+      if (tabName === 'memory') loadMemories();
+      if (tabName === 'jobs') loadJobs();
+      if (tabName === 'flamegraph') loadFlamegraph();
+    }
+
+    async function loadStats() {
+      try {
+        const res = await fetch('/health');
+        const data = await res.json();
+        if (data && data.analytics) {
+          document.getElementById('stat-success-rate').innerText = data.analytics.success_rate_percent + '%';
+          document.getElementById('stat-total-queries').innerText = data.analytics.total_requests;
+        }
+      } catch (e) {}
+    }
+
+    async function loadTasks() {
+      try {
+        const res = await fetch('/tasks');
+        const data = await res.json();
+        const container = document.getElementById('tasks-list');
+        if (data.tasks && data.tasks.length > 0) {
+          container.innerHTML = data.tasks.map(t => `
+            <div class="task-item">
+              <div><div class="task-title">#${t.id} ${t.title}</div><div class="task-meta">${t.priority} • ${t.status}</div></div>
+            </div>
+          `).join('');
+        } else {
+          container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem;">No tasks found.</div>';
+        }
+      } catch (e) {}
+    }
+
+    async function loadMemories() {
+      const q = document.getElementById('memory-search-input').value.trim();
+      const url = q ? `/memory/semantic?q=${encodeURIComponent(q)}` : '/memory/semantic';
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const container = document.getElementById('memory-results');
+        const items = data.results || data.memories || [];
+        if (items.length > 0) {
+          container.innerHTML = items.map(m => {
+            const mem = m.memory || m;
+            const scoreBadge = m.similarity_score ? `<span class="node-badge badge-allowed">${Math.round(m.similarity_score*100)}% Match</span>` : '';
+            return `
+              <div class="task-item" style="flex-direction: column; align-items: flex-start; gap: 0.4rem;">
+                <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                  <span style="font-size: 0.75rem; color: var(--cyan-glow); font-weight: 600;">[${mem.category}]</span>
+                  ${scoreBadge}
+                </div>
+                <div style="font-size: 0.85rem; color: #fff; white-space: pre-wrap;">${mem.content}</div>
+              </div>
+            `;
+          }).join('');
+        } else {
+          container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem;">No memory records found.</div>';
+        }
+      } catch (e) {}
+    }
+
+    async function loadJobs() {
+      try {
+        const res = await fetch('/jobs');
+        const data = await res.json();
+        const container = document.getElementById('jobs-list');
+        if (data.jobs && data.jobs.length > 0) {
+          container.innerHTML = data.jobs.map(j => `
+            <div class="task-item">
+              <div>
+                <div class="task-title">${j.name}</div>
+                <div class="task-meta">Interval: ${j.interval_seconds}s • Runs: ${j.run_count} • Status: ${j.is_active ? 'Active' : 'Paused'}</div>
+              </div>
+              <button class="btn" style="background: rgba(244,63,94,0.2); color: var(--accent-rose); font-size: 0.75rem;" onclick="deleteJob('${j.job_id}')">Cancel</button>
+            </div>
+          `).join('');
+        } else {
+          container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem;">No scheduled jobs running.</div>';
+        }
+      } catch (e) {}
+    }
+
+    async function addSampleJob() {
+      try {
+        await fetch('/jobs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: "Automated GitHub Sync & Integrity Check",
+            interval_seconds: 60,
+            action_type: "cron_sync"
+          })
+        });
+        loadJobs();
+      } catch (e) {}
+    }
+
+    async function deleteJob(id) {
+      try {
+        await fetch(`/jobs/${id}`, { method: 'DELETE' });
+        loadJobs();
+      } catch (e) {}
+    }
+
+    async function launchSwarm() {
+      const prompt = document.getElementById('swarm-input').value.trim();
+      if (!prompt) return;
+      const timeline = document.getElementById('swarm-timeline');
+      timeline.innerHTML = '<div style="color: var(--cyan-glow);">🤖 Swarm coordinator executing handoffs (Researcher ➔ Coder ➔ Reviewer)...</div>';
+
+      try {
+        const res = await fetch('/swarm/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: prompt })
+        });
+        const data = await res.json();
+
+        timeline.innerHTML = data.turns.map(t => `
+          <div class="task-item" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; width: 100%;">
+              <strong style="color: var(--cyan-glow);">Turn ${t.turn_index}: ${t.agent_name.toUpperCase()}</strong>
+              <span class="node-badge badge-allowed">${Math.round(t.duration_ms)}ms</span>
+            </div>
+            <div style="font-size: 0.85rem; color: #d1d5db; white-space: pre-wrap;">${t.output}</div>
+          </div>
+        `).join('') + `<div style="padding: 1rem; background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent-emerald); border-radius: 8px;"><strong>Consensus Final Artifact:</strong><br><pre>${data.final_artifact}</pre></div>`;
+      } catch (e) {
+        timeline.innerHTML = '<div style="color: var(--accent-rose);">❌ Swarm execution error: ' + e.message + '</div>';
+      }
+    }
+
+    async function loadFlamegraph() {
+      try {
+        const res = await fetch('/traces?limit=1');
+        const data = await res.json();
+        const container = document.getElementById('flamegraph-container');
+        if (data.traces && data.traces.length > 0) {
+          const t = data.traces[0];
+          const fgRes = await fetch(`/traces/${t.trace_id}/flamegraph`);
+          const fg = await fgRes.json();
+
+          container.innerHTML = `
+            <div style="margin-bottom: 0.75rem; font-size: 0.9rem; color: #fff;">Trace ID: <code>${t.trace_id}</code> (Total: ${Math.round(fg.duration_ms)}ms)</div>
+            ${fg.children.map(c => `
+              <div style="margin-bottom: 0.5rem;">
+                <div class="flame-bar" style="width: ${Math.max(15, c.percentage_of_total)}%;">
+                  ${c.name} — ${Math.round(c.duration_ms)}ms (${c.percentage_of_total}%)
+                </div>
+              </div>
+            `).join('')}
+          `;
+        } else {
+          container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem;">No traces recorded yet.</div>';
+        }
+      } catch (e) {}
+    }
+
+    function renderDAG(plan) {
+      const container = document.getElementById('dag-graph-container');
+      if (!plan || plan.length === 0) {
+        container.innerHTML = '<div class="dag-node"><div class="node-header"><span>No External Tools Needed</span></div><div class="node-op">Direct answer query</div></div>';
+        return;
+      }
+
+      container.innerHTML = plan.map((act, idx) => `
+        <div class="dag-node success" id="node-${act.action_id}">
+          <div class="node-header">
+            <span>Step ${idx+1}: ${act.tool_name}</span>
+            <span class="node-badge badge-${act.required_permission.toLowerCase()}">${act.required_permission}</span>
+          </div>
+          <div class="node-op">${act.operation}()</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">${act.reason || 'Executing action'}</div>
+        </div>
+      `).join('');
+    }
+
+    async function sendQuery() {
+      const input = document.getElementById('chat-input');
+      const query = input.value.trim();
+      if (!query) return;
+
+      input.value = '';
+      const chat = document.getElementById('chat-messages');
+
+      chat.innerHTML += `<div class="message user">${query}</div>`;
+      chat.scrollTop = chat.scrollHeight;
+
+      const loadingId = 'loading-' + Date.now();
+      chat.innerHTML += `<div class="message assistant" id="${loadingId}">⚡ <em>Generating DAG plan and executing workflow...</em></div>`;
+      chat.scrollTop = chat.scrollHeight;
+
+      try {
+        const res = await fetch('/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: query })
+        });
+        const data = await res.json();
+
+        document.getElementById(loadingId).remove();
+
+        if (data.execution_result && data.execution_result.step_records) {
+          renderDAG(data.execution_result.step_records.map(r => r.action));
+        }
+
+        chat.innerHTML += `<div class="message assistant">${data.response_text.replace(/\n/g, '<br>')}</div>`;
+        chat.scrollTop = chat.scrollHeight;
+
+        loadStats();
+        loadTasks();
+      } catch (e) {
+        document.getElementById(loadingId).innerText = "❌ Error executing query: " + e.message;
+      }
+    }
+
+    async function checkApprovals() {
+      try {
+        const res = await fetch('/approvals');
+        const data = await res.json();
+        if (data.pending_approvals && data.pending_approvals.length > 0) {
+          const req = data.pending_approvals[0];
+          currentApprovalId = req.approval_id;
+          document.getElementById('modal-desc').innerText = `Tool: ${req.tool_name} • Operation: ${req.operation} (${req.description})`;
+          document.getElementById('modal-diff').innerText = req.diff_preview || JSON.stringify(req.parameters, null, 2);
+          document.getElementById('approval-modal').style.display = 'flex';
+        } else {
+          document.getElementById('approval-modal').style.display = 'none';
+        }
+      } catch (e) {}
+    }
+
+    async function resolveApproval(approved) {
+      if (!currentApprovalId) return;
+      try {
+        await fetch(`/approvals/${currentApprovalId}/decision`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ decision: approved ? 'approve' : 'reject' })
+        });
+      } catch (e) {}
+      document.getElementById('approval-modal').style.display = 'none';
+      currentApprovalId = null;
+    }
+
+    document.getElementById('chat-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendQuery();
+    });
+
+    loadStats();
+    loadTasks();
+    setInterval(checkApprovals, 2000);
+  </script>
+</body>
+</html>

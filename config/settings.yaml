@@ -1,0 +1,21 @@
+# Default static configuration for Xeren Assistant (Phase 1)
+app:
+  name: "Xeren Assistant"
+  version: "0.1.0"
+  environment: "development"
+
+execution:
+  max_steps_per_task: 10
+  max_retries_per_step: 2
+  task_timeout_seconds: 60.0
+  tool_timeout_seconds: 10.0
+
+security:
+  strict_path_containment: true
+  block_deletions: true
+  redact_secrets_in_logs: true
+
+storage:
+  db_path: "data/xeren.sqlite"
+  traces_dir: "traces"
+  preferences_path: "config/preferences.yaml"

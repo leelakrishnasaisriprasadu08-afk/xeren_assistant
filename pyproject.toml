@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xeren-assistant"
+version = "0.1.0"
+description = "Personal AI Automation Assistant - Phase 1 Foundational Core"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Xeren Team" }
+]
+dependencies = [
+    "pydantic>=2.7.0",
+    "pydantic-settings>=2.2.0",
+    "fastapi>=0.111.0",
+    "uvicorn>=0.30.0",
+    "rich>=13.7.0",
+    "pyyaml>=6.0.1",
+    "python-dotenv>=1.0.1",
+    "google-genai>=0.1.1",
+    "requests>=2.32.0",
+    "duckduckgo-search>=6.1.0",
+]
+
+[project.scripts]
+xeren = "main:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
