@@ -13,6 +13,7 @@ from security.trust_boundary import TrustBoundary
 from .base import Action, BaseTool, ToolResult
 from .browser_tool import BrowserTool
 from .codebase_tool import CodebaseTool
+from .communication_tool import CommunicationTool
 from .device_tool import DeviceTool
 from .filesystem_tool import FilesystemTool
 from .github_tool import GitHubTool
@@ -172,5 +173,6 @@ def get_default_registry(settings: Optional[Settings] = None) -> ToolRegistry:
   registry.register_tool(DeviceTool())
   registry.register_tool(BrowserTool())
   registry.register_tool(VisionTool())
+  registry.register_tool(CommunicationTool(client_store=None))
 
   return registry

@@ -18,6 +18,7 @@ class IntentType(str, Enum):
   SCHEDULE = "schedule"
   VISION = "vision"
   BROWSER = "browser"
+  CLIENT = "client"
   COMPOSITE = "composite"
 
 
@@ -40,6 +41,42 @@ class IntentClassifier:
   def _classify_rules(self, query: str) -> Optional[Intent]:
     """Fast deterministic rule-based classifier."""
     q = query.lower().strip()
+
+    # Client Outreach & Communications
+    if any(
+        kw in q
+        for kw in [
+            "draft reply to client",
+            "reply to client",
+            "client reply",
+            "draft client email",
+            "send client email",
+            "send email to client",
+            "client inquiry",
+            "client thread",
+            "list client threads",
+            "show client messages",
+            "client profile",
+            "create client",
+            "client message",
+            "draft to client",
+        ]
+    ):
+      client_name_match = re.search(
+          r'(?:to client|for client|client)\s+([a-zA-Z0-9_\-]+)',
+          query,
+          re.IGNORECASE,
+      )
+      entities = {}
+      if client_name_match and client_name_match.group(1).lower() not in ["email", "thread", "message", "reply", "profile"]:
+        entities["client_name"] = client_name_match.group(1)
+      return Intent(
+          intent_type=IntentType.CLIENT,
+          confidence=0.95,
+          primary_tool="communication",
+          entities=entities,
+          summary="Client communication, outreach drafting, or CRM operation",
+      )
 
     # Vision & Screen Understanding
     if any(

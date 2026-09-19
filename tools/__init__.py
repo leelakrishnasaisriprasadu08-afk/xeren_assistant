@@ -3,6 +3,7 @@
 from .base import Action, BaseTool, ToolResult
 from .browser_tool import BrowserTool
 from .codebase_tool import CodebaseTool
+from .communication_tool import CommunicationTool
 from .device_tool import DeviceTool
 from .filesystem_tool import FilesystemTool
 from .github_tool import GitHubTool
@@ -22,6 +23,8 @@ __all__ = [
     "ToolRegistry",
     "get_default_registry",
     "BrowserTool",
+    "CodebaseTool",
+    "CommunicationTool",
     "DeviceTool",
     "FilesystemTool",
     "GitHubTool",
@@ -30,9 +33,9 @@ __all__ = [
     "ShellTool",
     "HTTPTool",
     "SubagentTool",
-    "CodebaseTool",
     "PatchTool",
     "VisionTool",
 ]
+
 
 

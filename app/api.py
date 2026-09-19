@@ -36,6 +36,35 @@ class HealthResponse(BaseModel):
   analytics: Dict[str, Any]
 
 
+class ClientDraftRequest(BaseModel):
+  client_id: Optional[str] = None
+  thread_id: Optional[str] = None
+  incoming_message: str = Field(description="Client question or inquiry")
+  sender: Optional[str] = Field(default="Client", description="Sender name or email")
+  task_context: Optional[str] = None
+  style: Optional[str] = Field(default="professional", description="Tone style: professional, technical, empathetic, concise")
+  include_git_status: Optional[bool] = False
+
+
+class ClientSendRequest(BaseModel):
+  channel: str = Field(default="email", description="Channel: 'email' or 'webhook'")
+  to: Optional[str] = None
+  subject: Optional[str] = None
+  body: Optional[str] = None
+  thread_id: Optional[str] = None
+  client_id: Optional[str] = None
+  url: Optional[str] = None
+  payload: Optional[Dict[str, Any]] = None
+
+
+class ClientCreateRequest(BaseModel):
+  name: str
+  email: str
+  company: Optional[str] = None
+  communication_tone: Optional[str] = "professional"
+  notes: Optional[str] = None
+
+
 def create_app(assistant: Optional[XerenAssistant] = None) -> FastAPI:
   """Factory creating FastAPI application with injected XerenAssistant instance and approval hooks."""
   app = FastAPI(
@@ -449,6 +478,101 @@ def create_app(assistant: Optional[XerenAssistant] = None) -> FastAPI:
       raise HTTPException(status_code=500, detail=res.error or "Content extraction failed.")
     return res.data
 
+  @app.post("/client/draft")
+  async def client_draft_endpoint(req: ClientDraftRequest):
+    """Generates an intelligent, context-grounded response for client outreach."""
+    comm_tool = _assistant.tool_registry.get_tool("communication")
+    if not comm_tool:
+      raise HTTPException(status_code=500, detail="CommunicationTool not registered.")
+    from tools.base import Action
+    res = await comm_tool.execute(Action(
+        action_id="client_draft",
+        tool_name="communication",
+        operation="draft_client_reply",
+        parameters=req.model_dump()
+    ))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to draft client reply.")
+    return res.data
+
+  @app.post("/client/send")
+  async def client_send_endpoint(req: ClientSendRequest):
+    """Dispatches client communication via email or webhook (requires permission approval)."""
+    comm_tool = _assistant.tool_registry.get_tool("communication")
+    if not comm_tool:
+      raise HTTPException(status_code=500, detail="CommunicationTool not registered.")
+    from tools.base import Action
+    if req.channel == "webhook":
+      op = "send_webhook"
+      params = {"url": req.url, "payload": req.payload or {"subject": req.subject, "body": req.body}}
+    else:
+      op = "send_email"
+      params = {"to": req.to, "subject": req.subject, "body": req.body, "thread_id": req.thread_id, "client_id": req.client_id}
+    res = await comm_tool.execute(Action(
+        action_id="client_send",
+        tool_name="communication",
+        operation=op,
+        parameters=params
+    ))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to send client message.")
+    return res.data
+
+  @app.get("/client/threads")
+  async def list_client_threads_endpoint(client_id: Optional[str] = None):
+    """Lists client interaction threads."""
+    comm_tool = _assistant.tool_registry.get_tool("communication")
+    if not comm_tool:
+      raise HTTPException(status_code=500, detail="CommunicationTool not registered.")
+    from tools.base import Action
+    res = await comm_tool.execute(Action(
+        action_id="client_threads",
+        tool_name="communication",
+        operation="list_client_threads",
+        parameters={"client_id": client_id} if client_id else {}
+    ))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to list threads.")
+    return res.data
+
+  @app.get("/client/profiles")
+  async def get_client_profile_endpoint(client_id: Optional[str] = None, email: Optional[str] = None):
+    """Retrieves client profile and communication preferences."""
+    comm_tool = _assistant.tool_registry.get_tool("communication")
+    if not comm_tool:
+      raise HTTPException(status_code=500, detail="CommunicationTool not registered.")
+    from tools.base import Action
+    params = {}
+    if client_id:
+      params["client_id"] = client_id
+    if email:
+      params["email"] = email
+    res = await comm_tool.execute(Action(
+        action_id="client_profile",
+        tool_name="communication",
+        operation="get_client_profile",
+        parameters=params
+    ))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to get client profile.")
+    return res.data
+
+  @app.post("/client/create")
+  async def create_client_endpoint(req: ClientCreateRequest):
+    """Registers a new client profile with tone and company preferences."""
+    comm_tool = _assistant.tool_registry.get_tool("communication")
+    if not comm_tool:
+      raise HTTPException(status_code=500, detail="CommunicationTool not registered.")
+    from tools.base import Action
+    res = await comm_tool.execute(Action(
+        action_id="client_create",
+        tool_name="communication",
+        operation="create_client",
+        parameters=req.model_dump()
+    ))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to create client.")
+    return res.data
 
   @app.get("/traces")
   async def list_traces(limit: int = 20):

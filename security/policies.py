@@ -487,6 +487,51 @@ OPERATION_POLICIES: Dict[Tuple[str, str], OperationPolicy] = {
         risk_level=RiskLevel.LOW,
         description="Capture visual snapshot of web page",
     ),
+    # Client Communication operations
+    ("communication", "draft_client_reply"): OperationPolicy(
+        tool_name="communication",
+        operation="draft_client_reply",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Draft a context-grounded client response",
+    ),
+    ("communication", "list_client_threads"): OperationPolicy(
+        tool_name="communication",
+        operation="list_client_threads",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="List open client inquiry threads and drafts",
+    ),
+    ("communication", "get_client_profile"): OperationPolicy(
+        tool_name="communication",
+        operation="get_client_profile",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Retrieve client CRM record and contact information",
+    ),
+    ("communication", "create_client"): OperationPolicy(
+        tool_name="communication",
+        operation="create_client",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Register a new client profile in CRM",
+    ),
+    ("communication", "send_email"): OperationPolicy(
+        tool_name="communication",
+        operation="send_email",
+        permission_level=PermissionLevel.ASK,
+        risk_level=RiskLevel.HIGH,
+        description="Send an outbound email to a client",
+        requires_user_approval=True,
+    ),
+    ("communication", "send_webhook"): OperationPolicy(
+        tool_name="communication",
+        operation="send_webhook",
+        permission_level=PermissionLevel.ASK,
+        risk_level=RiskLevel.MEDIUM,
+        description="Dispatch a message to an external client webhook",
+        requires_user_approval=True,
+    ),
 }
 
 

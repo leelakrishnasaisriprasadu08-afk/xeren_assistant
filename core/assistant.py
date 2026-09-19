@@ -68,10 +68,14 @@ class XerenAssistant:
           )
       )
 
-    # Ensure VisionTool uses configured llm_provider
+    # Ensure VisionTool and CommunicationTool use configured llm_provider
     vis_tool = self.tool_registry.get_tool("vision")
     if vis_tool and hasattr(vis_tool, "agent"):
       vis_tool.agent.llm_provider = self.llm_provider
+
+    comm_tool = self.tool_registry.get_tool("communication")
+    if comm_tool and hasattr(comm_tool, "agent"):
+      comm_tool.agent.llm_provider = self.llm_provider
 
 
     self.intent_classifier = intent_classifier or IntentClassifier(
@@ -424,6 +428,50 @@ class XerenAssistant:
           results = data.get("results", [])
           res_lines = "\n".join([f"- **[{r.get('title')}]({r.get('url')})**" for r in results[:5]])
           lines.append(f"🔎 **Browser Search Results for '{data.get('query')}'**{repaired_badge}:\n\n{res_lines}")
+
+      elif action.tool_name == "communication":
+        if action.operation == "draft_client_reply":
+          draft_obj = data.get("draft", {}) if isinstance(data, dict) else {}
+          if not isinstance(draft_obj, dict):
+            draft_obj = {"body": str(draft_obj), "recipient": "Client", "subject": "Update", "style": "professional"}
+          recipient = draft_obj.get("recipient") or (data.get("recipient") if isinstance(data, dict) else None) or "Client"
+          subject = draft_obj.get("subject") or (data.get("subject") if isinstance(data, dict) else None) or "Update"
+          style = draft_obj.get("style") or draft_obj.get("persona") or "professional"
+          body = draft_obj.get("body") or draft_obj.get("draft") or str(draft_obj)
+          conf = draft_obj.get("confidence_score", 0.95)
+          lines.append(
+              f"✉️ **Client Reply Drafted**{repaired_badge}:\n"
+              f"**To**: `{recipient}`\n"
+              f"**Subject**: {subject}\n"
+              f"**Style**: `{style}`\n\n"
+              f"```markdown\n{body}\n```\n\n"
+              f"*(Confidence: {conf:.2f})*"
+          )
+        elif action.operation == "send_email":
+          lines.append(
+              f"📧 **Email Dispatched**{repaired_badge} to `{data.get('to')}`: "
+              f"*{data.get('subject')}* (Message ID: `{data.get('message_id')}`)"
+          )
+        elif action.operation == "send_webhook":
+          lines.append(
+              f"🔗 **Webhook Fired**{repaired_badge} to `{data.get('url')}`: Status {data.get('status_code')}"
+          )
+        elif action.operation == "list_client_threads":
+          threads = data.get("threads", []) if isinstance(data, dict) else []
+          t_lines = "\n".join([f"- **Thread `{t.get('thread_id')}`** ({t.get('status')}): {t.get('subject')}" for t in threads[:5]])
+          lines.append(f"💬 **Client Threads ({len(threads)})**{repaired_badge}:\n{t_lines or '- No active threads'}")
+        elif action.operation == "get_client_profile":
+          client = data.get("client") or {} if isinstance(data, dict) else {}
+          lines.append(
+              f"👤 **Client Profile**{repaired_badge}: **{client.get('name')}** (`{client.get('client_id')}`)\n"
+              f"- **Email**: `{client.get('email')}`\n"
+              f"- **Company**: {client.get('company')}\n"
+              f"- **Default Tone**: `{client.get('communication_tone')}`"
+          )
+        elif action.operation == "create_client":
+          lines.append(
+              f"✅ **Client Registered**{repaired_badge}: **{data.get('name')}** (`{data.get('client_id')}`) - `{data.get('email')}`"
+          )
 
 
 

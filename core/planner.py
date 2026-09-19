@@ -498,6 +498,63 @@ class TaskPlanner:
         )
         return graph
 
+    # Client Communications & Outreach Plan
+    if intent.intent_type == IntentType.CLIENT:
+      if any(kw in q.lower() for kw in ["list client threads", "show client threads", "client threads"]):
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="communication",
+                operation="list_client_threads",
+                parameters={},
+                reason="Retrieve active client inquiry threads and drafts",
+            )
+        )
+        return graph
+
+      elif any(kw in q.lower() for kw in ["client profile", "get client", "lookup client"]):
+        client_name = intent.entities.get("client_name") or "Client"
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="communication",
+                operation="get_client_profile",
+                parameters={"name": client_name},
+                reason=f"Look up client profile for '{client_name}'",
+            )
+        )
+        return graph
+
+      elif any(kw in q.lower() for kw in ["create client", "add client", "new client"]):
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="communication",
+                operation="create_client",
+                parameters={"name": intent.entities.get("client_name", "New Client"), "email": "client@example.com"},
+                reason="Register new client profile",
+            )
+        )
+        return graph
+
+      else:
+        client_name = intent.entities.get("client_name") or "Client"
+        persona = "technical" if "technical" in q.lower() else ("concise" if "concise" in q.lower() else "professional")
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="communication",
+                operation="draft_client_reply",
+                parameters={
+                    "client_name": client_name,
+                    "inquiry": q,
+                    "persona": persona,
+                },
+                reason=f"Draft tailored client response for '{client_name}' ({persona} tone)",
+            )
+        )
+        return graph
+
     # Task Scheduling Plan
     if intent.intent_type == IntentType.SCHEDULE:
       graph.add_action(
@@ -573,7 +630,9 @@ class TaskPlanner:
             " list_windows, lock_screen, mute_volume, set_volume),"
             " vision (analyze_screen, extract_screen_text, inspect_image_file),"
             " browser (navigate_url, extract_page_content, search_and_summarize,"
-            " capture_page_screenshot)."
+            " capture_page_screenshot),"
+            " communication (draft_client_reply, send_email, send_webhook,"
+            " list_client_threads, get_client_profile, create_client)."
             " Return a JSON array of Action objects with keys: action_id,"
             " tool_name, operation, parameters, reason, timeout, depends_on."
         )
