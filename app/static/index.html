@@ -269,19 +269,6 @@
     .step-title { font-size: 0.85rem; font-weight: 600; color: #fff; display: flex; justify-content: space-between; }
     .step-desc { font-size: 0.75rem; color: var(--text-muted); }
     .step-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--cyan-glow); }
-
-    /* Capability Radar */
-    .capability-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
-    }
-
-    .cap-item {
-      background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 8px; padding: 0.6rem 0.75rem; display: flex; flex-direction: column; gap: 0.2rem;
-    }
-    .cap-name { font-size: 0.78rem; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 0.35rem; }
-    .cap-desc { font-size: 0.68rem; color: var(--text-muted); }
-
     /* Telemetry Stream Log */
     .telemetry-box {
       background: #000; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px;
@@ -443,50 +430,16 @@
         </div>
       </div>
 
-      <!-- 3. Autonomous Capabilities Matrix (What Xeren Can Do) -->
-      <div class="card">
+      <!-- 3. Inside Process Live Telemetry -->
+      <div class="card" style="flex: 1; display: flex; flex-direction: column;">
         <div class="card-header">
-          <div class="card-title">🛠️ Active Autonomous Capabilities</div>
+          <div class="card-title">📡 Inside Process Live Telemetry</div>
+          <span style="font-size: 0.72rem; color: var(--cyan-glow);">REAL-TIME</span>
         </div>
-        <div class="capability-grid">
-          <div class="cap-item">
-            <div class="cap-name">🤖 Multi-Agent Swarm</div>
-            <div class="cap-desc">Autonomous debate & consensus</div>
-          </div>
-          <div class="cap-item">
-            <div class="cap-name">💻 AST Patch Engine</div>
-            <div class="cap-desc">Surgical diffs & self-healing</div>
-          </div>
-          <div class="cap-item">
-            <div class="cap-name">👁️ Screen Vision & OCR</div>
-            <div class="cap-desc">Desktop capture & UI reading</div>
-          </div>
-          <div class="cap-item">
-            <div class="cap-name">🌐 Web Crawler</div>
-            <div class="cap-desc">Headless navigation & search</div>
-          </div>
-          <div class="cap-item">
-            <div class="cap-name">✉️ Client CRM Liaison</div>
-            <div class="cap-desc">Multi-persona email & webhooks</div>
-          </div>
-          <div class="cap-item">
-            <div class="cap-name">⏰ Background Cron</div>
-            <div class="cap-desc">Persistent SQLite scheduler</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 4. Inside Process Live Telemetry -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">📡 Inside Process Telemetry</div>
-          <span style="font-size: 0.72rem; color: var(--cyan-glow);">LIVE</span>
-        </div>
-        <div class="telemetry-box" id="telemetry-stream">
+        <div class="telemetry-box" id="telemetry-stream" style="flex: 1; min-height: 240px; max-height: 380px;">
           <div>[SYSTEM] Xeren Autonomous Engine initialized.</div>
-          <div>[SECURITY] Risk gate loaded with ASK / ALLOWED policies.</div>
-          <div>[READY] Awaiting instructions.</div>
-        </div>
+          <div>[SECURITY] Risk gate active (ASK & ALLOWED policies enforced).</div>
+          <div>[READY] Awaiting prompt to begin autonomous execution.</div>
       </div>
 
     </aside>
