@@ -47,6 +47,33 @@ def main():
   )
   run_parser.add_argument("query", type=str, help="Instruction or query to run")
 
+  # Daemon mode
+  daemon_parser = subparsers.add_parser(
+      "daemon",
+      help=(
+          "Start background desktop daemon, system tray, and global hotkey"
+          " listener"
+      ),
+  )
+  daemon_parser.add_argument(
+      "--host", default="127.0.0.1", help="Host interface to bind"
+  )
+  daemon_parser.add_argument(
+      "--port", type=int, default=8000, help="Port to listen on"
+  )
+  daemon_parser.add_argument(
+      "--no-server",
+      action="store_true",
+      help="Do not start web server in daemon thread",
+  )
+
+  # Notify command
+  notify_parser = subparsers.add_parser(
+      "notify", help="Dispatch a desktop toast notification"
+  )
+  notify_parser.add_argument("title", type=str, help="Notification title")
+  notify_parser.add_argument("message", type=str, help="Notification message")
+
   args = parser.parse_args()
 
   # Default to CLI if no subcommand provided
@@ -54,6 +81,31 @@ def main():
     assistant = XerenAssistant()
     cli = XerenCLI(assistant)
     asyncio.run(cli.run_interactive())
+
+  elif args.command == "daemon":
+    import time
+    from desktop.daemon import DesktopDaemon
+
+    daemon = DesktopDaemon(host=args.host, port=args.port)
+    print(
+        f"Starting Xeren Desktop Daemon (Tray, Hotkeys, Dashboard:"
+        f" http://{args.host}:{args.port})"
+    )
+    status = daemon.start(run_server=not args.no_server)
+    print(f"Daemon Status: {status}")
+    try:
+      while True:
+        time.sleep(1)
+    except KeyboardInterrupt:
+      print("Stopping Desktop Daemon...")
+      daemon.stop()
+
+  elif args.command == "notify":
+    from desktop.notifications import DesktopNotifier
+
+    notifier = DesktopNotifier.get_instance()
+    notifier.notify(title=args.title, message=args.message)
+    print(f"Notification sent: {args.title} — {args.message}")
 
   elif args.command == "api":
     app = create_app()
