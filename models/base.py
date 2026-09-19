@@ -42,3 +42,17 @@ class BaseLLMProvider(ABC):
   ) -> LLMResponse:
     """Generates a completion from the LLM given conversation messages."""
     pass
+
+  async def generate_vision(
+      self,
+      prompt: str,
+      image_bytes: bytes,
+      mime_type: str = "image/png",
+      system_instruction: Optional[str] = None,
+  ) -> LLMResponse:
+    """Generates a multimodal visual completion from an image and text prompt."""
+    return await self.generate(
+        messages=[LLMMessage(role="user", content=f"[Image Analysis Request]\n{prompt}")],
+        system_instruction=system_instruction,
+    )
+

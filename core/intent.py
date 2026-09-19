@@ -16,6 +16,8 @@ class IntentType(str, Enum):
   TASKS = "tasks"
   DEVICE = "device"
   SCHEDULE = "schedule"
+  VISION = "vision"
+  BROWSER = "browser"
   COMPOSITE = "composite"
 
 
@@ -38,6 +40,51 @@ class IntentClassifier:
   def _classify_rules(self, query: str) -> Optional[Intent]:
     """Fast deterministic rule-based classifier."""
     q = query.lower().strip()
+
+    # Vision & Screen Understanding
+    if any(
+        kw in q
+        for kw in [
+            "look at my screen",
+            "see my screen",
+            "analyze my screen",
+            "analyze screen",
+            "what is on my screen",
+            "what's on my screen",
+            "what is open on my screen",
+            "explain my screen",
+            "explain what is on screen",
+            "read screen text",
+            "extract screen text",
+            "diagnose screen error",
+            "inspect image",
+            "analyze image",
+            "what is in this image",
+        ]
+    ):
+      return Intent(
+          intent_type=IntentType.VISION,
+          confidence=0.95,
+          primary_tool="vision",
+          summary="Multi-modal screen vision or visual image understanding",
+      )
+
+    # Browser & Web Scraping
+    if (
+        any(kw in q for kw in ["browse to", "navigate to", "extract article from", "scrape webpage", "read webpage", "open url"])
+        or (any(proto in q for proto in ["http://", "https://"]) and any(action in q for action in ["extract", "read", "summarize", "scrape", "headings"]))
+    ):
+      url_match = re.search(r'(https?://[^\s\'"]+)', query)
+      entities = {}
+      if url_match:
+        entities["url"] = url_match.group(1)
+      return Intent(
+          intent_type=IntentType.BROWSER,
+          confidence=0.95,
+          primary_tool="browser",
+          entities=entities,
+          summary="Autonomous browser web navigation and content extraction",
+      )
 
     # Schedule detection (e.g. "schedule health check every 5 minutes", "list schedules")
     if any(

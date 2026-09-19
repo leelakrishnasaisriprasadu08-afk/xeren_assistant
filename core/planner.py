@@ -430,6 +430,74 @@ class TaskPlanner:
         )
         return graph
 
+    # Vision & Screen Analysis Plan
+    if intent.intent_type == IntentType.VISION:
+      if any(kw in q.lower() for kw in ["extract text", "read text", "read error", "diagnose error", "ocr"]):
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="vision",
+                operation="extract_screen_text",
+                parameters={},
+                reason="Extract all visible text, logs, and error dialogs from active screen",
+            )
+        )
+        return graph
+      else:
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="vision",
+                operation="analyze_screen",
+                parameters={"prompt": q},
+                reason=f"Analyze active screen with visual multimodal model for query: '{q}'",
+            )
+        )
+        return graph
+
+    # Browser & Autonomous Web Crawling Plan
+    if intent.intent_type == IntentType.BROWSER:
+      target_url = intent.entities.get("url")
+      if not target_url:
+        url_match = re.search(r'(https?://[^\s\'"]+)', q)
+        if url_match:
+          target_url = url_match.group(1)
+
+      if target_url:
+        if any(kw in q.lower() for kw in ["extract", "scrape", "article", "full text"]):
+          graph.add_action(
+              self.create_action(
+                  action_id="act_01",
+                  tool_name="browser",
+                  operation="extract_page_content",
+                  parameters={"url": target_url},
+                  reason=f"Extract structured article text and headings from '{target_url}'",
+              )
+          )
+          return graph
+        else:
+          graph.add_action(
+              self.create_action(
+                  action_id="act_01",
+                  tool_name="browser",
+                  operation="navigate_url",
+                  parameters={"url": target_url},
+                  reason=f"Navigate to '{target_url}' and inspect page structure",
+              )
+          )
+          return graph
+      else:
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="browser",
+                operation="search_and_summarize",
+                parameters={"query": q},
+                reason=f"Perform autonomous web research and extraction for '{q}'",
+            )
+        )
+        return graph
+
     # Task Scheduling Plan
     if intent.intent_type == IntentType.SCHEDULE:
       graph.add_action(
@@ -502,7 +570,10 @@ class TaskPlanner:
             " apply_patch), device (get_system_info, list_processes,"
             " kill_process, launch_app, open_path_or_url, get_clipboard,"
             " set_clipboard, capture_screenshot, get_active_window,"
-            " list_windows, lock_screen, mute_volume, set_volume)."
+            " list_windows, lock_screen, mute_volume, set_volume),"
+            " vision (analyze_screen, extract_screen_text, inspect_image_file),"
+            " browser (navigate_url, extract_page_content, search_and_summarize,"
+            " capture_page_screenshot)."
             " Return a JSON array of Action objects with keys: action_id,"
             " tool_name, operation, parameters, reason, timeout, depends_on."
         )

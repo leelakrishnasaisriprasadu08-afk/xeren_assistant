@@ -11,6 +11,7 @@ from security.permission_gate import (
 from security.policies import OperationPolicy, PermissionLevel, RiskLevel, get_operation_policy
 from security.trust_boundary import TrustBoundary
 from .base import Action, BaseTool, ToolResult
+from .browser_tool import BrowserTool
 from .codebase_tool import CodebaseTool
 from .device_tool import DeviceTool
 from .filesystem_tool import FilesystemTool
@@ -19,6 +20,7 @@ from .http_tool import HTTPTool
 from .patch_tool import PatchTool
 from .shell_tool import ShellTool
 from .task_tool import TaskTool
+from .vision_tool import VisionTool
 from .web_search_tool import WebSearchTool
 
 
@@ -168,5 +170,7 @@ def get_default_registry(settings: Optional[Settings] = None) -> ToolRegistry:
   registry.register_tool(CodebaseTool())
   registry.register_tool(PatchTool())
   registry.register_tool(DeviceTool())
+  registry.register_tool(BrowserTool())
+  registry.register_tool(VisionTool())
 
   return registry

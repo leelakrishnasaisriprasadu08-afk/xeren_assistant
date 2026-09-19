@@ -68,6 +68,12 @@ class XerenAssistant:
           )
       )
 
+    # Ensure VisionTool uses configured llm_provider
+    vis_tool = self.tool_registry.get_tool("vision")
+    if vis_tool and hasattr(vis_tool, "agent"):
+      vis_tool.agent.llm_provider = self.llm_provider
+
+
     self.intent_classifier = intent_classifier or IntentClassifier(
         llm_provider=self.llm_provider
     )
@@ -389,6 +395,36 @@ class XerenAssistant:
 
         elif action.operation == "open_path_or_url":
           lines.append(f"🔗 **Opened Target**{repaired_badge}: `{data.get('target')}`")
+
+      elif action.tool_name == "vision":
+        analysis_text = data.get("analysis", "") if isinstance(data, dict) else str(data)
+        src_path = data.get("screenshot_path") if isinstance(data, dict) else ""
+        lines.append(
+            f"👁️ **Multimodal Screen Vision Analysis**{repaired_badge}:\n{analysis_text}\n\n"
+            f"*(Snapshot: `{src_path}`)*"
+            if src_path
+            else f"👁️ **Multimodal Screen Vision Analysis**{repaired_badge}:\n{analysis_text}"
+        )
+
+      elif action.tool_name == "browser":
+        if action.operation == "navigate_url":
+          headings_list = data.get("headings", [])
+          h_str = "\n".join([f"- **{h.get('level')}**: {h.get('text')}" for h in headings_list[:5]])
+          lines.append(
+              f"🌐 **Web Page Navigated**{repaired_badge}: [{data.get('title')}]({data.get('url')})\n\n"
+              f"**Key Headings**:\n{h_str or '- None'}\n\n"
+              f"**Page Summary**:\n> {data.get('content_snippet', '')[:500]}"
+          )
+        elif action.operation == "extract_page_content":
+          lines.append(
+              f"📄 **Extracted Page Content**{repaired_badge}: [{data.get('title')}]({data.get('url')}) ({data.get('word_count')} words)\n\n"
+              f"{data.get('text_content', '')[:1200]}"
+          )
+        elif action.operation == "search_and_summarize":
+          results = data.get("results", [])
+          res_lines = "\n".join([f"- **[{r.get('title')}]({r.get('url')})**" for r in results[:5]])
+          lines.append(f"🔎 **Browser Search Results for '{data.get('query')}'**{repaired_badge}:\n\n{res_lines}")
+
 
 
     return (

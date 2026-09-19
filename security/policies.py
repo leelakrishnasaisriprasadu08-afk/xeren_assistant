@@ -436,6 +436,57 @@ OPERATION_POLICIES: Dict[Tuple[str, str], OperationPolicy] = {
         risk_level=RiskLevel.LOW,
         description="Set system audio volume level",
     ),
+    # Vision operations
+    ("vision", "analyze_screen"): OperationPolicy(
+        tool_name="vision",
+        operation="analyze_screen",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Analyze active desktop screen using multimodal vision",
+    ),
+    ("vision", "extract_screen_text"): OperationPolicy(
+        tool_name="vision",
+        operation="extract_screen_text",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Extract visible text, logs, and error dialogs from screen",
+    ),
+    ("vision", "inspect_image_file"): OperationPolicy(
+        tool_name="vision",
+        operation="inspect_image_file",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Inspect and explain visual contents of an image file",
+    ),
+    # Browser operations
+    ("browser", "navigate_url"): OperationPolicy(
+        tool_name="browser",
+        operation="navigate_url",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Navigate to web URL and extract page structure and headings",
+    ),
+    ("browser", "extract_page_content"): OperationPolicy(
+        tool_name="browser",
+        operation="extract_page_content",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Extract structured text, tables, and article content from web page",
+    ),
+    ("browser", "search_and_summarize"): OperationPolicy(
+        tool_name="browser",
+        operation="search_and_summarize",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Perform deep multi-source web crawl and search summarization",
+    ),
+    ("browser", "capture_page_screenshot"): OperationPolicy(
+        tool_name="browser",
+        operation="capture_page_screenshot",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Capture visual snapshot of web page",
+    ),
 }
 
 

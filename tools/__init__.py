@@ -1,6 +1,7 @@
 """Tool subsystem and registry for Xeren Assistant."""
 
 from .base import Action, BaseTool, ToolResult
+from .browser_tool import BrowserTool
 from .codebase_tool import CodebaseTool
 from .device_tool import DeviceTool
 from .filesystem_tool import FilesystemTool
@@ -11,6 +12,7 @@ from .registry import ToolRegistry, get_default_registry
 from .shell_tool import ShellTool
 from .subagent_tool import SubagentTool
 from .task_tool import TaskTool
+from .vision_tool import VisionTool
 from .web_search_tool import WebSearchTool
 
 __all__ = [
@@ -19,6 +21,7 @@ __all__ = [
     "BaseTool",
     "ToolRegistry",
     "get_default_registry",
+    "BrowserTool",
     "DeviceTool",
     "FilesystemTool",
     "GitHubTool",
@@ -29,5 +32,7 @@ __all__ = [
     "SubagentTool",
     "CodebaseTool",
     "PatchTool",
+    "VisionTool",
 ]
+
 

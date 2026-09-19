@@ -82,6 +82,38 @@ class GeminiProvider(BaseLLMProvider):
     except Exception as e:
       raise RuntimeError(f"Gemini API generation error: {str(e)}")
 
+  async def generate_vision(
+      self,
+      prompt: str,
+      image_bytes: bytes,
+      mime_type: str = "image/png",
+      system_instruction: Optional[str] = None,
+  ) -> LLMResponse:
+    from google.genai import types
+
+    contents = [
+        types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
+        prompt,
+    ]
+    config_kwargs: Dict[str, Any] = {"temperature": 0.2}
+    if system_instruction:
+      config_kwargs["system_instruction"] = system_instruction
+
+    try:
+      response = self.client.models.generate_content(
+          model=self.model_name,
+          contents=contents,
+          config=config_kwargs,
+      )
+      text = response.text or ""
+      return LLMResponse(
+          text=text,
+          raw_response=response,
+          model_name=self.model_name,
+      )
+    except Exception as e:
+      raise RuntimeError(f"Gemini Vision API generation error: {str(e)}")
+
 
 class MockLLMProvider(BaseLLMProvider):
   """Deterministic Mock LLM Provider for offline development and testing."""
@@ -100,8 +132,22 @@ class MockLLMProvider(BaseLLMProvider):
     self.call_history.append(messages)
     return LLMResponse(
         text=self.canned_response,
-        model_name="mock-provider",
-        usage=LLMUsage(prompt_tokens=10, completion_tokens=10, total_tokens=20),
+        model_name="mock-llm-v1",
+        usage=LLMUsage(
+            prompt_tokens=10, completion_tokens=15, total_tokens=25
+        ),
+    )
+
+  async def generate_vision(
+      self,
+      prompt: str,
+      image_bytes: bytes,
+      mime_type: str = "image/png",
+      system_instruction: Optional[str] = None,
+  ) -> LLMResponse:
+    return LLMResponse(
+        text="### Screen Vision Analysis\n- **Visible Application**: Visual Studio Code & Terminal\n- **Active Elements**: Editor canvas, file tree, system taskbar\n- **Diagnostics**: No active error dialogs detected.",
+        model_name="mock-vision",
     )
 
 

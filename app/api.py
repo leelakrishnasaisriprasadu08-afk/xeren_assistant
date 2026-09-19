@@ -393,6 +393,63 @@ def create_app(assistant: Optional[XerenAssistant] = None) -> FastAPI:
       raise HTTPException(status_code=404, detail=f"Job {job_id} not found or already inactive.")
     return {"status": "cancelled", "job_id": job_id}
 
+  @app.post("/vision/analyze-screen")
+  async def analyze_screen_endpoint(data: Optional[Dict[str, Any]] = None):
+    """Analyzes desktop screen or image using multimodal vision."""
+    payload = data or {}
+    vis_tool = _assistant.tool_registry.get_tool("vision")
+    if not vis_tool:
+      raise HTTPException(status_code=500, detail="VisionTool not registered.")
+    from tools.base import Action
+    res = await vis_tool.execute(Action(action_id="vis_screen", tool_name="vision", operation="analyze_screen", parameters=payload))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Screen vision analysis failed.")
+    return res.data
+
+  @app.post("/vision/extract-text")
+  async def extract_screen_text_endpoint(data: Optional[Dict[str, Any]] = None):
+    """Extracts text and error diagnostics from active screen."""
+    payload = data or {}
+    vis_tool = _assistant.tool_registry.get_tool("vision")
+    if not vis_tool:
+      raise HTTPException(status_code=500, detail="VisionTool not registered.")
+    from tools.base import Action
+    res = await vis_tool.execute(Action(action_id="vis_text", tool_name="vision", operation="extract_screen_text", parameters=payload))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "OCR text extraction failed.")
+    return res.data
+
+  @app.post("/browser/navigate")
+  async def browser_navigate_endpoint(data: Dict[str, Any]):
+    """Navigates to URL and extracts page headings and links."""
+    url = data.get("url")
+    if not url:
+      raise HTTPException(status_code=400, detail="url parameter is required.")
+    browser_tool = _assistant.tool_registry.get_tool("browser")
+    if not browser_tool:
+      raise HTTPException(status_code=500, detail="BrowserTool not registered.")
+    from tools.base import Action
+    res = await browser_tool.execute(Action(action_id="browse_nav", tool_name="browser", operation="navigate_url", parameters={"url": url}))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Browser navigation failed.")
+    return res.data
+
+  @app.post("/browser/extract")
+  async def browser_extract_endpoint(data: Dict[str, Any]):
+    """Extracts article content and structured text from URL."""
+    url = data.get("url")
+    if not url:
+      raise HTTPException(status_code=400, detail="url parameter is required.")
+    browser_tool = _assistant.tool_registry.get_tool("browser")
+    if not browser_tool:
+      raise HTTPException(status_code=500, detail="BrowserTool not registered.")
+    from tools.base import Action
+    res = await browser_tool.execute(Action(action_id="browse_ext", tool_name="browser", operation="extract_page_content", parameters={"url": url}))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Content extraction failed.")
+    return res.data
+
+
   @app.get("/traces")
   async def list_traces(limit: int = 20):
     """Lists recent execution traces."""
