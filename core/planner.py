@@ -457,7 +457,45 @@ class TaskPlanner:
 
     # Browser & Autonomous Web Crawling Plan
     if intent.intent_type == IntentType.BROWSER:
+      platform = intent.entities.get("platform")
       target_url = intent.entities.get("url")
+
+      if platform:
+        # Step 1: Check active desktop window for the platform/browser
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="device",
+                operation="get_active_window",
+                parameters={},
+                reason=f"Inspect active desktop foreground window for {platform.capitalize()}",
+            )
+        )
+        # Step 2: Use multimodal vision to capture and analyze open profile, dashboard, or browser tab
+        graph.add_action(
+            self.create_action(
+                action_id="act_02",
+                tool_name="vision",
+                operation="analyze_screen",
+                parameters={"prompt": f"Inspect the active {platform.capitalize()} window, account dashboard, gigs, statistics, or open web tabs and provide detailed diagnostic advice for: '{q}'"},
+                depends_on=["act_01"],
+                reason=f"Visually analyze active {platform.capitalize()} workspace and account dashboard",
+            )
+        )
+        # Step 3: Headless navigation/summarization
+        if target_url:
+          graph.add_action(
+              self.create_action(
+                  action_id="act_03",
+                  tool_name="browser",
+                  operation="navigate_url",
+                  parameters={"url": target_url},
+                  depends_on=["act_01"],
+                  reason=f"Navigate to {platform.capitalize()} gateway ({target_url}) to extract live metadata",
+              )
+          )
+        return graph
+
       if not target_url:
         url_match = re.search(r'(https?://[^\s\'"]+)', q)
         if url_match:

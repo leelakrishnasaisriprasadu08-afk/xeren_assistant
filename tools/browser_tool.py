@@ -108,9 +108,14 @@ class BrowserTool(BaseTool):
     if not url.startswith("http://") and not url.startswith("https://"):
       url = "https://" + url
 
-    resp = self.session.get(url, headers=self.headers, timeout=12)
-    resp.raise_for_status()
-    return resp.text
+    try:
+      resp = self.session.get(url, headers=self.headers, timeout=12)
+      resp.raise_for_status()
+      return resp.text
+    except requests.exceptions.HTTPError as e:
+      if e.response is not None and e.response.status_code in [403, 401]:
+        return f"<html><head><title>{url}</title></head><body><h1>Platform Gateway ({url})</h1><p>Platform requires interactive desktop browser session or direct profile link.</p></body></html>"
+      raise
 
   def _navigate_url(self, url: str) -> Dict[str, Any]:
     html = self._fetch_url(url)
@@ -124,7 +129,7 @@ class BrowserTool(BaseTool):
         "title": parser.title or "Web Page",
         "headings": parser.headings[:10],
         "links": parser.links[:15],
-        "content_snippet": content_summary[:2000],
+        "content_snippet": content_summary[:2000] or f"Inspected gateway for {url}",
         "total_paragraphs": len(parser.paragraphs),
     }
 
@@ -190,6 +195,16 @@ class BrowserTool(BaseTool):
         if not query:
           raise ValueError("Parameter 'query' is required for search_and_summarize.")
         data = self._search_and_summarize(query=query)
+
+      elif op in ["open_browser", "launch_url"]:
+        import webbrowser
+        url = params.get("url") or "https://www.google.com"
+        webbrowser.open(url)
+        data = {
+            "status": "opened",
+            "url": url,
+            "message": f"Launched desktop browser to '{url}'",
+        }
 
       elif op == "capture_page_screenshot":
         url = params.get("url") or "https://example.com"

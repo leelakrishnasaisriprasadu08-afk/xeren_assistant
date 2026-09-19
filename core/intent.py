@@ -106,6 +106,30 @@ class IntentClassifier:
           summary="Multi-modal screen vision or visual image understanding",
       )
 
+    # Autonomous Web Account / Portal / Platform Inspection
+    known_platforms = {
+        "fiverr": "https://www.fiverr.com",
+        "upwork": "https://www.upwork.com",
+        "freelancer": "https://www.freelancer.com",
+        "linkedin": "https://www.linkedin.com",
+        "gmail": "https://mail.google.com",
+        "google mail": "https://mail.google.com",
+        "nptel": "https://nptel.ac.in",
+        "trello": "https://trello.com",
+        "notion": "https://notion.so",
+        "slack": "https://slack.com",
+        "discord": "https://discord.com",
+    }
+    for plat_name, plat_url in known_platforms.items():
+      if plat_name in q and any(action in q for action in ["check", "inspect", "review", "open", "view", "audit", "account", "profile", "dashboard", "portal", "freelancing", "gigs"]):
+        return Intent(
+            intent_type=IntentType.BROWSER,
+            confidence=0.95,
+            primary_tool="browser",
+            entities={"platform": plat_name, "url": plat_url},
+            summary=f"Autonomous web inspection and account review for {plat_name.capitalize()}",
+        )
+
     # Browser & Web Scraping
     if (
         any(kw in q for kw in ["browse to", "navigate to", "extract article from", "scrape webpage", "read webpage", "open url"])
