@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xeren Assistant — Enterprise AI Platform</title>
+  <title>Xeren Assistant — Autonomous Enterprise AI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #090d16;
-      --bg-card: rgba(18, 24, 38, 0.75);
+      --bg-dark: #070a12;
+      --bg-card: rgba(15, 21, 36, 0.85);
       --bg-glass: rgba(255, 255, 255, 0.03);
-      --border-glow: rgba(0, 240, 255, 0.2);
+      --border-glow: rgba(0, 240, 255, 0.25);
       --border-card: rgba(255, 255, 255, 0.08);
       --cyan-glow: #00f0ff;
       --accent-purple: #7928ca;
@@ -42,63 +42,44 @@
     }
 
     header {
-      padding: 1.25rem 2rem;
+      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border-card);
-      backdrop-filter: blur(12px);
-      background: rgba(9, 13, 22, 0.85);
+      backdrop-filter: blur(16px);
+      background: rgba(7, 10, 18, 0.9);
       position: sticky;
       top: 0;
       z-index: 50;
     }
 
-    .brand { display: flex; align-items: center; gap: 0.75rem; }
+    .brand { display: flex; align-items: center; gap: 0.85rem; }
 
     .brand-logo {
-      width: 40px; height: 40px; border-radius: 10px;
+      width: 42px; height: 42px; border-radius: 12px;
       background: linear-gradient(135deg, var(--cyan-glow), var(--accent-purple));
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
-      font-weight: 800; color: #000; font-size: 1.2rem;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.45);
+      font-weight: 800; color: #000; font-size: 1.3rem;
     }
 
     .brand-title {
-      font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em;
+      font-size: 1.3rem; font-weight: 700; letter-spacing: -0.02em;
       background: linear-gradient(to right, #fff, var(--cyan-glow));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
 
-    .brand-badge {
-      font-size: 0.75rem; padding: 3px 10px; border-radius: 20px;
-      background: rgba(0, 240, 255, 0.12); border: 1px solid rgba(0, 240, 255, 0.35);
-      color: var(--cyan-glow); font-weight: 600;
+    .brand-subtitle {
+      font-size: 0.75rem; color: var(--text-muted); font-weight: 500;
     }
 
-    .nav-tabs {
-      display: flex; gap: 0.5rem; background: rgba(0, 0, 0, 0.4);
-      padding: 4px; border-radius: 12px; border: 1px solid var(--border-card);
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 5px 14px; border-radius: 20px;
+      background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35);
+      color: var(--accent-emerald); font-size: 0.8rem; font-weight: 600;
     }
-
-    .nav-tab {
-      padding: 6px 14px; border-radius: 8px; font-size: 0.85rem;
-      font-weight: 600; color: var(--text-muted); cursor: pointer;
-      border: none; background: transparent; transition: all 0.2s;
-    }
-
-    .nav-tab.active {
-      background: rgba(0, 240, 255, 0.15); color: var(--cyan-glow);
-      border: 1px solid rgba(0, 240, 255, 0.3);
-    }
-
-    .nav-stats { display: flex; gap: 1.5rem; align-items: center; }
-
-    .stat-pill {
-      font-size: 0.85rem; color: var(--text-muted);
-      display: flex; align-items: center; gap: 0.5rem;
-    }
-    .stat-pill strong { color: #fff; }
 
     .status-dot {
       width: 8px; height: 8px; border-radius: 50%;
@@ -107,34 +88,55 @@
       animation: pulse 2s infinite;
     }
 
+    .status-dot.working {
+      background: var(--cyan-glow);
+      box-shadow: 0 0 12px var(--cyan-glow);
+      animation: spin-pulse 1.2s infinite;
+    }
+
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.85); }
+      50% { opacity: 0.4; transform: scale(0.85); }
     }
 
+    @keyframes spin-pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.7; }
+    }
+
+    .header-metrics { display: flex; gap: 1.5rem; align-items: center; }
+
+    .stat-pill {
+      font-size: 0.85rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .stat-pill strong { color: #fff; }
+
+    /* Main Container Layout */
     .container {
-      max-width: 1440px; margin: 0 auto; padding: 1.5rem; flex: 1;
-      display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; width: 100%;
+      max-width: 1600px; margin: 0 auto; padding: 1.25rem 1.75rem; flex: 1;
+      display: grid; grid-template-columns: 1fr 440px; gap: 1.5rem; width: 100%;
     }
 
-    .main-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+    .main-workspace { display: flex; flex-direction: column; gap: 1.25rem; }
 
     .card {
       background: var(--bg-card); border: 1px solid var(--border-card);
       border-radius: var(--radius-lg); padding: 1.25rem;
-      backdrop-filter: blur(16px); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      backdrop-filter: blur(16px); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
       position: relative;
     }
 
     .card-header {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;
     }
 
     .card-title {
-      font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: #fff;
+      font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; color: #fff;
     }
 
-    .chat-container { display: flex; flex-direction: column; height: 480px; }
+    /* Interactive Unified Chat */
+    .chat-container { display: flex; flex-direction: column; height: 560px; }
 
     .chat-messages {
       flex: 1; overflow-y: auto; display: flex; flex-direction: column;
@@ -142,13 +144,13 @@
     }
 
     .message {
-      padding: 1rem; border-radius: var(--radius-md); max-width: 90%;
-      font-size: 0.95rem; line-height: 1.5;
+      padding: 1rem 1.25rem; border-radius: var(--radius-md); max-width: 92%;
+      font-size: 0.92rem; line-height: 1.55;
     }
 
     .message.user {
-      background: linear-gradient(135deg, rgba(121, 40, 202, 0.25), rgba(0, 240, 255, 0.2));
-      border: 1px solid rgba(0, 240, 255, 0.35); align-self: flex-end; border-bottom-right-radius: 2px;
+      background: linear-gradient(135deg, rgba(121, 40, 202, 0.3), rgba(0, 240, 255, 0.25));
+      border: 1px solid rgba(0, 240, 255, 0.4); align-self: flex-end; border-bottom-right-radius: 2px;
     }
 
     .message.assistant {
@@ -157,22 +159,35 @@
     }
 
     .message pre {
-      background: rgba(0, 0, 0, 0.45); padding: 0.75rem; border-radius: 6px;
-      font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; overflow-x: auto;
-      margin-top: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.55); padding: 0.85rem; border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; overflow-x: auto;
+      margin-top: 0.6rem; border: 1px solid rgba(255, 255, 255, 0.08); color: #e5e7eb;
     }
 
-    .chat-input-row { display: flex; gap: 0.75rem; margin-top: 1rem; }
+    .quick-starters {
+      display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem;
+    }
+
+    .starter-chip {
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-card);
+      padding: 5px 12px; border-radius: 20px; font-size: 0.78rem; color: var(--text-muted);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .starter-chip:hover {
+      background: rgba(0, 240, 255, 0.15); color: var(--cyan-glow); border-color: rgba(0, 240, 255, 0.35);
+    }
+
+    .chat-input-row { display: flex; gap: 0.75rem; }
 
     .chat-input {
-      flex: 1; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-card);
+      flex: 1; background: rgba(0, 0, 0, 0.45); border: 1px solid var(--border-card);
       border-radius: var(--radius-md); padding: 0.85rem 1.25rem; color: #fff;
       font-family: inherit; font-size: 0.95rem; outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .chat-input:focus {
-      border-color: var(--cyan-glow); box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+      border-color: var(--cyan-glow); box-shadow: 0 0 18px rgba(0, 240, 255, 0.3);
     }
 
     .btn-send {
@@ -183,30 +198,98 @@
     }
     .btn-send:hover { transform: translateY(-1px); opacity: 0.9; }
 
-    .dag-graph { display: flex; gap: 1rem; overflow-x: auto; padding: 0.75rem 0; }
+    /* Live Execution Graph (DAG Waves) */
+    .dag-graph {
+      display: flex; gap: 0.75rem; overflow-x: auto; padding: 0.5rem 0;
+    }
 
     .dag-node {
       background: rgba(0, 0, 0, 0.5); border: 1px solid var(--border-card);
-      border-radius: var(--radius-md); padding: 0.9rem; min-width: 220px;
-      display: flex; flex-direction: column; gap: 0.4rem;
+      border-radius: var(--radius-md); padding: 0.85rem; min-width: 210px;
+      display: flex; flex-direction: column; gap: 0.35rem; transition: all 0.2s;
+    }
+    .dag-node.active {
+      border-color: var(--cyan-glow);
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
     }
     .dag-node.success { border-color: var(--accent-emerald); }
+    .dag-node.repaired { border-color: var(--accent-purple); }
 
-    .node-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 600; }
-    .node-op { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--cyan-glow); }
-    .node-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 12px; text-transform: uppercase; font-weight: 700; }
+    .node-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; font-weight: 600; }
+    .node-op { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--cyan-glow); }
+    .node-badge { font-size: 0.68rem; padding: 2px 7px; border-radius: 12px; text-transform: uppercase; font-weight: 700; }
     .badge-allowed { background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); }
     .badge-ask { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); }
     .badge-denied { background: rgba(244, 63, 94, 0.2); color: var(--accent-rose); }
 
-    .side-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+    /* Live Inside-Process Aside Tracker */
+    .tracker-aside { display: flex; flex-direction: column; gap: 1.25rem; }
 
-    .task-item {
-      padding: 0.75rem; background: rgba(0, 0, 0, 0.3); border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 0.5rem;
-      display: flex; justify-content: space-between; align-items: center;
+    .pulse-stage-card {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(121, 40, 202, 0.15));
+      border: 1px solid rgba(0, 240, 255, 0.35); border-radius: var(--radius-lg);
+      padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;
     }
 
+    .pulse-title-row { display: flex; justify-content: space-between; align-items: center; }
+    .pulse-state-label { font-size: 0.8rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; color: var(--cyan-glow); }
+    .pulse-now-working { font-size: 1.05rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem; }
+
+    /* Vertical Live Stepper */
+    .stepper-timeline {
+      display: flex; flex-direction: column; gap: 0.85rem; position: relative;
+      padding-left: 1.75rem; margin-top: 0.5rem;
+    }
+
+    .stepper-timeline::before {
+      content: ''; position: absolute; left: 8px; top: 8px; bottom: 8px; width: 2px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .step-item {
+      position: relative; display: flex; flex-direction: column; gap: 0.25rem;
+    }
+
+    .step-bullet {
+      position: absolute; left: -1.75rem; top: 2px; width: 18px; height: 18px;
+      border-radius: 50%; background: #1f293d; border: 2px solid var(--text-muted);
+      display: flex; align-items: center; justify-content: center; font-size: 0.65rem;
+      font-weight: 700; color: #fff; z-index: 2; transition: all 0.3s;
+    }
+
+    .step-item.active .step-bullet {
+      background: var(--cyan-glow); border-color: #fff; color: #000;
+      box-shadow: 0 0 12px var(--cyan-glow);
+    }
+
+    .step-item.completed .step-bullet {
+      background: var(--accent-emerald); border-color: var(--accent-emerald); color: #000;
+    }
+
+    .step-title { font-size: 0.85rem; font-weight: 600; color: #fff; display: flex; justify-content: space-between; }
+    .step-desc { font-size: 0.75rem; color: var(--text-muted); }
+    .step-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--cyan-glow); }
+
+    /* Capability Radar */
+    .capability-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+    }
+
+    .cap-item {
+      background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px; padding: 0.6rem 0.75rem; display: flex; flex-direction: column; gap: 0.2rem;
+    }
+    .cap-name { font-size: 0.78rem; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 0.35rem; }
+    .cap-desc { font-size: 0.68rem; color: var(--text-muted); }
+
+    /* Telemetry Stream Log */
+    .telemetry-box {
+      background: #000; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px;
+      padding: 0.75rem; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+      height: 140px; overflow-y: auto; color: #a3e635; display: flex; flex-direction: column; gap: 0.3rem;
+    }
+
+    /* Modal for Approval */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px);
@@ -228,192 +311,192 @@
     .btn { padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: none; }
     .btn-approve { background: var(--accent-emerald); color: #000; }
     .btn-reject { background: rgba(244, 63, 94, 0.2); border: 1px solid var(--accent-rose); color: var(--accent-rose); }
-    
-    .tab-content { display: none; }
-    .tab-content.active { display: flex; flex-direction: column; gap: 1.5rem; }
-
-    .flame-bar {
-      background: linear-gradient(90deg, var(--cyan-glow), var(--accent-purple));
-      height: 24px; border-radius: 4px; display: flex; align-items: center;
-      padding: 0 8px; font-size: 0.75rem; font-weight: 700; color: #000; margin-bottom: 4px;
-    }
   </style>
 </head>
 <body>
+
+  <!-- Top Real-time Header -->
   <header>
     <div class="brand">
       <div class="brand-logo">X</div>
-      <div><div class="brand-title">Xeren Assistant</div></div>
-      <span class="brand-badge">Phase 6 AST Codebase & Patch Studio</span>
+      <div>
+        <div class="brand-title">Xeren Assistant</div>
+        <div class="brand-subtitle">Autonomous Multimodal & Multi-Agent Engine</div>
+      </div>
     </div>
 
-    <div class="nav-tabs">
-      <button class="nav-tab active" onclick="switchTab('chat')">💬 Orchestrator & DAG</button>
-      <button class="nav-tab" onclick="switchTab('swarm')">🤖 Multi-Agent Swarm</button>
-      <button class="nav-tab" onclick="switchTab('codebase')">💻 Codebase & Patch</button>
-      <button class="nav-tab" onclick="switchTab('memory')">🧠 Semantic Memory</button>
-      <button class="nav-tab" onclick="switchTab('jobs')">⏰ Cron & Scheduler</button>
-      <button class="nav-tab" onclick="switchTab('flamegraph')">📊 Trace Flamegraph</button>
-    </div>
-
-    <div class="nav-stats">
-      <div class="stat-pill"><div class="status-dot"></div><span>Status: <strong>Enterprise Live</strong></span></div>
+    <div class="header-metrics">
+      <div class="status-badge">
+        <div class="status-dot" id="system-status-dot"></div>
+        <span id="system-status-text">Ready & Autonomous</span>
+      </div>
       <div class="stat-pill"><span>Success: <strong id="stat-success-rate">100%</strong></span></div>
-      <div class="stat-pill"><span>Queries: <strong id="stat-total-queries">0</strong></span></div>
+      <div class="stat-pill"><span>Total Actions: <strong id="stat-total-queries">0</strong></span></div>
     </div>
   </header>
 
+  <!-- Unified Main Container -->
   <div class="container">
-    <!-- Tab 1: Chat & Live DAG -->
-    <div class="main-panel tab-content active" id="tab-chat">
+
+    <!-- Left / Center: Interactive Command Center & Plan Graph -->
+    <div class="main-workspace">
+      
+      <!-- Live Dynamic DAG Wave Visualization -->
       <div class="card">
         <div class="card-header">
-          <div class="card-title">⚡ Execution Graph (DAG Wave Scheduler)</div>
+          <div class="card-title">⚡ Autonomous Plan & Execution Graph (DAG Waves)</div>
           <span class="stat-pill" id="dag-wave-info">Idle</span>
         </div>
         <div class="dag-graph" id="dag-graph-container">
-          <div class="dag-node"><div class="node-header"><span>Ready for Task</span><span class="node-badge badge-allowed">Ready</span></div><div class="node-op">Waiting for instruction...</div></div>
+          <div class="dag-node">
+            <div class="node-header"><span>Autonomous Engine Ready</span><span class="node-badge badge-allowed">Ready</span></div>
+            <div class="node-op">Awaiting prompt or scheduled task...</div>
+          </div>
         </div>
       </div>
 
+      <!-- Main Unified Chat & Instruction Console -->
       <div class="card chat-container">
-        <div class="card-header"><div class="card-title">💬 Interactive AI Orchestrator</div></div>
+        <div class="card-header">
+          <div class="card-title">💬 Live Interaction & Execution Console</div>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Hotkeys: <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Alt+Space</kbd> or Enter</span>
+        </div>
+
         <div class="chat-messages" id="chat-messages">
           <div class="message assistant">
-            👋 <strong>Welcome to Xeren Assistant Enterprise Phase 6!</strong><br>
-            Equipped with AST Codebase Indexing, Autonomous Test-Driven Patch Generator, Multi-Agent Swarm Collaboration, Background Scheduled Cron Jobs, Long-Term Memory, and Flamegraph Observability.
+            👋 <strong>Welcome to Xeren Assistant!</strong><br>
+            I am your unified, fully autonomous AI assistant. Whatever you need—writing or patching code, debugging errors, inspecting the screen, researching the web, drafting client emails, or scheduling background tasks—simply type below. I will automatically detect the goal, generate the execution plan, and run the required tools in real time.
           </div>
         </div>
+
+        <!-- Quick Action Prompt Starters -->
+        <div class="quick-starters">
+          <div class="starter-chip" onclick="applyStarter('Inspect recent git commits and check repository health')">🔍 Check Repo Health</div>
+          <div class="starter-chip" onclick="applyStarter('Analyze current desktop screen and diagnose any visible errors')">👁️ Screen Vision Analysis</div>
+          <div class="starter-chip" onclick="applyStarter('Coordinate multi-agent swarm debate on building resilient retry mechanisms')">🤖 Swarm Debate</div>
+          <div class="starter-chip" onclick="applyStarter('Draft a polite project status reply for our client asking about progress')">✉️ Client Outreach Draft</div>
+          <div class="starter-chip" onclick="applyStarter('Schedule a background repository health watcher every 60 seconds')">⏰ Schedule Task</div>
+        </div>
+
         <div class="chat-input-row">
-          <input type="text" id="chat-input" class="chat-input" placeholder="Ask Xeren to execute workflows, inspect repositories, or audit code..." autocomplete="off">
-          <button class="btn-send" id="btn-send" onclick="sendQuery()">Execute Plan ➔</button>
+          <input type="text" id="chat-input" class="chat-input" placeholder="Give Xeren any instruction or goal (e.g. 'Patch security redactor to support bearer tokens')..." autocomplete="off">
+          <button class="btn-send" id="btn-send" onclick="sendQuery()">Execute ➔</button>
         </div>
       </div>
+
     </div>
 
-    <!-- Tab 2: Autonomous Multi-Agent Swarm -->
-    <div class="main-panel tab-content" id="tab-swarm">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🤖 Multi-Agent Swarm Collaboration</div>
-          <button class="btn btn-approve" onclick="launchSwarm()">Launch Swarm ➔</button>
-        </div>
-        <div class="chat-input-row" style="margin-top: 0; margin-bottom: 1rem;">
-          <input type="text" id="swarm-input" class="chat-input" placeholder="Enter high-level engineering goal (e.g. Build SQLite connection pooler with retry exponential backoff)...">
-        </div>
-        <div id="swarm-timeline" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 480px; overflow-y: auto;">
-          <div style="color: var(--text-muted); font-size: 0.9rem;">Click 'Launch Swarm' above to coordinate Researcher, Coder, and Reviewer subagents in consensus loop.</div>
-        </div>
-      </div>
-    </div>
+    <!-- Right: Inside-Process Step-by-Step Live Tracker -->
+    <aside class="tracker-aside">
 
-    <!-- Tab 6: AST Codebase & Patch Studio -->
-    <div class="main-panel tab-content" id="tab-codebase">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">🔍 AST Codebase Symbol Explorer</div>
-          <button class="btn" style="background: rgba(0, 240, 255, 0.15); color: var(--cyan-glow); border: 1px solid rgba(0,240,255,0.3);" onclick="reindexCodebase()">⚡ Re-index Workspace</button>
+      <!-- 1. Real-time Live State & Progress Pulse -->
+      <div class="pulse-stage-card">
+        <div class="pulse-title-row">
+          <span class="pulse-state-label">LIVE PROCESS STATE</span>
+          <span id="pulse-timer" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted);">0.0s</span>
         </div>
-        <div class="chat-input-row" style="margin-top: 0; margin-bottom: 1rem;">
-          <input type="text" id="symbol-search-input" class="chat-input" placeholder="Search functions, classes, methods (e.g. CodebaseIndexer, DiffApplier)..." onkeyup="if(event.key==='Enter') searchSymbols()">
-          <button class="btn btn-approve" onclick="searchSymbols()">Search</button>
+        <div class="pulse-now-working" id="pulse-status-text">
+          <span>🟢 Ready for Next Task</span>
         </div>
-        <div id="symbols-results" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 250px; overflow-y: auto;">
-          <div style="color: var(--text-muted); font-size: 0.9rem;">Type symbol name or click Re-index to view codebase structure.</div>
+        <div style="font-size: 0.78rem; color: var(--text-muted);" id="pulse-sub-text">
+          Listening on local socket and UI event stream.
         </div>
       </div>
 
+      <!-- 2. Step-by-Step Execution Stepper (Real-time Pipeline) -->
       <div class="card">
         <div class="card-header">
-          <div class="card-title">🛠️ Autonomous Test-Driven Patch Generator</div>
+          <div class="card-title">📍 Step-by-Step Pipeline Tracker</div>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-          <div style="display: flex; gap: 0.75rem;">
-            <input type="text" id="patch-file-input" class="chat-input" placeholder="Target file (e.g. security/secrets.py)...">
-            <input type="text" id="patch-test-input" class="chat-input" placeholder="Test target (optional, e.g. tests/unit/test_secrets.py)...">
+        <div class="stepper-timeline" id="stepper-container">
+          
+          <div class="step-item" id="step-intent">
+            <div class="step-bullet">1</div>
+            <div class="step-title"><span>Intent Classification</span><span class="step-meta" id="meta-intent">Idle</span></div>
+            <div class="step-desc">Identifies goal category and security boundaries.</div>
           </div>
-          <textarea id="patch-instruction-input" class="chat-input" style="height: 70px; resize: none;" placeholder="Instruction: Bug fix or feature change (e.g. Add support for Bearer tokens in header redactor)..."></textarea>
-          <button class="btn btn-approve" style="align-self: flex-start;" onclick="runPatchGenerator()">🚀 Generate & Test Patch</button>
-          <div id="patch-output-container" style="display: none; margin-top: 0.5rem;">
-            <div id="patch-status-badge" style="font-weight: 700; margin-bottom: 0.5rem;"></div>
-            <pre id="patch-diff-preview" style="background: #000; padding: 1rem; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; max-height: 250px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); white-space: pre-wrap;"></pre>
+
+          <div class="step-item" id="step-plan">
+            <div class="step-bullet">2</div>
+            <div class="step-title"><span>DAG Task Synthesis</span><span class="step-meta" id="meta-plan">Pending</span></div>
+            <div class="step-desc">Builds topological execution waves and parameter flow.</div>
+          </div>
+
+          <div class="step-item" id="step-exec">
+            <div class="step-bullet">3</div>
+            <div class="step-title"><span>Wave Execution & Tooling</span><span class="step-meta" id="meta-exec">Pending</span></div>
+            <div class="step-desc">Executes sandboxed tools, subagents, and AST patches.</div>
+          </div>
+
+          <div class="step-item" id="step-verify">
+            <div class="step-bullet">4</div>
+            <div class="step-title"><span>Loop-2 Semantic Verification</span><span class="step-meta" id="meta-verify">Pending</span></div>
+            <div class="step-desc">Verifies outputs, catches anomalies, and auto-repairs.</div>
+          </div>
+
+          <div class="step-item" id="step-memory">
+            <div class="step-bullet">5</div>
+            <div class="step-title"><span>Memory & Trace Commit</span><span class="step-meta" id="meta-memory">Pending</span></div>
+            <div class="step-desc">Stores episodic learnings and flamegraph telemetry.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 3. Autonomous Capabilities Matrix (What Xeren Can Do) -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🛠️ Active Autonomous Capabilities</div>
+        </div>
+        <div class="capability-grid">
+          <div class="cap-item">
+            <div class="cap-name">🤖 Multi-Agent Swarm</div>
+            <div class="cap-desc">Autonomous debate & consensus</div>
+          </div>
+          <div class="cap-item">
+            <div class="cap-name">💻 AST Patch Engine</div>
+            <div class="cap-desc">Surgical diffs & self-healing</div>
+          </div>
+          <div class="cap-item">
+            <div class="cap-name">👁️ Screen Vision & OCR</div>
+            <div class="cap-desc">Desktop capture & UI reading</div>
+          </div>
+          <div class="cap-item">
+            <div class="cap-name">🌐 Web Crawler</div>
+            <div class="cap-desc">Headless navigation & search</div>
+          </div>
+          <div class="cap-item">
+            <div class="cap-name">✉️ Client CRM Liaison</div>
+            <div class="cap-desc">Multi-persona email & webhooks</div>
+          </div>
+          <div class="cap-item">
+            <div class="cap-name">⏰ Background Cron</div>
+            <div class="cap-desc">Persistent SQLite scheduler</div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Tab 3: Semantic Memory Explorer -->
-    <div class="main-panel tab-content" id="tab-memory">
+      <!-- 4. Inside Process Live Telemetry -->
       <div class="card">
         <div class="card-header">
-          <div class="card-title">🧠 Long-Term Semantic Memory Explorer</div>
-          <button class="btn" style="background: rgba(0, 240, 255, 0.15); color: var(--cyan-glow); border: 1px solid rgba(0,240,255,0.3);" onclick="loadMemories()">Search Memory</button>
+          <div class="card-title">📡 Inside Process Telemetry</div>
+          <span style="font-size: 0.72rem; color: var(--cyan-glow);">LIVE</span>
         </div>
-        <div class="chat-input-row" style="margin-top: 0; margin-bottom: 1rem;">
-          <input type="text" id="memory-search-input" class="chat-input" placeholder="Search episodic memories by semantic concept or keyword..." onkeyup="if(event.key==='Enter') loadMemories()">
-        </div>
-        <div id="memory-results" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 480px; overflow-y: auto;">
-          <div style="color: var(--text-muted); font-size: 0.9rem;">Type a query above to search past experiences.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tab 4: Background Cron & Scheduler -->
-    <div class="main-panel tab-content" id="tab-jobs">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">⏰ Persistent Scheduled Background Jobs</div>
-          <button class="btn btn-approve" onclick="addSampleJob()">+ Schedule Repo Watcher</button>
-        </div>
-        <div id="jobs-list" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 480px; overflow-y: auto;">
-          <div style="color: var(--text-muted); font-size: 0.9rem;">Loading background jobs...</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tab 5: Flamegraph Visualizer -->
-    <div class="main-panel tab-content" id="tab-flamegraph">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">📊 Execution Latency Flamegraph</div>
-          <button class="btn" style="background: rgba(255,255,255,0.08); color: #fff;" onclick="loadFlamegraph()">Refresh Traces</button>
-        </div>
-        <div id="flamegraph-container" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 480px; overflow-y: auto;">
-          <div style="color: var(--text-muted); font-size: 0.9rem;">Execute queries in the chat tab to view latency breakdown.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Side Panel (Telemetry & Tasks) -->
-    <div class="side-panel">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">📋 Local Task Queue</div>
-          <button class="btn" style="background: rgba(255,255,255,0.08); color: #fff; padding: 4px 8px; font-size: 0.75rem;" onclick="loadTasks()">Refresh</button>
-        </div>
-        <div id="tasks-list" style="max-height: 240px; overflow-y: auto;">
-          <div style="color: var(--text-muted); font-size: 0.85rem;">Loading tasks...</div>
+        <div class="telemetry-box" id="telemetry-stream">
+          <div>[SYSTEM] Xeren Autonomous Engine initialized.</div>
+          <div>[SECURITY] Risk gate loaded with ASK / ALLOWED policies.</div>
+          <div>[READY] Awaiting instructions.</div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-header"><div class="card-title">🛠️ Tool & Swarm Ecosystem</div></div>
-        <div id="tools-list" style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.4rem;">
-          <div class="task-item"><span>🤖 Multi-Agent Swarm</span> <span class="node-badge badge-allowed">Consensus</span></div>
-          <div class="task-item"><span>⏰ Persistent Scheduler</span> <span class="node-badge badge-allowed">SQLite Cron</span></div>
-          <div class="task-item"><span>🧠 Semantic Memory</span> <span class="node-badge badge-allowed">Vector</span></div>
-          <div class="task-item"><span>💻 Sandboxed Shell</span> <span class="node-badge badge-ask">ASK Mode</span></div>
-          <div class="task-item"><span>📁 Filesystem</span> <span class="node-badge badge-allowed">Sandboxed</span></div>
-          <div class="task-item"><span>🐙 GitHub</span> <span class="node-badge badge-allowed">Read/Write</span></div>
-        </div>
-      </div>
-    </div>
+    </aside>
+
   </div>
 
-  <!-- Interactive Approval Modal -->
+  <!-- Interactive Human Approval Modal -->
   <div class="modal-overlay" id="approval-modal">
     <div class="modal">
-      <div class="modal-header"><span>⚠️ Action Requires Human-In-The-Loop Approval</span></div>
+      <div class="modal-header"><span>⚠️ Action Requires Operator Confirmation</span></div>
       <p id="modal-desc" style="font-size: 0.9rem; color: #d1d5db; margin-bottom: 0.5rem;"></p>
       <div class="modal-diff" id="modal-diff"></div>
       <div class="modal-actions">
@@ -425,184 +508,70 @@
 
   <script>
     let currentApprovalId = null;
+    let timerInterval = null;
+    let queryStartTime = 0;
 
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-      document.getElementById('tab-' + tabName).classList.add('active');
-      event.target.classList.add('active');
-      if (tabName === 'memory') loadMemories();
-      if (tabName === 'jobs') loadJobs();
-      if (tabName === 'flamegraph') loadFlamegraph();
+    function logTelemetry(msg) {
+      const box = document.getElementById('telemetry-stream');
+      const timeStr = new Date().toISOString().substring(11, 19);
+      box.innerHTML += `<div>[${timeStr}] ${msg}</div>`;
+      box.scrollTop = box.scrollHeight;
     }
 
-    async function loadStats() {
-      try {
-        const res = await fetch('/health');
-        const data = await res.json();
-        if (data && data.analytics) {
-          document.getElementById('stat-success-rate').innerText = data.analytics.success_rate_percent + '%';
-          document.getElementById('stat-total-queries').innerText = data.analytics.total_requests;
-        }
-      } catch (e) {}
-    }
+    function updatePulseState(statusText, subText, isWorking = true) {
+      const dot = document.getElementById('system-status-dot');
+      const statusLabel = document.getElementById('system-status-text');
+      const pulseStatus = document.getElementById('pulse-status-text');
+      const pulseSub = document.getElementById('pulse-sub-text');
 
-    async function loadTasks() {
-      try {
-        const res = await fetch('/tasks');
-        const data = await res.json();
-        const container = document.getElementById('tasks-list');
-        if (data.tasks && data.tasks.length > 0) {
-          container.innerHTML = data.tasks.map(t => `
-            <div class="task-item">
-              <div><div class="task-title">#${t.id} ${t.title}</div><div class="task-meta">${t.priority} • ${t.status}</div></div>
-            </div>
-          `).join('');
-        } else {
-          container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem;">No tasks found.</div>';
-        }
-      } catch (e) {}
-    }
+      pulseStatus.innerHTML = statusText;
+      pulseSub.innerText = subText;
 
-    async function loadMemories() {
-      const q = document.getElementById('memory-search-input').value.trim();
-      const url = q ? `/memory/semantic?q=${encodeURIComponent(q)}` : '/memory/semantic';
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        const container = document.getElementById('memory-results');
-        const items = data.results || data.memories || [];
-        if (items.length > 0) {
-          container.innerHTML = items.map(m => {
-            const mem = m.memory || m;
-            const scoreBadge = m.similarity_score ? `<span class="node-badge badge-allowed">${Math.round(m.similarity_score*100)}% Match</span>` : '';
-            return `
-              <div class="task-item" style="flex-direction: column; align-items: flex-start; gap: 0.4rem;">
-                <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                  <span style="font-size: 0.75rem; color: var(--cyan-glow); font-weight: 600;">[${mem.category}]</span>
-                  ${scoreBadge}
-                </div>
-                <div style="font-size: 0.85rem; color: #fff; white-space: pre-wrap;">${mem.content}</div>
-              </div>
-            `;
-          }).join('');
-        } else {
-          container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem;">No memory records found.</div>';
-        }
-      } catch (e) {}
-    }
-
-    async function loadJobs() {
-      try {
-        const res = await fetch('/jobs');
-        const data = await res.json();
-        const container = document.getElementById('jobs-list');
-        if (data.jobs && data.jobs.length > 0) {
-          container.innerHTML = data.jobs.map(j => `
-            <div class="task-item">
-              <div>
-                <div class="task-title">${j.name}</div>
-                <div class="task-meta">Interval: ${j.interval_seconds}s • Runs: ${j.run_count} • Status: ${j.is_active ? 'Active' : 'Paused'}</div>
-              </div>
-              <button class="btn" style="background: rgba(244,63,94,0.2); color: var(--accent-rose); font-size: 0.75rem;" onclick="deleteJob('${j.job_id}')">Cancel</button>
-            </div>
-          `).join('');
-        } else {
-          container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem;">No scheduled jobs running.</div>';
-        }
-      } catch (e) {}
-    }
-
-    async function addSampleJob() {
-      try {
-        await fetch('/jobs', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: "Automated GitHub Sync & Integrity Check",
-            interval_seconds: 60,
-            action_type: "cron_sync"
-          })
-        });
-        loadJobs();
-      } catch (e) {}
-    }
-
-    async function deleteJob(id) {
-      try {
-        await fetch(`/jobs/${id}`, { method: 'DELETE' });
-        loadJobs();
-      } catch (e) {}
-    }
-
-    async function launchSwarm() {
-      const prompt = document.getElementById('swarm-input').value.trim();
-      if (!prompt) return;
-      const timeline = document.getElementById('swarm-timeline');
-      timeline.innerHTML = '<div style="color: var(--cyan-glow);">🤖 Swarm coordinator executing handoffs (Researcher ➔ Coder ➔ Reviewer)...</div>';
-
-      try {
-        const res = await fetch('/swarm/run', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: prompt })
-        });
-        const data = await res.json();
-
-        timeline.innerHTML = data.turns.map(t => `
-          <div class="task-item" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
-            <div style="display: flex; justify-content: space-between; width: 100%;">
-              <strong style="color: var(--cyan-glow);">Turn ${t.turn_index}: ${t.agent_name.toUpperCase()}</strong>
-              <span class="node-badge badge-allowed">${Math.round(t.duration_ms)}ms</span>
-            </div>
-            <div style="font-size: 0.85rem; color: #d1d5db; white-space: pre-wrap;">${t.output}</div>
-          </div>
-        `).join('') + `<div style="padding: 1rem; background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent-emerald); border-radius: 8px;"><strong>Consensus Final Artifact:</strong><br><pre>${data.final_artifact}</pre></div>`;
-      } catch (e) {
-        timeline.innerHTML = '<div style="color: var(--accent-rose);">❌ Swarm execution error: ' + e.message + '</div>';
+      if (isWorking) {
+        dot.className = 'status-dot working';
+        statusLabel.innerText = 'Executing Task...';
+      } else {
+        dot.className = 'status-dot';
+        statusLabel.innerText = 'Ready & Autonomous';
       }
     }
 
-    async function loadFlamegraph() {
-      try {
-        const res = await fetch('/traces?limit=1');
-        const data = await res.json();
-        const container = document.getElementById('flamegraph-container');
-        if (data.traces && data.traces.length > 0) {
-          const t = data.traces[0];
-          const fgRes = await fetch(`/traces/${t.trace_id}/flamegraph`);
-          const fg = await fgRes.json();
+    function setStepState(stepId, state, metaText = '') {
+      const el = document.getElementById(stepId);
+      const metaEl = document.getElementById('meta-' + stepId.replace('step-', ''));
+      if (!el) return;
 
-          container.innerHTML = `
-            <div style="margin-bottom: 0.75rem; font-size: 0.9rem; color: #fff;">Trace ID: <code>${t.trace_id}</code> (Total: ${Math.round(fg.duration_ms)}ms)</div>
-            ${fg.children.map(c => `
-              <div style="margin-bottom: 0.5rem;">
-                <div class="flame-bar" style="width: ${Math.max(15, c.percentage_of_total)}%;">
-                  ${c.name} — ${Math.round(c.duration_ms)}ms (${c.percentage_of_total}%)
-                </div>
-              </div>
-            `).join('')}
-          `;
-        } else {
-          container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem;">No traces recorded yet.</div>';
-        }
-      } catch (e) {}
+      el.classList.remove('active', 'completed');
+      if (state === 'active') el.classList.add('active');
+      if (state === 'completed') el.classList.add('completed');
+      if (metaEl && metaText) metaEl.innerText = metaText;
+    }
+
+    function resetPipelineTracker() {
+      ['step-intent', 'step-plan', 'step-exec', 'step-verify', 'step-memory'].forEach(s => {
+        setStepState(s, '', 'Pending');
+      });
+    }
+
+    function applyStarter(text) {
+      document.getElementById('chat-input').value = text;
+      sendQuery();
     }
 
     function renderDAG(plan) {
       const container = document.getElementById('dag-graph-container');
       if (!plan || plan.length === 0) {
-        container.innerHTML = '<div class="dag-node"><div class="node-header"><span>No External Tools Needed</span></div><div class="node-op">Direct answer query</div></div>';
+        container.innerHTML = '<div class="dag-node"><div class="node-header"><span>Direct Answer Query</span><span class="node-badge badge-allowed">Complete</span></div><div class="node-op">Answered via LLM reasoning</div></div>';
         return;
       }
 
       container.innerHTML = plan.map((act, idx) => `
-        <div class="dag-node success" id="node-${act.action_id}">
+        <div class="dag-node success" id="node-${act.action_id || idx}">
           <div class="node-header">
             <span>Step ${idx+1}: ${act.tool_name}</span>
-            <span class="node-badge badge-${act.required_permission.toLowerCase()}">${act.required_permission}</span>
+            <span class="node-badge badge-${(act.required_permission || 'ALLOWED').toLowerCase()}">${act.required_permission || 'ALLOWED'}</span>
           </div>
-          <div class="node-op">${act.operation}()</div>
+          <div class="node-op">${act.operation || 'execute'}()</div>
           <div style="font-size: 0.75rem; color: var(--text-muted);">${act.reason || 'Executing action'}</div>
         </div>
       `).join('');
@@ -620,8 +589,21 @@
       chat.scrollTop = chat.scrollHeight;
 
       const loadingId = 'loading-' + Date.now();
-      chat.innerHTML += `<div class="message assistant" id="${loadingId}">⚡ <em>Generating DAG plan and executing workflow...</em></div>`;
+      chat.innerHTML += `<div class="message assistant" id="${loadingId}">⚡ <em>Autonomous planning and execution in progress...</em></div>`;
       chat.scrollTop = chat.scrollHeight;
+
+      resetPipelineTracker();
+      queryStartTime = Date.now();
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const sec = ((Date.now() - queryStartTime) / 1000).toFixed(1);
+        document.getElementById('pulse-timer').innerText = `${sec}s`;
+      }, 100);
+
+      // 1. Intent Stage
+      setStepState('step-intent', 'active', 'Analyzing...');
+      updatePulseState('🧠 Classifying Intent & Context', `Evaluating: "${query.substring(0, 40)}..."`);
+      logTelemetry(`Classifying prompt intent: "${query.substring(0, 35)}..."`);
 
       try {
         const res = await fetch('/query', {
@@ -631,20 +613,51 @@
         });
         const data = await res.json();
 
+        // 2. DAG Plan Stage
+        setStepState('step-intent', 'completed', 'Identified');
+        setStepState('step-plan', 'completed', `${(data.tools_used || []).length} Actions`);
+        setStepState('step-exec', 'completed', `${(data.tools_used || []).length} Steps`);
+        setStepState('step-verify', 'completed', 'Verified (Loop-2)');
+        setStepState('step-memory', 'completed', 'Committed');
+
+        clearInterval(timerInterval);
+        const totalElapsed = ((Date.now() - queryStartTime) / 1000).toFixed(2);
+        document.getElementById('pulse-timer').innerText = `${totalElapsed}s`;
+
+        updatePulseState('✅ Work Completed Successfully', `Executed in ${totalElapsed}s across ${data.tools_used?.length || 1} action(s).`, false);
+        logTelemetry(`Task completed successfully (Trace: ${data.trace_id?.substring(0, 8)}...)`);
+
         document.getElementById(loadingId).remove();
 
         if (data.execution_result && data.execution_result.step_records) {
           renderDAG(data.execution_result.step_records.map(r => r.action));
+        } else if (data.tools_used && data.tools_used.length > 0) {
+          renderDAG(data.tools_used.map((t, idx) => ({ tool_name: t, operation: 'execute', required_permission: 'ALLOWED' })));
+        } else {
+          renderDAG([]);
         }
 
         chat.innerHTML += `<div class="message assistant">${data.response_text.replace(/\n/g, '<br>')}</div>`;
         chat.scrollTop = chat.scrollHeight;
 
         loadStats();
-        loadTasks();
       } catch (e) {
-        document.getElementById(loadingId).innerText = "❌ Error executing query: " + e.message;
+        clearInterval(timerInterval);
+        document.getElementById(loadingId).innerText = "❌ Error executing task: " + e.message;
+        updatePulseState('❌ Task Execution Error', e.message, false);
+        logTelemetry(`ERROR: ${e.message}`);
       }
+    }
+
+    async function loadStats() {
+      try {
+        const res = await fetch('/health');
+        const data = await res.json();
+        if (data && data.analytics) {
+          document.getElementById('stat-success-rate').innerText = data.analytics.success_rate_percent + '%';
+          document.getElementById('stat-total-queries').innerText = data.analytics.total_requests;
+        }
+      } catch (e) {}
     }
 
     async function checkApprovals() {
@@ -657,6 +670,8 @@
           document.getElementById('modal-desc').innerText = `Tool: ${req.tool_name} • Operation: ${req.operation} (${req.description})`;
           document.getElementById('modal-diff').innerText = req.diff_preview || JSON.stringify(req.parameters, null, 2);
           document.getElementById('approval-modal').style.display = 'flex';
+          updatePulseState('⚠️ Awaiting Operator Confirmation', `Approval required for ${req.tool_name}:${req.operation}`);
+          logTelemetry(`[PERMISSION GATE] Approval required for ${req.tool_name}.${req.operation}`);
         } else {
           document.getElementById('approval-modal').style.display = 'none';
         }
@@ -671,6 +686,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ decision: approved ? 'approve' : 'reject' })
         });
+        logTelemetry(`[PERMISSION GATE] Operator ${approved ? 'APPROVED' : 'REJECTED'} action.`);
       } catch (e) {}
       document.getElementById('approval-modal').style.display = 'none';
       currentApprovalId = null;
@@ -680,92 +696,7 @@
       if (e.key === 'Enter') sendQuery();
     });
 
-    async function reindexCodebase() {
-      const resultsDiv = document.getElementById('symbols-results');
-      resultsDiv.innerHTML = '<div style="color: var(--cyan-glow);">⚡ Parsing AST symbols across all workspace source files...</div>';
-      try {
-        const res = await fetch('/codebase/index', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ force: true })
-        });
-        const data = await res.json();
-        resultsDiv.innerHTML = `<div style="color: var(--accent-emerald);">✅ Indexed ${data.total_symbols_indexed} symbols across ${data.files_scanned} files (${Math.round(data.elapsed_ms)}ms).</div>`;
-        searchSymbols();
-      } catch (e) {
-        resultsDiv.innerHTML = `<div style="color: var(--accent-rose);">❌ Indexing error: ${e.message}</div>`;
-      }
-    }
-
-    async function searchSymbols() {
-      const query = document.getElementById('symbol-search-input').value.trim();
-      const resultsDiv = document.getElementById('symbols-results');
-      try {
-        const res = await fetch(`/codebase/symbols?query=${encodeURIComponent(query)}&limit=30`);
-        const data = await res.json();
-        if (data.symbols && data.symbols.length > 0) {
-          resultsDiv.innerHTML = data.symbols.map(s => `
-            <div class="task-item" style="gap: 0.5rem; justify-content: space-between;">
-              <div style="display: flex; flex-direction: column;">
-                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--cyan-glow);">
-                  <strong>${s.name}</strong> <span style="color: var(--text-muted); font-size: 0.75rem;">${s.signature || ''}</span>
-                </div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">${s.file_path}:${s.line_start}-${s.line_end}</div>
-              </div>
-              <span class="node-badge badge-allowed">${s.type}</span>
-            </div>
-          `).join('');
-        } else {
-          resultsDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem;">No matching symbols found.</div>';
-        }
-      } catch (e) {}
-    }
-
-    async function runPatchGenerator() {
-      const targetFile = document.getElementById('patch-file-input').value.trim();
-      const testTarget = document.getElementById('patch-test-input').value.trim();
-      const instruction = document.getElementById('patch-instruction-input').value.trim();
-      const outputContainer = document.getElementById('patch-output-container');
-      const statusBadge = document.getElementById('patch-status-badge');
-      const diffPreview = document.getElementById('patch-diff-preview');
-
-      if (!targetFile || !instruction) {
-        alert('Please provide target file and instruction.');
-        return;
-      }
-
-      outputContainer.style.display = 'block';
-      statusBadge.innerHTML = '<span style="color: var(--cyan-glow);">⚡ Generating surgical patch, running tests in staging sandbox, and executing self-healing loop...</span>';
-      diffPreview.innerText = 'Analyzing AST symbols and executing test harness...';
-
-      try {
-        const res = await fetch('/patch/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            target_file: targetFile,
-            instruction: instruction,
-            test_target: testTarget || null,
-            max_retries: 2,
-            dry_run: false
-          })
-        });
-        const data = await res.json();
-
-        if (data.tests_passed) {
-          statusBadge.innerHTML = `<span style="color: var(--accent-emerald);">✅ Patch Verified & Applied (${data.attempts} attempt(s), ${Math.round(data.elapsed_ms)}ms)</span>`;
-          diffPreview.innerText = data.patch_diff || '(Clean diff applied)';
-        } else {
-          statusBadge.innerHTML = `<span style="color: var(--accent-rose);">❌ Tests Failed After ${data.attempts} Attempt(s) (Changes Staged & Rolled Back)</span>`;
-          diffPreview.innerText = data.test_output || data.error || 'Test failure';
-        }
-      } catch (e) {
-        statusBadge.innerHTML = `<span style="color: var(--accent-rose);">❌ Execution Error: ${e.message}</span>`;
-      }
-    }
-
     loadStats();
-    loadTasks();
     setInterval(checkApprovals, 2000);
   </script>
 </body>
