@@ -223,6 +223,25 @@ class XerenAssistant:
                 f"- [#{iss.get('number')}] **{iss.get('title')}** (by"
                 f" @{iss.get('user')})"
             )
+        elif action.operation in ["read_prs", "search_prs", "search_pull_requests"]:
+          prs = data if isinstance(data, list) else []
+          if prs:
+            lines.append(f"🐙 **GitHub Pull Requests ({len(prs)})**{repaired_badge}:")
+            for pr in prs[:10]:
+              repo_str = f" in `{pr.get('repository')}`" if pr.get('repository') else ""
+              url_str = f"\n  🔗 {pr.get('html_url')}" if pr.get('html_url') else ""
+              lines.append(
+                  f"- [#{pr.get('number')}] **{pr.get('title')}** ({pr.get('state')}){repo_str} (by @{pr.get('user')}){url_str}"
+              )
+          else:
+            lines.append(f"🐙 **No pull requests found on your GitHub account**{repaired_badge}.")
+        elif action.operation in ["list_repos", "list_user_repos"]:
+          repos = data if isinstance(data, list) else []
+          lines.append(f"🐙 **Your GitHub Repositories ({len(repos)})**{repaired_badge}:")
+          for r in repos[:10]:
+            lines.append(
+                f"- **[{r.get('full_name')}]({r.get('html_url')})** ⭐ {r.get('stars', 0)} | 📌 {r.get('open_issues_count', 0)} open issues/PRs\n  > {r.get('description') or 'No description'}"
+            )
         elif action.operation == "create_issue":
           lines.append(
               f"🐙 **Created GitHub Issue #{data.get('issue_number')}**:"

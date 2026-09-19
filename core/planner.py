@@ -133,6 +133,17 @@ class TaskPlanner:
               )
           )
           return graph
+        elif any(kw in q.lower() for kw in ["pull request", "pr", "prs", "pulls"]):
+          graph.add_action(
+              self.create_action(
+                  action_id="act_01",
+                  tool_name="github",
+                  operation="read_prs",
+                  parameters={"repo": repo, "limit": 10},
+                  reason=f"Fetch pull requests from GitHub repository '{repo}'",
+              )
+          )
+          return graph
         else:
           graph.add_action(
               self.create_action(
@@ -141,6 +152,30 @@ class TaskPlanner:
                   operation="get_repo",
                   parameters={"repo": repo},
                   reason=f"Fetch repository metadata for '{repo}'",
+              )
+          )
+          return graph
+      else:
+        # User did not specify a repo (e.g. "check my github", "check repos with pull request")
+        if any(kw in q.lower() for kw in ["pull request", "pr", "prs", "pulls"]):
+          graph.add_action(
+              self.create_action(
+                  action_id="act_01",
+                  tool_name="github",
+                  operation="search_prs",
+                  parameters={},
+                  reason="Search pull requests across user's GitHub repositories",
+              )
+          )
+          return graph
+        else:
+          graph.add_action(
+              self.create_action(
+                  action_id="act_01",
+                  tool_name="github",
+                  operation="list_repos",
+                  parameters={"limit": 10},
+                  reason="List repositories from authenticated GitHub user account",
               )
           )
           return graph
@@ -249,9 +284,11 @@ class TaskPlanner:
             "You are the Task Planner for Xeren Assistant. Available tools:"
             " filesystem (read_file, list_dir, search_files, write_file,"
             " create_file), github (get_repo, read_issues, read_prs,"
-            " get_commits, create_issue, create_pr), web_search (search,"
-            " fetch_page), tasks (create_task, list_tasks, update_task,"
-            " get_task). Return a JSON array of Action objects with keys:"
+            " get_commits, create_issue, create_pr, list_repos, search_prs),"
+            " web_search (search, fetch_page), tasks (create_task, list_tasks,"
+            " update_task, get_task), codebase (index_workspace, find_symbol,"
+            " get_file_outline, get_call_graph), patch (generate_patch,"
+            " apply_patch). Return a JSON array of Action objects with keys:"
             " action_id, tool_name, operation, parameters, reason, timeout,"
             " depends_on."
         )
