@@ -13,7 +13,7 @@ class GeminiProvider(BaseLLMProvider):
   def __init__(
       self,
       api_key: Optional[str] = None,
-      model_name: str = "gemini-3.6-flash",
+      model_name: str = "gemini-3.5-flash",
   ):
     self.model_name = model_name
     settings = get_settings()
@@ -56,31 +56,38 @@ class GeminiProvider(BaseLLMProvider):
       config_kwargs["response_mime_type"] = "application/json"
       config_kwargs["response_schema"] = response_schema
 
-    try:
-      response = self.client.models.generate_content(
-          model=self.model_name,
-          contents=contents,
-          config=config_kwargs,
-      )
-      text = response.text or ""
-      return LLMResponse(
-          text=text,
-          raw_response=response,
-          model_name=self.model_name,
-          usage=LLMUsage(
-              prompt_tokens=getattr(
-                  response.usage_metadata, "prompt_token_count", 0
-              ),
-              completion_tokens=getattr(
-                  response.usage_metadata, "candidates_token_count", 0
-              ),
-              total_tokens=getattr(
-                  response.usage_metadata, "total_token_count", 0
-              ),
-          ),
-      )
-    except Exception as e:
-      raise RuntimeError(f"Gemini API generation error: {str(e)}")
+    models_to_try = [self.model_name, "gemini-3.5-flash", "gemini-3.5-flash-lite"]
+    last_err = None
+
+    for m in models_to_try:
+      try:
+        response = self.client.models.generate_content(
+            model=m,
+            contents=contents,
+            config=config_kwargs,
+        )
+        text = response.text or ""
+        return LLMResponse(
+            text=text,
+            raw_response=response,
+            model_name=m,
+            usage=LLMUsage(
+                prompt_tokens=getattr(
+                    response.usage_metadata, "prompt_token_count", 0
+                ),
+                completion_tokens=getattr(
+                    response.usage_metadata, "candidates_token_count", 0
+                ),
+                total_tokens=getattr(
+                    response.usage_metadata, "total_token_count", 0
+                ),
+            ),
+        )
+      except Exception as e:
+        last_err = e
+        continue
+
+    raise RuntimeError(f"Gemini API generation error: {str(last_err)}")
 
   async def generate_vision(
       self,
