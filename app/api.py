@@ -6,8 +6,14 @@ from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
+from agents.swarm import SwarmCoordinator
+from codebase.indexer import CodebaseIndexer
 from core.assistant import AssistantResponse, XerenAssistant
+from core.scheduler import TaskScheduler
+from patching.diff_applier import DiffApplier
+from patching.patch_engine import PatchEngine
 from security.permission_gate import ApprovalRequest
+from telemetry.flamegraph import TraceSpanTree
 
 
 class QueryRequest(BaseModel):
@@ -181,15 +187,21 @@ def create_app(assistant: Optional[XerenAssistant] = None) -> FastAPI:
     )
     return {"status": "saved", "memory": record.model_dump()}
 
-  # Phase 5: Task Scheduler Engine
-  from core.scheduler import TaskScheduler
-  from agents.swarm import SwarmCoordinator
-  from telemetry.flamegraph import TraceSpanTree
-
+  # Phase 5 & 6 engines
   scheduler = TaskScheduler(db_path=_assistant.settings.db_path)
   swarm_coordinator = SwarmCoordinator(
       llm_provider=_assistant.llm_provider,
       tool_registry=_assistant.tool_registry,
+  )
+  codebase_indexer = CodebaseIndexer(
+      workspace_root=_assistant.settings.workspace_root,
+      db_path=_assistant.settings.db_path,
+  )
+  patch_engine = PatchEngine(
+      workspace_root=_assistant.settings.workspace_root,
+      llm_provider=_assistant.llm_provider,
+      indexer=codebase_indexer,
+      settings=_assistant.settings,
   )
 
   @app.get("/jobs")
@@ -229,6 +241,85 @@ def create_app(assistant: Optional[XerenAssistant] = None) -> FastAPI:
       raise HTTPException(status_code=400, detail="Prompt cannot be empty.")
     result = await swarm_coordinator.collaborate(prompt=prompt)
     return result.model_dump()
+
+  # Phase 6: AST Codebase Indexing & Patching Endpoints
+  @app.post("/codebase/index")
+  async def index_codebase_endpoint(data: Optional[Dict[str, Any]] = None):
+    """Triggers complete or incremental codebase AST indexing."""
+    force = bool(data.get("force", False)) if data else False
+    result = codebase_indexer.index_workspace(force=force)
+    return result
+
+  @app.get("/codebase/symbols")
+  async def search_codebase_symbols_endpoint(
+      query: str = "",
+      type: Optional[str] = None,
+      file: Optional[str] = None,
+      limit: int = 50,
+  ):
+    """Searches indexed codebase symbols by name, type, or file."""
+    symbols = codebase_indexer.search_symbols(
+        query=query, symbol_type=type, file_pattern=file, limit=limit
+    )
+    return {"symbols": symbols, "total": len(symbols)}
+
+  @app.get("/codebase/outline")
+  async def get_file_outline_endpoint(file_path: str):
+    """Returns the structural AST outline for a specific source file."""
+    if not file_path:
+      raise HTTPException(status_code=400, detail="file_path parameter is required.")
+    outline = codebase_indexer.get_file_outline(file_path=file_path)
+    return {"file_path": file_path, "outline": outline}
+
+  @app.get("/codebase/call-graph")
+  async def get_call_graph_endpoint(symbol_name: str):
+    """Returns caller and callee hierarchies for a target symbol."""
+    if not symbol_name:
+      raise HTTPException(status_code=400, detail="symbol_name parameter is required.")
+    hierarchy = codebase_indexer.get_call_hierarchy(symbol_name=symbol_name)
+    return hierarchy
+
+  @app.post("/patch/generate")
+  async def generate_patch_endpoint(data: Dict[str, Any]):
+    """Autonomous TDD patch generation and test verification."""
+    target_file = data.get("target_file", "").strip()
+    instruction = data.get("instruction", "").strip()
+    test_target = data.get("test_target")
+    max_retries = int(data.get("max_retries", 2))
+    dry_run = bool(data.get("dry_run", False))
+
+    if not target_file or not instruction:
+      raise HTTPException(
+          status_code=400,
+          detail="target_file and instruction are required parameters.",
+      )
+
+    res = await patch_engine.generate_and_verify_patch(
+        target_file=target_file,
+        instruction=instruction,
+        test_target=test_target,
+        max_retries=max_retries,
+        dry_run=dry_run,
+    )
+    return res.model_dump()
+
+  @app.post("/patch/apply")
+  async def apply_patch_endpoint(data: Dict[str, Any]):
+    """Applies a unified diff patch to a workspace file."""
+    target_file = data.get("target_file", "").strip()
+    patch_diff = data.get("patch_diff", "").strip()
+
+    if not target_file or not patch_diff:
+      raise HTTPException(
+          status_code=400,
+          detail="target_file and patch_diff are required parameters.",
+      )
+
+    full_path = patch_engine.workspace_root / target_file
+    success, error = DiffApplier.apply_patch_to_file(full_path, patch_diff)
+    if not success:
+      raise HTTPException(status_code=400, detail=error or "Failed to apply patch.")
+    return {"status": "applied", "target_file": target_file}
 
   @app.get("/traces")
   async def list_traces(limit: int = 20):

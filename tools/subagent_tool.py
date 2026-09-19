@@ -3,6 +3,7 @@
 import time
 from typing import Any, Dict, List, Optional
 from agents.base import BaseSubagent, SubagentResult
+from agents.patcher import PatchSubagent
 from agents.researcher import ResearchSubagent
 from agents.reviewer import CodeReviewerSubagent
 from models.base import BaseLLMProvider
@@ -14,10 +15,11 @@ class SubagentTool(BaseTool):
   """Exposes specialized subagent execution to the Task Planner and Controller."""
 
   name = "subagent"
-  description = "Delegates complex sub-tasks to specialized autonomous subagents (researcher, code_reviewer)."
+  description = "Delegates complex sub-tasks to specialized autonomous subagents (researcher, code_reviewer, patcher)."
   supported_operations: List[str] = [
       "delegate_research",
       "delegate_code_review",
+      "delegate_patch",
   ]
 
   def __init__(
@@ -33,6 +35,7 @@ class SubagentTool(BaseTool):
     self.reviewer = CodeReviewerSubagent(
         llm_provider=llm_provider, tool_registry=tool_registry
     )
+    self.patcher = PatchSubagent(llm_provider=llm_provider)
 
   async def execute(self, action: Action) -> ToolResult:
     start_time = time.perf_counter()
@@ -56,6 +59,19 @@ class SubagentTool(BaseTool):
 
     elif op == "delegate_code_review":
       res = await self.reviewer.run(goal=goal, context=params)
+      elapsed = (time.perf_counter() - start_time) * 1000
+      return ToolResult(
+          action_id=action.action_id,
+          tool_name=self.name,
+          operation=action.operation,
+          success=res.success,
+          data=res.model_dump(),
+          error=res.error,
+          execution_time_ms=elapsed,
+      )
+
+    elif op == "delegate_patch":
+      res = await self.patcher.run(goal=goal, context=params)
       elapsed = (time.perf_counter() - start_time) * 1000
       return ToolResult(
           action_id=action.action_id,

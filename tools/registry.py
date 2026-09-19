@@ -11,9 +11,11 @@ from security.permission_gate import (
 from security.policies import OperationPolicy, PermissionLevel, RiskLevel, get_operation_policy
 from security.trust_boundary import TrustBoundary
 from .base import Action, BaseTool, ToolResult
+from .codebase_tool import CodebaseTool
 from .filesystem_tool import FilesystemTool
 from .github_tool import GitHubTool
 from .http_tool import HTTPTool
+from .patch_tool import PatchTool
 from .shell_tool import ShellTool
 from .task_tool import TaskTool
 from .web_search_tool import WebSearchTool
@@ -162,5 +164,7 @@ def get_default_registry(settings: Optional[Settings] = None) -> ToolRegistry:
       ShellTool(workspace_root=current_settings.workspace_root)
   )
   registry.register_tool(HTTPTool())
+  registry.register_tool(CodebaseTool())
+  registry.register_tool(PatchTool())
 
   return registry

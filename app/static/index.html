@@ -244,12 +244,13 @@
     <div class="brand">
       <div class="brand-logo">X</div>
       <div><div class="brand-title">Xeren Assistant</div></div>
-      <span class="brand-badge">Phase 5 Production Multi-Agent Swarm</span>
+      <span class="brand-badge">Phase 6 AST Codebase & Patch Studio</span>
     </div>
 
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="switchTab('chat')">💬 Orchestrator & DAG</button>
       <button class="nav-tab" onclick="switchTab('swarm')">🤖 Multi-Agent Swarm</button>
+      <button class="nav-tab" onclick="switchTab('codebase')">💻 Codebase & Patch</button>
       <button class="nav-tab" onclick="switchTab('memory')">🧠 Semantic Memory</button>
       <button class="nav-tab" onclick="switchTab('jobs')">⏰ Cron & Scheduler</button>
       <button class="nav-tab" onclick="switchTab('flamegraph')">📊 Trace Flamegraph</button>
@@ -279,8 +280,8 @@
         <div class="card-header"><div class="card-title">💬 Interactive AI Orchestrator</div></div>
         <div class="chat-messages" id="chat-messages">
           <div class="message assistant">
-            👋 <strong>Welcome to Xeren Assistant Enterprise Phase 5!</strong><br>
-            Equipped with Autonomous Multi-Agent Swarm Collaboration, Background Scheduled Cron Jobs, Long-Term Memory, and Flamegraph Observability.
+            👋 <strong>Welcome to Xeren Assistant Enterprise Phase 6!</strong><br>
+            Equipped with AST Codebase Indexing, Autonomous Test-Driven Patch Generator, Multi-Agent Swarm Collaboration, Background Scheduled Cron Jobs, Long-Term Memory, and Flamegraph Observability.
           </div>
         </div>
         <div class="chat-input-row">
@@ -302,6 +303,41 @@
         </div>
         <div id="swarm-timeline" style="display: flex; flex-direction: column; gap: 0.75rem; max-height: 480px; overflow-y: auto;">
           <div style="color: var(--text-muted); font-size: 0.9rem;">Click 'Launch Swarm' above to coordinate Researcher, Coder, and Reviewer subagents in consensus loop.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 6: AST Codebase & Patch Studio -->
+    <div class="main-panel tab-content" id="tab-codebase">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🔍 AST Codebase Symbol Explorer</div>
+          <button class="btn" style="background: rgba(0, 240, 255, 0.15); color: var(--cyan-glow); border: 1px solid rgba(0,240,255,0.3);" onclick="reindexCodebase()">⚡ Re-index Workspace</button>
+        </div>
+        <div class="chat-input-row" style="margin-top: 0; margin-bottom: 1rem;">
+          <input type="text" id="symbol-search-input" class="chat-input" placeholder="Search functions, classes, methods (e.g. CodebaseIndexer, DiffApplier)..." onkeyup="if(event.key==='Enter') searchSymbols()">
+          <button class="btn btn-approve" onclick="searchSymbols()">Search</button>
+        </div>
+        <div id="symbols-results" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 250px; overflow-y: auto;">
+          <div style="color: var(--text-muted); font-size: 0.9rem;">Type symbol name or click Re-index to view codebase structure.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🛠️ Autonomous Test-Driven Patch Generator</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="display: flex; gap: 0.75rem;">
+            <input type="text" id="patch-file-input" class="chat-input" placeholder="Target file (e.g. security/secrets.py)...">
+            <input type="text" id="patch-test-input" class="chat-input" placeholder="Test target (optional, e.g. tests/unit/test_secrets.py)...">
+          </div>
+          <textarea id="patch-instruction-input" class="chat-input" style="height: 70px; resize: none;" placeholder="Instruction: Bug fix or feature change (e.g. Add support for Bearer tokens in header redactor)..."></textarea>
+          <button class="btn btn-approve" style="align-self: flex-start;" onclick="runPatchGenerator()">🚀 Generate & Test Patch</button>
+          <div id="patch-output-container" style="display: none; margin-top: 0.5rem;">
+            <div id="patch-status-badge" style="font-weight: 700; margin-bottom: 0.5rem;"></div>
+            <pre id="patch-diff-preview" style="background: #000; padding: 1rem; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; max-height: 250px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); white-space: pre-wrap;"></pre>
+          </div>
         </div>
       </div>
     </div>
@@ -643,6 +679,90 @@
     document.getElementById('chat-input').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') sendQuery();
     });
+
+    async function reindexCodebase() {
+      const resultsDiv = document.getElementById('symbols-results');
+      resultsDiv.innerHTML = '<div style="color: var(--cyan-glow);">⚡ Parsing AST symbols across all workspace source files...</div>';
+      try {
+        const res = await fetch('/codebase/index', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ force: true })
+        });
+        const data = await res.json();
+        resultsDiv.innerHTML = `<div style="color: var(--accent-emerald);">✅ Indexed ${data.total_symbols_indexed} symbols across ${data.files_scanned} files (${Math.round(data.elapsed_ms)}ms).</div>`;
+        searchSymbols();
+      } catch (e) {
+        resultsDiv.innerHTML = `<div style="color: var(--accent-rose);">❌ Indexing error: ${e.message}</div>`;
+      }
+    }
+
+    async function searchSymbols() {
+      const query = document.getElementById('symbol-search-input').value.trim();
+      const resultsDiv = document.getElementById('symbols-results');
+      try {
+        const res = await fetch(`/codebase/symbols?query=${encodeURIComponent(query)}&limit=30`);
+        const data = await res.json();
+        if (data.symbols && data.symbols.length > 0) {
+          resultsDiv.innerHTML = data.symbols.map(s => `
+            <div class="task-item" style="gap: 0.5rem; justify-content: space-between;">
+              <div style="display: flex; flex-direction: column;">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--cyan-glow);">
+                  <strong>${s.name}</strong> <span style="color: var(--text-muted); font-size: 0.75rem;">${s.signature || ''}</span>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">${s.file_path}:${s.line_start}-${s.line_end}</div>
+              </div>
+              <span class="node-badge badge-allowed">${s.type}</span>
+            </div>
+          `).join('');
+        } else {
+          resultsDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem;">No matching symbols found.</div>';
+        }
+      } catch (e) {}
+    }
+
+    async function runPatchGenerator() {
+      const targetFile = document.getElementById('patch-file-input').value.trim();
+      const testTarget = document.getElementById('patch-test-input').value.trim();
+      const instruction = document.getElementById('patch-instruction-input').value.trim();
+      const outputContainer = document.getElementById('patch-output-container');
+      const statusBadge = document.getElementById('patch-status-badge');
+      const diffPreview = document.getElementById('patch-diff-preview');
+
+      if (!targetFile || !instruction) {
+        alert('Please provide target file and instruction.');
+        return;
+      }
+
+      outputContainer.style.display = 'block';
+      statusBadge.innerHTML = '<span style="color: var(--cyan-glow);">⚡ Generating surgical patch, running tests in staging sandbox, and executing self-healing loop...</span>';
+      diffPreview.innerText = 'Analyzing AST symbols and executing test harness...';
+
+      try {
+        const res = await fetch('/patch/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            target_file: targetFile,
+            instruction: instruction,
+            test_target: testTarget || null,
+            max_retries: 2,
+            dry_run: false
+          })
+        });
+        const data = await res.json();
+
+        if (data.tests_passed) {
+          statusBadge.innerHTML = `<span style="color: var(--accent-emerald);">✅ Patch Verified & Applied (${data.attempts} attempt(s), ${Math.round(data.elapsed_ms)}ms)</span>`;
+          diffPreview.innerText = data.patch_diff || '(Clean diff applied)';
+        } else {
+          statusBadge.innerHTML = `<span style="color: var(--accent-rose);">❌ Tests Failed After ${data.attempts} Attempt(s) (Changes Staged & Rolled Back)</span>`;
+          diffPreview.innerText = data.test_output || data.error || 'Test failure';
+        }
+      } catch (e) {
+        statusBadge.innerHTML = `<span style="color: var(--accent-rose);">❌ Execution Error: ${e.message}</span>`;
+      }
+    }
 
     loadStats();
     loadTasks();

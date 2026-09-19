@@ -247,6 +247,74 @@ OPERATION_POLICIES: Dict[Tuple[str, str], OperationPolicy] = {
         risk_level=RiskLevel.LOW,
         description="Delegate code and diff security analysis to CodeReviewerSubagent",
     ),
+    ("subagent", "delegate_patch"): OperationPolicy(
+        tool_name="subagent",
+        operation="delegate_patch",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Delegate autonomous test-driven patching to PatchSubagent",
+    ),
+    # Codebase AST & Symbol Indexing operations
+    ("codebase", "index_workspace"): OperationPolicy(
+        tool_name="codebase",
+        operation="index_workspace",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Index AST symbols and build call graph for workspace files",
+    ),
+    ("codebase", "find_symbol"): OperationPolicy(
+        tool_name="codebase",
+        operation="find_symbol",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Search for functions, classes, and methods across the codebase",
+    ),
+    ("codebase", "get_file_outline"): OperationPolicy(
+        tool_name="codebase",
+        operation="get_file_outline",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Extract structural outline and signatures for a source file",
+    ),
+    ("codebase", "find_references"): OperationPolicy(
+        tool_name="codebase",
+        operation="find_references",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Find all callers and references for a target code symbol",
+    ),
+    ("codebase", "get_call_graph"): OperationPolicy(
+        tool_name="codebase",
+        operation="get_call_graph",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Get caller and callee hierarchy for a target symbol",
+    ),
+    # Patch operations
+    ("patch", "generate_patch"): OperationPolicy(
+        tool_name="patch",
+        operation="generate_patch",
+        permission_level=PermissionLevel.ASK,
+        risk_level=RiskLevel.MEDIUM,
+        description="Generate and test-verify a code patch for a target file",
+        requires_user_approval=True,
+    ),
+    ("patch", "apply_patch"): OperationPolicy(
+        tool_name="patch",
+        operation="apply_patch",
+        permission_level=PermissionLevel.ASK,
+        risk_level=RiskLevel.MEDIUM,
+        description="Apply a unified diff patch to a source file",
+        requires_user_approval=True,
+    ),
+    ("patch", "revert_patch"): OperationPolicy(
+        tool_name="patch",
+        operation="revert_patch",
+        permission_level=PermissionLevel.ASK,
+        risk_level=RiskLevel.MEDIUM,
+        description="Revert a source file to previous backup content",
+        requires_user_approval=True,
+    ),
 }
 
 

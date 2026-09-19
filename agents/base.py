@@ -1,13 +1,13 @@
-"""Base abstractions for specialized autonomous subagents."""
-
+from __future__ import annotations
 from abc import ABC, abstractmethod
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 from pydantic import BaseModel, Field
 from models.base import BaseLLMProvider, LLMMessage, LLMResponse
 from security.trust_boundary import UntrustedData
-from tools.base import Action, ToolResult
-from tools.registry import ToolRegistry
+if TYPE_CHECKING:
+  from tools.base import Action, ToolResult
+  from tools.registry import ToolRegistry
 
 
 class SubagentResult(BaseModel):
