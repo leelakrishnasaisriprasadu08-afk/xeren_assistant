@@ -14,6 +14,8 @@ class IntentType(str, Enum):
   GITHUB = "github"
   WEB_SEARCH = "web_search"
   TASKS = "tasks"
+  DEVICE = "device"
+  SCHEDULE = "schedule"
   COMPOSITE = "composite"
 
 
@@ -36,6 +38,87 @@ class IntentClassifier:
   def _classify_rules(self, query: str) -> Optional[Intent]:
     """Fast deterministic rule-based classifier."""
     q = query.lower().strip()
+
+    # Schedule detection (e.g. "schedule health check every 5 minutes", "list schedules")
+    if any(
+        kw in q
+        for kw in [
+            "schedule",
+            "every 10 seconds",
+            "every 30 seconds",
+            "every 1 minute",
+            "every 5 minutes",
+            "every 10 minutes",
+            "every 30 minutes",
+            "every hour",
+            "every 2 hours",
+            "every day",
+            "recurring",
+            "cron job",
+            "list schedules",
+            "show schedules",
+            "cancel schedule",
+        ]
+    ):
+      return Intent(
+          intent_type=IntentType.SCHEDULE,
+          confidence=0.95,
+          primary_tool="scheduler",
+          summary="Task scheduling and recurring background execution",
+      )
+
+    # Device & OS automation detection
+    if any(
+        kw in q
+        for kw in [
+            "system stats",
+            "system info",
+            "cpu usage",
+            "ram usage",
+            "memory usage",
+            "disk space",
+            "battery status",
+            "device info",
+            "take screenshot",
+            "take a screenshot",
+            "capture screen",
+            "screenshot",
+            "clipboard",
+            "running process",
+            "list processes",
+            "kill process",
+            "terminate process",
+            "active window",
+            "list windows",
+            "lock screen",
+            "lock pc",
+            "mute volume",
+            "set volume",
+            "open notepad",
+            "launch notepad",
+            "open calc",
+            "launch calc",
+            "open calculator",
+            "launch calculator",
+            "open chrome",
+            "launch chrome",
+            "open edge",
+            "launch edge",
+            "open spotify",
+            "launch spotify",
+            "open vscode",
+            "launch vscode",
+            "open code",
+            "launch app",
+            "open app",
+        ]
+    ):
+      return Intent(
+          intent_type=IntentType.DEVICE,
+          confidence=0.95,
+          primary_tool="device",
+          summary="Device and OS level automation request",
+      )
 
     # Composite detection (e.g. search github / web and save to tasks)
     if ("github" in q or "issue" in q or "search" in q) and (

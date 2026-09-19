@@ -12,6 +12,7 @@ from security.policies import OperationPolicy, PermissionLevel, RiskLevel, get_o
 from security.trust_boundary import TrustBoundary
 from .base import Action, BaseTool, ToolResult
 from .codebase_tool import CodebaseTool
+from .device_tool import DeviceTool
 from .filesystem_tool import FilesystemTool
 from .github_tool import GitHubTool
 from .http_tool import HTTPTool
@@ -166,5 +167,6 @@ def get_default_registry(settings: Optional[Settings] = None) -> ToolRegistry:
   registry.register_tool(HTTPTool())
   registry.register_tool(CodebaseTool())
   registry.register_tool(PatchTool())
+  registry.register_tool(DeviceTool())
 
   return registry

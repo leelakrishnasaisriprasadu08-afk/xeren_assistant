@@ -321,6 +321,78 @@ def create_app(assistant: Optional[XerenAssistant] = None) -> FastAPI:
       raise HTTPException(status_code=400, detail=error or "Failed to apply patch.")
     return {"status": "applied", "target_file": target_file}
 
+  @app.get("/device/stats")
+  async def get_device_stats():
+    """Retrieves real-time CPU, RAM, Disk, Battery, and OS telemetry."""
+    dev_tool = _assistant.tool_registry.get_tool("device")
+    if not dev_tool:
+      raise HTTPException(status_code=500, detail="DeviceTool not registered.")
+    from tools.base import Action
+    res = await dev_tool.execute(Action(action_id="dev_stats", tool_name="device", operation="get_system_info", parameters={}))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to retrieve stats.")
+    return res.data
+
+  @app.get("/device/processes")
+  async def get_device_processes(limit: int = 20, sort_by: str = "memory", filter: Optional[str] = None):
+    """Lists running processes."""
+    dev_tool = _assistant.tool_registry.get_tool("device")
+    if not dev_tool:
+      raise HTTPException(status_code=500, detail="DeviceTool not registered.")
+    from tools.base import Action
+    res = await dev_tool.execute(Action(action_id="dev_proc", tool_name="device", operation="list_processes", parameters={"limit": limit, "sort_by": sort_by, "filter_name": filter}))
+    return {"processes": res.data or []}
+
+  @app.post("/device/launch")
+  async def launch_device_app(data: Dict[str, Any]):
+    """Launches a desktop application."""
+    app_name = data.get("app_name") or data.get("name")
+    if not app_name:
+      raise HTTPException(status_code=400, detail="app_name parameter is required.")
+    dev_tool = _assistant.tool_registry.get_tool("device")
+    from tools.base import Action
+    res = await dev_tool.execute(Action(action_id="dev_launch", tool_name="device", operation="launch_app", parameters={"app_name": app_name, "args": data.get("args")}))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to launch app.")
+    return res.data
+
+  @app.post("/device/screenshot")
+  async def capture_device_screenshot():
+    """Captures desktop screenshot."""
+    dev_tool = _assistant.tool_registry.get_tool("device")
+    from tools.base import Action
+    res = await dev_tool.execute(Action(action_id="dev_screen", tool_name="device", operation="capture_screenshot", parameters={}))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to take screenshot.")
+    return res.data
+
+  @app.get("/scheduler/jobs")
+  async def list_scheduled_jobs(active_only: bool = False):
+    """Lists scheduled background jobs."""
+    scheduler = TaskScheduler(db_path=_assistant.settings.db_path)
+    jobs = scheduler.list_jobs(only_active=active_only)
+    return {"jobs": [j.model_dump() for j in jobs]}
+
+  @app.post("/scheduler/jobs")
+  async def create_scheduled_job(data: Dict[str, Any]):
+    """Registers a new scheduled background job."""
+    name = data.get("name") or "Scheduled Task"
+    interval = float(data.get("interval_seconds", 60.0))
+    action_type = data.get("action_type", "query")
+    payload = data.get("payload", {})
+    scheduler = TaskScheduler(db_path=_assistant.settings.db_path)
+    job = scheduler.add_job(name=name, interval_seconds=interval, action_type=action_type, payload=payload)
+    return job.model_dump()
+
+  @app.delete("/scheduler/jobs/{job_id}")
+  async def cancel_scheduled_job(job_id: str):
+    """Cancels a scheduled background job."""
+    scheduler = TaskScheduler(db_path=_assistant.settings.db_path)
+    success = scheduler.cancel_job(job_id)
+    if not success:
+      raise HTTPException(status_code=404, detail=f"Job {job_id} not found or already inactive.")
+    return {"status": "cancelled", "job_id": job_id}
+
   @app.get("/traces")
   async def list_traces(limit: int = 20):
     """Lists recent execution traces."""
@@ -337,6 +409,7 @@ def create_app(assistant: Optional[XerenAssistant] = None) -> FastAPI:
       )
     flamegraph = TraceSpanTree.from_trace_dict(trace.model_dump())
     return flamegraph.model_dump()
+
 
   @app.websocket("/ws/stream")
   async def websocket_stream(websocket: WebSocket):

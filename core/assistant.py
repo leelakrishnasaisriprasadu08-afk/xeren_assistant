@@ -311,6 +311,86 @@ class XerenAssistant:
             f" ({action.operation}){repaired_badge}:\n{findings}"
         )
 
+      elif action.tool_name == "device":
+        if action.operation == "get_system_info":
+          cpu = data.get("cpu", {})
+          mem = data.get("memory", {})
+          plat = data.get("platform", {})
+          disks = data.get("disks", [])
+          bat = data.get("battery")
+          uptime = data.get("uptime_hours", 0)
+
+          disk_lines = []
+          for d in disks:
+            disk_lines.append(f"    - `{d.get('mountpoint')}` {d.get('used_gb')}GB / {d.get('total_gb')}GB ({d.get('percent_used')}%)")
+          disk_str = "\n".join(disk_lines) if disk_lines else "    - None detected"
+
+          bat_str = f"{bat.get('percent')}% (Plugged in: {bat.get('power_plugged')})" if bat else "Desktop / No battery"
+
+          lines.append(
+              f"🖥️ **System Telemetry & Device Health**{repaired_badge}:\n"
+              f"- **OS**: {plat.get('system')} {plat.get('release')} ({plat.get('architecture')}) | Host: `{plat.get('hostname')}`\n"
+              f"- **CPU Usage**: {cpu.get('usage_percent')}% ({cpu.get('logical_cores')} logical cores)\n"
+              f"- **Memory (RAM)**: {mem.get('used_gb')} GB / {mem.get('total_gb')} GB ({mem.get('percent_used')}% used, {mem.get('free_gb')} GB free)\n"
+              f"- **Storage Disks**:\n{disk_str}\n"
+              f"- **Battery**: {bat_str}\n"
+              f"- **System Uptime**: {uptime} hours"
+          )
+
+        elif action.operation == "list_processes":
+          procs = data if isinstance(data, list) else []
+          proc_rows = ["| PID | Process Name | CPU % | Memory (MB) | Status |", "| :--- | :--- | :--- | :--- | :--- |"]
+          for p in procs[:15]:
+            proc_rows.append(f"| {p.get('pid')} | `{p.get('name')}` | {p.get('cpu_percent')}% | {p.get('memory_mb')} MB | {p.get('status')} |")
+          lines.append(f"⚙️ **Active Running Processes ({len(procs)})**{repaired_badge}:\n\n" + "\n".join(proc_rows))
+
+        elif action.operation == "launch_app":
+          lines.append(f"🚀 **Launched Desktop Application**{repaired_badge}: `{data.get('app')}` (PID: {data.get('pid')})")
+
+        elif action.operation == "kill_process":
+          lines.append(f"🛑 **Terminated Process**{repaired_badge}: {data.get('killed_count')} process(es) stopped.")
+
+        elif action.operation == "capture_screenshot":
+          lines.append(
+              f"📸 **Desktop Screenshot Captured**{repaired_badge}:\n"
+              f"- **Saved to**: `{data.get('file_path')}`\n"
+              f"- **Resolution**: {data.get('width')}x{data.get('height')} px\n"
+              f"- **Size**: {round(data.get('size_bytes', 0) / 1024, 1)} KB"
+          )
+
+        elif action.operation == "get_clipboard":
+          clip = data.get("clipboard_text", "")
+          lines.append(f"📋 **Current Clipboard Text**{repaired_badge}:\n```\n{clip or '(Clipboard is empty)'}\n```")
+
+        elif action.operation == "set_clipboard":
+          lines.append(f"📋 **Copied to Clipboard**{repaired_badge}: {data.get('length')} characters.")
+
+        elif action.operation == "get_active_window":
+          lines.append(
+              f"🪟 **Active Foreground Window**{repaired_badge}:\n"
+              f"- **Title**: `{data.get('title')}`\n"
+              f"- **Process**: `{data.get('process_name')}` (PID: {data.get('pid')})"
+          )
+
+        elif action.operation == "list_windows":
+          wins = data if isinstance(data, list) else []
+          lines.append(f"🪟 **Visible Desktop Windows ({len(wins)})**{repaired_badge}:")
+          for w in wins[:10]:
+            lines.append(f"- `{w.get('title')}` (PID: {w.get('pid')})")
+
+        elif action.operation == "lock_screen":
+          lines.append(f"🔒 **Windows Workstation Screen Locked**{repaired_badge}")
+
+        elif action.operation == "mute_volume":
+          lines.append(f"🔊 **System Audio Mute Toggled**{repaired_badge}")
+
+        elif action.operation == "set_volume":
+          lines.append(f"🔊 **System Audio Volume**: Set to {data.get('level')}%{repaired_badge}")
+
+        elif action.operation == "open_path_or_url":
+          lines.append(f"🔗 **Opened Target**{repaired_badge}: `{data.get('target')}`")
+
+
     return (
         "\n\n".join(lines)
         if lines

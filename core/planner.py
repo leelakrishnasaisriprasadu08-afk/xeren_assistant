@@ -236,6 +236,217 @@ class TaskPlanner:
         )
         return graph
 
+    # Device and OS Automation Plan
+    if intent.intent_type == IntentType.DEVICE:
+      # 1. System Info / Telemetry
+      if any(
+          kw in q.lower()
+          for kw in [
+              "system stats",
+              "system info",
+              "cpu",
+              "ram",
+              "memory",
+              "disk space",
+              "battery",
+              "device info",
+              "hardware",
+          ]
+      ):
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="device",
+                operation="get_system_info",
+                parameters={},
+                reason="Gather real-time CPU, RAM, Disk, Battery, and OS telemetry",
+            )
+        )
+        return graph
+
+      # 2. Screenshot
+      if any(
+          kw in q.lower()
+          for kw in ["screenshot", "capture screen", "capture desktop"]
+      ):
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="device",
+                operation="capture_screenshot",
+                parameters={},
+                reason="Capture full screen desktop screenshot",
+            )
+        )
+        return graph
+
+      # 3. Process Management
+      if any(
+          kw in q.lower()
+          for kw in ["kill process", "terminate process", "stop process"]
+      ):
+        proc_match = re.search(
+            r'(?:kill|terminate|stop)\s+process\s+[\'"]?([^\s\'"]+)[\'"]?',
+            q,
+            re.IGNORECASE,
+        )
+        target = proc_match.group(1) if proc_match else None
+        params: Dict[str, Any] = {}
+        if target:
+          if target.isdigit():
+            params["pid"] = int(target)
+          else:
+            params["name"] = target
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="device",
+                operation="kill_process",
+                parameters=params,
+                reason=f"Terminate process '{target or 'specified'}'",
+            )
+        )
+        return graph
+
+      if any(
+          kw in q.lower()
+          for kw in ["list processes", "running processes", "show processes", "task manager"]
+      ):
+        sort = "cpu" if "cpu" in q.lower() else "memory"
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="device",
+                operation="list_processes",
+                parameters={"limit": 15, "sort_by": sort},
+                reason=f"List active processes sorted by {sort}",
+            )
+        )
+        return graph
+
+      # 4. Clipboard
+      if any(
+          kw in q.lower()
+          for kw in ["get clipboard", "read clipboard", "paste clipboard"]
+      ):
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="device",
+                operation="get_clipboard",
+                parameters={},
+                reason="Read current text from system clipboard",
+            )
+        )
+        return graph
+
+      if any(
+          kw in q.lower()
+          for kw in ["set clipboard", "copy to clipboard"]
+      ):
+        text_match = re.search(
+            r'(?:copy to clipboard|set clipboard)\s+[\'"]?(.+)[\'"]?',
+            q,
+            re.IGNORECASE,
+        )
+        text_to_copy = text_match.group(1).strip("'\"") if text_match else ""
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="device",
+                operation="set_clipboard",
+                parameters={"text": text_to_copy},
+                reason="Copy text to system clipboard",
+            )
+        )
+        return graph
+
+      # 5. Windows & Lock
+      if any(kw in q.lower() for kw in ["lock screen", "lock pc", "lock computer"]):
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="device",
+                operation="lock_screen",
+                parameters={},
+                reason="Lock the Windows workstation screen",
+            )
+        )
+        return graph
+
+      if any(kw in q.lower() for kw in ["active window", "focused window"]):
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="device",
+                operation="get_active_window",
+                parameters={},
+                reason="Inspect active foreground desktop window",
+            )
+        )
+        return graph
+
+      if any(kw in q.lower() for kw in ["list windows", "open windows"]):
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="device",
+                operation="list_windows",
+                parameters={},
+                reason="List visible top-level application windows",
+            )
+        )
+        return graph
+
+      # 6. Audio / Volume
+      if any(kw in q.lower() for kw in ["mute volume", "unmute", "mute audio"]):
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="device",
+                operation="mute_volume",
+                parameters={},
+                reason="Toggle mute on system audio",
+            )
+        )
+        return graph
+
+      # 7. App Launching
+      app_match = re.search(
+          r'(?:open|launch|run|start)\s+(?:app\s+|application\s+)?[\'"]?([a-zA-Z0-9_\-\.\s]+)[\'"]?',
+          q,
+          re.IGNORECASE,
+      )
+      if app_match:
+        app_name = app_match.group(1).strip()
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="device",
+                operation="launch_app",
+                parameters={"app_name": app_name},
+                reason=f"Launch desktop application '{app_name}'",
+            )
+        )
+        return graph
+
+    # Task Scheduling Plan
+    if intent.intent_type == IntentType.SCHEDULE:
+      graph.add_action(
+          self.create_action(
+              action_id="act_01",
+              tool_name="tasks",
+              operation="create_task",
+              parameters={
+                  "title": f"Scheduled Job: {q}",
+                  "description": f"Scheduled task created from prompt: '{q}'",
+                  "priority": "high",
+              },
+              reason=f"Register scheduled workflow for '{q}'",
+          )
+      )
+      return graph
+
     # Composite DAG Workflow (GitHub check + task creation with dependency)
     if intent.intent_type == IntentType.COMPOSITE:
       repo_match = re.search(r"([\w\-]+/[\w\-]+)", q)
@@ -288,9 +499,12 @@ class TaskPlanner:
             " web_search (search, fetch_page), tasks (create_task, list_tasks,"
             " update_task, get_task), codebase (index_workspace, find_symbol,"
             " get_file_outline, get_call_graph), patch (generate_patch,"
-            " apply_patch). Return a JSON array of Action objects with keys:"
-            " action_id, tool_name, operation, parameters, reason, timeout,"
-            " depends_on."
+            " apply_patch), device (get_system_info, list_processes,"
+            " kill_process, launch_app, open_path_or_url, get_clipboard,"
+            " set_clipboard, capture_screenshot, get_active_window,"
+            " list_windows, lock_screen, mute_volume, set_volume)."
+            " Return a JSON array of Action objects with keys: action_id,"
+            " tool_name, operation, parameters, reason, timeout, depends_on."
         )
         resp = await self.llm_provider.generate(
             messages=[LLMMessage(role="user", content=query)],
