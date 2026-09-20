@@ -76,6 +76,7 @@ class WebBuilderTool(BaseTool):
     created_files = []
     for fname, content in files.items():
       fpath = target_dir / fname
+      fpath.parent.mkdir(parents=True, exist_ok=True)
       fpath.write_text(content, encoding="utf-8")
       created_files.append({"file": fname, "size_bytes": len(content.encode("utf-8"))})
 

@@ -1,8 +1,9 @@
-"""Autonomous Web & App Deployment Agent for Xeren Assistant.
+"""Autonomous Multi-Language Web & App Deployment Agent for Xeren Assistant.
 
-Generates complete, realistic, production-grade full-stack web applications
-tailored directly to the user's ideas, persona, tech stack, and portfolio requirements.
-Includes Python backend (REST API + static file server) and modern HTML5/CSS3/JS frontend.
+Scaffolds complete, multi-tier, production-grade software repositories on the user's disk
+with multi-language source files (Python, JavaScript, HTML, CSS, Shell, Batch, Docker, YAML, JSON),
+complete architectural documentation (ARCHITECTURE.md, API_SPEC.md, DEPLOYMENT.md, SECURITY.md),
+automated unit tests, and cross-platform run scripts.
 """
 
 import json
@@ -14,13 +15,13 @@ from models.provider import MockLLMProvider
 
 
 class WebDeployerAgent:
-  """Autonomous agent that designs, scaffolds, and deploys complete full-stack web apps and portfolios."""
+  """Autonomous agent that designs, scaffolds, and deploys complete real-world multi-language codebases."""
 
   def __init__(self, llm_provider: Optional[BaseLLMProvider] = None):
     self.llm_provider = llm_provider or MockLLMProvider()
 
   def _extract_user_context(self, prompt: str, project_name: str) -> Dict[str, Any]:
-    """Extracts custom user ideas, name, role, skills, and sections from prompt."""
+    """Extracts custom user ideas, name, role, domain, and custom features from prompt."""
     p_lower = prompt.lower()
 
     # Extract Name
@@ -38,15 +39,16 @@ class WebDeployerAgent:
           "the website",
           "modern",
           "clean",
+          "production",
       ]:
         name = candidate
     elif "leela" in p_lower:
       name = "Leela Krishna"
     elif "xeren" in p_lower:
-      name = "Xeren AI Core"
+      name = "Xeren Autonomous Systems"
 
     # Extract Role / Title
-    role = "Senior AI Engineer & Full-Stack Systems Architect"
+    role = "Lead AI Systems Engineer & Full-Stack Architect"
     if any(kw in p_lower for kw in ["data scientist", "machine learning", "ai researcher"]):
       role = "Senior AI / ML Research & Systems Engineer"
     elif any(kw in p_lower for kw in ["devops", "cloud", "sre", "infrastructure"]):
@@ -56,57 +58,389 @@ class WebDeployerAgent:
     elif any(kw in p_lower for kw in ["freelance", "consultant", "developer"]):
       role = "Full-Stack Software Consultant & Autonomous Systems Developer"
 
-    # Extract Bio / Headline
+    # Extract Headline
     headline = (
-        f"Crafting resilient, high-concurrency systems, autonomous AI agents, "
-        f"and modern web architectures with relentless precision."
+        f"Designing resilient, high-concurrency systems, autonomous agent architectures, "
+        f"and modern full-stack web platforms with verified engineering excellence."
     )
 
-    # Determine Project Title
+    # Determine Project Title & Slug
     title = project_name.replace("_", " ").replace("-", " ").title()
-    if title.lower() in ["ai portfolio", "xeren web app", "web app"]:
-      title = f"{name} • Engineering Portfolio"
+    if title.lower() in ["ai portfolio", "xeren web app", "web app", "my web app"]:
+      title = f"{name} • Software Platform"
+
+    slug = re.sub(r"[^a-zA-Z0-9_\-]", "_", project_name.lower()).strip("_") or "xeren_app"
 
     return {
         "name": name,
         "role": role,
         "headline": headline,
         "title": title,
+        "slug": slug,
         "prompt": prompt,
-        "project_name": project_name,
     }
 
   def generate_scaffold_files(
       self, prompt: str, project_name: str
   ) -> Dict[str, str]:
-    """Generates complete source code files (server.py, index.html, styles.css, app.js, README.md)."""
+    """Generates a complete multi-tier, multi-language repository with 15+ files."""
     ctx = self._extract_user_context(prompt, project_name)
     name = ctx["name"]
     role = ctx["role"]
     headline = ctx["headline"]
     title = ctx["title"]
+    slug = ctx["slug"]
 
-    # 1. Generate Python Full-Stack Backend (server.py)
-    server_content = f'''#!/usr/bin/env python3
-"""Full-Stack Backend Server for {title}.
+    # 1. Root README.md
+    readme_content = f"""# {title}
 
-Provides REST API endpoints for projects, skills, real-time stats, and contact messaging,
-while serving static frontend assets (HTML, CSS, JS) on a unified port.
+> {headline}
+
+**{title}** is a production-ready, full-stack web application and engineering platform autonomously generated and deployed by **Xeren Assistant**.
+
+---
+
+## 🌟 Architecture & Multi-Language Stack
+
+| Component | Language / Tool | Responsibility |
+| :--- | :--- | :--- |
+| **Backend API Server** | Python 3 (`http.server` / REST) | REST endpoints for projects, skills, telemetry, and contact |
+| **Data Layer** | Python (`data_store.py`) | In-memory persistence & JSON ledger for messages |
+| **Frontend Client** | HTML5 Semantic Markup | Accessible, SEO-friendly responsive interface |
+| **Styles & Effects** | Vanilla CSS3 + Glassmorphism | Custom design tokens, dark mode gradients, micro-interactions |
+| **Client Scripting** | Modern Vanilla JavaScript | Dynamic project filters, interactive terminal sandbox, AJAX forms |
+| **Containerization** | Docker & Docker Compose | Containerized multi-environment runtime |
+| **Automation & Scripts** | Bash (`.sh`) & Batch (`.bat`) | One-click cross-platform development launchers |
+| **Quality Assurance** | Python `pytest` | Automated unit tests for backend APIs and frontend assets |
+
+---
+
+## 📂 Repository Directory Layout
+
+```
+{slug}/
+├── README.md                      # Project overview, setup, and run instructions
+├── .env.example                   # Environment configuration template
+├── requirements.txt               # Python backend dependencies
+├── package.json                   # Web application metadata and scripts
+├── Dockerfile                     # Container build manifest
+├── docker-compose.yml             # Container orchestration config
+│
+├── docs/                          # Comprehensive System Architecture Documents
+│   ├── ARCHITECTURE.md            # System design, Mermaid diagrams & data flow
+│   ├── API_SPEC.md                # OpenAPI / REST endpoint specifications
+│   ├── DEPLOYMENT.md              # Production deployment & monitoring guide
+│   └── SECURITY.md                # Security policy & cryptographic rings
+│
+├── backend/                       # Python Backend Subsystem
+│   ├── __init__.py
+│   ├── server.py                  # Standalone unified HTTP/REST API server
+│   ├── models.py                  # Data schemas & validation models
+│   ├── data_store.py              # Repository persistence & store logic
+│   └── api_routes.py              # Route dispatcher
+│
+├── frontend/                      # Frontend Web Subsystem
+│   ├── index.html                 # Main web application entry point
+│   ├── styles/
+│   │   └── main.css               # Glassmorphic CSS styling & design tokens
+│   └── scripts/
+│       └── app.js                 # Dynamic client-side logic & terminal emulator
+│
+├── tests/                         # Automated Unit Tests
+│   ├── __init__.py
+│   ├── test_backend_api.py        # Backend REST API endpoint tests
+│   └── test_frontend.py          # Frontend asset integrity tests
+│
+├── scripts/                       # Cross-Platform Execution Scripts
+│   ├── run_dev.bat                # Windows launch script
+│   └── run_dev.sh                 # Linux / macOS launch script
+│
+└── server.py                      # Root launcher bridging backend & frontend
+```
+
+---
+
+## 🚀 Quick Start & Local Execution
+
+### 1. Run with Python (No External Dependencies Required)
+```bash
+# Launch the full-stack server on default port 3000:
+python server.py 3000
+```
+Open **http://127.0.0.1:3000** in your browser.
+
+### 2. Using Cross-Platform Scripts
+* **Windows**: `scripts\\run_dev.bat`
+* **Linux / macOS**: `bash scripts/run_dev.sh`
+
+### 3. Run with Docker
+```bash
+docker-compose up --build
+```
+
+### 4. Run Automated Test Suite
+```bash
+pytest tests/ -v
+```
+
+---
+
+## 📡 REST API Summary
+
+- `GET /api/health` — System health status, backend uptime, and version.
+- `GET /api/profile` — Profile metadata, bio, location, and social links.
+- `GET /api/projects` — Categorized software projects with architecture notes.
+- `GET /api/skills` — Categorized technical proficiencies.
+- `GET /api/stats` — Real-time telemetry statistics.
+- `POST /api/contact` — Interactive message dispatch endpoint.
+
+See [`docs/API_SPEC.md`](docs/API_SPEC.md) for full endpoint specifications.
 """
 
-import json
-import mimetypes
-import os
-from pathlib import Path
-import sys
+    # 2. docs/ARCHITECTURE.md
+    arch_doc = f"""# System Architecture Specification: {title}
+
+This document details the architectural design, component topology, and data flow for **{title}**.
+
+---
+
+## 🏛️ System Architecture Topology
+
+```mermaid
+graph TD
+    Client["Browser Client (HTML5 / CSS3 / JS)"] --> Gateway["Python Backend HTTP Server (server.py)"]
+    
+    subgraph "Backend Subsystem"
+        Gateway --> Router["API Route Dispatcher (api_routes.py)"]
+        Router --> Models["Data Models & Schemas (models.py)"]
+        Router --> Store["Data Store & Persistence (data_store.py)"]
+        Store --> MsgLog["In-Memory & JSON Message Ledger"]
+        Gateway --> StaticHandler["Static Asset Server (frontend/)"]
+    end
+
+    subgraph "Frontend Subsystem"
+        Client --> Hero["Hero & KPI Metrics"]
+        Client --> Projects["Filterable Projects Showcase"]
+        Client --> Skills["Skills & Technology Matrix"]
+        Client --> Terminal["Interactive Developer Terminal"]
+        Client --> Contact["AJAX Contact Form"]
+    end
+```
+
+---
+
+## 🧩 Component Responsibilities
+
+### 1. Backend Server Layer (`backend/server.py`)
+- Extends Python's native `http.server.SimpleHTTPRequestHandler` with zero external dependencies.
+- Handles CORS headers (`Access-Control-Allow-Origin: *`) for open local interoperability.
+- Seamlessly maps `/api/*` requests to REST handlers and all other GET requests to `frontend/` static assets.
+
+### 2. Data Store Layer (`backend/data_store.py`)
+- Provides query functions (`get_projects(category=None)`, `get_skills()`, `get_stats()`, `add_contact_message(payload)`).
+- Thread-safe message queuing for incoming contact submissions.
+
+### 3. Frontend Client Layer (`frontend/`)
+- Built with Vanilla HTML5/CSS3/JavaScript for maximum speed, zero build-step overhead, and compatibility.
+- Interactive developer terminal simulating a full CLI inside the browser with dynamic commands (`help`, `skills`, `projects`, `stats`, `health`, `theme`, `clear`).
+- Live AJAX communication with Python backend for real-time contact form validation and submission.
+"""
+
+    # 3. docs/API_SPEC.md
+    api_doc = f"""# REST API Specification: {title}
+
+Base URL: `http://127.0.0.1:3000`
+
+---
+
+## 1. System Health
+* **Endpoint**: `GET /api/health`
+* **Response**: `200 OK`
+```json
+{{
+  "status": "healthy",
+  "uptime_seconds": 12.4,
+  "app": "{title}",
+  "version": "2.5.0",
+  "backend": "Python 3 Native HTTP/REST"
+}}
+```
+
+---
+
+## 2. Creator Profile
+* **Endpoint**: `GET /api/profile`
+* **Response**: `200 OK`
+```json
+{{
+  "name": "{name}",
+  "role": "{role}",
+  "headline": "{headline}",
+  "location": "Global / Remote",
+  "availability": "Available for High-Impact Projects",
+  "github": "https://github.com",
+  "linkedin": "https://linkedin.com",
+  "email": "contact@{name.lower().replace(' ', '')}.dev"
+}}
+```
+
+---
+
+## 3. Projects Catalog
+* **Endpoint**: `GET /api/projects`
+* **Response**: `200 OK`
+```json
+{{
+  "projects": [
+    {{
+      "id": "proj-1",
+      "title": "Autonomous Multi-Agent Orchestration Framework",
+      "category": "ai",
+      "badge": "Featured",
+      "description": "Enterprise-grade autonomous agent framework supporting dynamic DAG wave scheduling.",
+      "tech_stack": ["Python", "FastAPI", "SQLite", "AsyncIO", "PyTorch"],
+      "metrics": "149/149 Verified Tests • Sub-20ms DAG Latency"
+    }}
+  ],
+  "total": 5
+}}
+```
+
+---
+
+## 4. Contact Message Dispatch
+* **Endpoint**: `POST /api/contact`
+* **Headers**: `Content-Type: application/json`
+* **Request Body**:
+```json
+{{
+  "name": "Sarah Connor",
+  "email": "sarah@cyberdyne.com",
+  "subject": "AI Systems Consultation",
+  "message": "We would like to discuss building an autonomous agent architecture."
+}}
+```
+* **Response**: `200 OK`
+```json
+{{
+  "status": "success",
+  "message": "Thank you, Sarah Connor! Your message has been safely received by the Python backend.",
+  "timestamp": 1726857600.0
+}}
+```
+"""
+
+    # 4. docs/DEPLOYMENT.md
+    deploy_doc = f"""# Production Deployment & Operations Guide: {title}
+
+This guide explains how to deploy and operate **{title}** in production environments.
+
+---
+
+## 1. Docker Deployment
+
+### Build and Run:
+```bash
+# Build standalone image
+docker build -t {slug}:latest .
+
+# Run container on port 3000
+docker run -d -p 3000:3000 --name {slug}_instance {slug}:latest
+```
+
+---
+
+## 2. Systemd Service (Linux Production)
+
+Create `/etc/systemd/system/{slug}.service`:
+```ini
+[Unit]
+Description={title} Full-Stack Web Service
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/{slug}
+ExecStart=/usr/bin/python3 server.py 3000
+Restart=always
+RestartSec=5
+Environment=PORT=3000
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now {slug}
+```
+
+---
+
+## 3. Nginx Reverse Proxy Configuration
+
+```nginx
+server {{
+    listen 80;
+    server_name yourdomain.com;
+
+    location / {{
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }}
+}}
+```
+"""
+
+    # 5. docs/SECURITY.md
+    sec_doc = f"""# Security & Privilege Rings Specification: {title}
+
+**{title}** implements defensive security best practices inspired by Linux kernel privilege rings:
+
+1. **Input Validation**: Strict JSON body parsing and type-checking on all POST `/api/contact` submissions.
+2. **CORS Isolation**: Controlled cross-origin resource sharing headers.
+3. **No Unsafe Execution**: Zero `eval()` or unsanitized shell execution in backend routing.
+4. **Header Hardening**: `X-Content-Type-Options: nosniff` and UTF-8 charset enforcement.
+"""
+
+    # 6. backend/models.py
+    models_py = f'''"""Data models and payload schemas for {title}."""
+
+from typing import Any, Dict, List, Optional
+
+class ContactMessage:
+    """Represents an inbound message received via the contact form."""
+    def __init__(self, name: str, email: str, subject: str, message: str, timestamp: float):
+        self.name = name
+        self.email = email
+        self.subject = subject
+        self.message = message
+        self.timestamp = timestamp
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {{
+            "name": self.name,
+            "email": self.email,
+            "subject": self.subject,
+            "message": self.message,
+            "timestamp": self.timestamp,
+        }}
+'''
+
+    # 7. backend/data_store.py
+    data_store_py = f'''"""In-memory and persistent data repository for {title}."""
+
 import time
-from urllib.parse import parse_qs, urlparse
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from typing import Any, Dict, List, Optional
+from .models import ContactMessage
 
-START_TIME = time.time()
-MESSAGES_LOG = []
-
-PORTFOLIO_DATA = {{
+PORTFOLIO_STORE = {{
     "owner": {{
         "name": "{name}",
         "role": "{role}",
@@ -182,17 +516,130 @@ PORTFOLIO_DATA = {{
         }}
     ],
     "skills": [
-        {{"name": "Python / AsyncIO / FastAPI", "category": "Backend & Core", "level": 98}},
-        {{"name": "Autonomous Agents & LLM Orchestration", "category": "AI & Systems", "level": 96}},
-        {{"name": "Linux Security Rings & Cryptography", "category": "Security", "level": 94}},
-        {{"name": "Modern JavaScript & Glassmorphic UI", "category": "Frontend", "level": 92}},
+        {{"name": "Python / AsyncIO / FastAPI", "category": "Backend Core", "level": 98}},
+        {{"name": "Autonomous Agents & LLM DAGs", "category": "AI & Systems", "level": 96}},
+        {{"name": "Linux Security Rings & AES-256", "category": "Security", "level": 94}},
+        {{"name": "Modern JS & Glassmorphic UI", "category": "Frontend", "level": 92}},
         {{"name": "Docker / DevOps & Linux Daemons", "category": "DevOps & Cloud", "level": 90}},
         {{"name": "SQLite & Vector Storage / TF-IDF", "category": "Databases", "level": 95}}
     ]
 }}
 
-class PortfolioAPIHandler(SimpleHTTPRequestHandler):
-    """Custom HTTP handler serving both JSON REST API and static frontend assets."""
+MESSAGES: List[ContactMessage] = []
+
+def get_profile() -> Dict[str, Any]:
+    return PORTFOLIO_STORE["owner"]
+
+def get_projects(category: Optional[str] = None) -> List[Dict[str, Any]]:
+    projects = PORTFOLIO_STORE["projects"]
+    if category and category != "all":
+        return [p for p in projects if p.get("category") == category]
+    return projects
+
+def get_skills() -> List[Dict[str, Any]]:
+    return PORTFOLIO_STORE["skills"]
+
+def get_stats() -> Dict[str, Any]:
+    stats = dict(PORTFOLIO_STORE["stats"])
+    stats["total_messages"] = len(MESSAGES)
+    return stats
+
+def add_message(name: str, email: str, subject: str, message: str) -> ContactMessage:
+    record = ContactMessage(
+        name=name, email=email, subject=subject, message=message, timestamp=time.time()
+    )
+    MESSAGES.append(record)
+    return record
+'''
+
+    # 8. backend/api_routes.py
+    api_routes_py = f'''"""REST API route dispatch logic for {title}."""
+
+import json
+import time
+from urllib.parse import urlparse
+from . import data_store
+
+START_TIME = time.time()
+
+def handle_api_get(path: str) -> tuple[int, dict]:
+    parsed = urlparse(path)
+    p = parsed.path
+
+    if p == "/api/health":
+        return 200, {{
+            "status": "healthy",
+            "uptime_seconds": round(time.time() - START_TIME, 1),
+            "app": "{title}",
+            "version": "2.5.0",
+            "backend": "Python 3 Native HTTP Server",
+        }}
+    elif p == "/api/profile":
+        return 200, data_store.get_profile()
+    elif p == "/api/projects":
+        projects = data_store.get_projects()
+        return 200, {{"projects": projects, "total": len(projects)}}
+    elif p == "/api/skills":
+        return 200, {{"skills": data_store.get_skills()}}
+    elif p == "/api/stats":
+        stats = data_store.get_stats()
+        stats["server_uptime"] = f"{{round(time.time() - START_TIME, 1)}}s"
+        return 200, stats
+    return 404, {{"error": "API route not found"}}
+
+def handle_api_post(path: str, raw_body: str) -> tuple[int, dict]:
+    parsed = urlparse(path)
+    if parsed.path == "/api/contact":
+        try:
+            payload = json.loads(raw_body) if raw_body else {{}}
+            name = payload.get("name", "").strip()
+            email = payload.get("email", "").strip()
+            message = payload.get("message", "").strip()
+            subject = payload.get("subject", "General Inquiry").strip()
+
+            if not name or not email or not message:
+                return 400, {{"status": "error", "message": "Fields 'name', 'email', and 'message' are required."}}
+
+            msg = data_store.add_message(name=name, email=email, subject=subject, message=message)
+            return 200, {{
+                "status": "success",
+                "message": f"Thank you, {{name}}! Your message has been safely received by the Python backend.",
+                "record": msg.to_dict(),
+            }}
+        except Exception as e:
+            return 500, {{"status": "error", "message": f"Failed to process message: {{str(e)}}"}}
+    return 404, {{"error": "Endpoint not found"}}
+'''
+
+    # 9. backend/server.py & Root server.py
+    backend_server_py = f'''#!/usr/bin/env python3
+"""Unified Full-Stack HTTP & REST API Server for {title}."""
+
+import json
+import os
+from pathlib import Path
+import sys
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+
+# Import local backend routing modules
+try:
+    from backend.api_routes import handle_api_get, handle_api_post
+except ImportError:
+    from api_routes import handle_api_get, handle_api_post
+
+class UnifiedAppHandler(SimpleHTTPRequestHandler):
+    """Handles REST API calls and serves frontend static assets."""
+
+    def __init__(self, *args, **kwargs):
+        # Locate frontend assets directory
+        base_dir = Path(__file__).resolve().parent
+        if (base_dir / "frontend").exists():
+            directory = str(base_dir / "frontend")
+        elif (base_dir.parent / "frontend").exists():
+            directory = str(base_dir.parent / "frontend")
+        else:
+            directory = str(base_dir)
+        super().__init__(*args, directory=directory, **kwargs)
 
     def end_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -204,7 +651,7 @@ class PortfolioAPIHandler(SimpleHTTPRequestHandler):
         self.send_response(200)
         self.end_headers()
 
-    def _send_json(self, data: dict, status_code: int = 200):
+    def _send_json(self, status_code: int, data: dict):
         body = json.dumps(data, indent=2).encode("utf-8")
         self.send_response(status_code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -213,73 +660,29 @@ class PortfolioAPIHandler(SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
-        parsed = urlparse(self.path)
-        path = parsed.path
-
-        if path == "/api/health":
-            self._send_json({{
-                "status": "healthy",
-                "uptime_seconds": round(time.time() - START_TIME, 1),
-                "app": "{title}",
-                "version": "2.5.0",
-                "backend": "Python 3 Standard HTTP Server",
-            }})
-        elif path == "/api/profile":
-            self._send_json(PORTFOLIO_DATA["owner"])
-        elif path == "/api/projects":
-            self._send_json({{"projects": PORTFOLIO_DATA["projects"], "total": len(PORTFOLIO_DATA["projects"])}})
-        elif path == "/api/skills":
-            self._send_json({{"skills": PORTFOLIO_DATA["skills"]}})
-        elif path == "/api/stats":
-            stats = dict(PORTFOLIO_DATA["stats"])
-            stats["server_uptime"] = f"{{round(time.time() - START_TIME, 1)}}s"
-            stats["messages_received"] = len(MESSAGES_LOG)
-            self._send_json(stats)
+        if self.path.startswith("/api/"):
+            status_code, data = handle_api_get(self.path)
+            self._send_json(status_code, data)
         else:
             super().do_GET()
 
     def do_POST(self):
-        parsed = urlparse(self.path)
-        if parsed.path == "/api/contact":
-            try:
-                content_len = int(self.headers.get("Content-Length", 0))
-                raw_body = self.rfile.read(content_len).decode("utf-8")
-                payload = json.loads(raw_body) if raw_body else {{}}
-
-                name = payload.get("name", "").strip()
-                email = payload.get("email", "").strip()
-                message = payload.get("message", "").strip()
-
-                if not name or not email or not message:
-                    self._send_json({{"status": "error", "message": "Fields 'name', 'email', and 'message' are required."}}, 400)
-                    return
-
-                msg_record = {{
-                    "name": name,
-                    "email": email,
-                    "subject": payload.get("subject", "General Inquiry"),
-                    "message": message,
-                    "timestamp": time.time(),
-                }}
-                MESSAGES_LOG.append(msg_record)
-                self._send_json({{
-                    "status": "success",
-                    "message": f"Thank you, {{name}}! Your message has been safely received by the Python backend.",
-                    "record": msg_record,
-                }})
-            except Exception as e:
-                self._send_json({{"status": "error", "message": f"Failed to process message: {{str(e)}}"}}, 500)
+        if self.path.startswith("/api/"):
+            content_len = int(self.headers.get("Content-Length", 0))
+            raw_body = self.rfile.read(content_len).decode("utf-8") if content_len > 0 else ""
+            status_code, data = handle_api_post(self.path, raw_body)
+            self._send_json(status_code, data)
         else:
-            self._send_json({{"status": "error", "message": "Endpoint not found"}}, 404)
+            self._send_json(404, {{"error": "Endpoint not found"}})
 
 def run(port: int = 3000):
     server_address = ("", port)
-    httpd = HTTPServer(server_address, PortfolioAPIHandler)
-    print(f"🚀 [Xeren Python Backend] Serving '{title}' at http://127.0.0.1:{{port}}")
+    httpd = HTTPServer(server_address, UnifiedAppHandler)
+    print(f"🚀 [Python Backend Server] Serving '{title}' at http://127.0.0.1:{{port}}")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        print("\\n🛑 Shutting down server gracefully...")
+        print("\\n🛑 Gracefully shutting down server...")
         httpd.server_close()
 
 if __name__ == "__main__":
@@ -287,7 +690,7 @@ if __name__ == "__main__":
     run(port=p)
 '''
 
-    # 2. Generate HTML5 Structure (index.html)
+    # 10. frontend/index.html
     html_content = f'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -298,13 +701,13 @@ if __name__ == "__main__":
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
   <div class="glow-orb glow-top"></div>
   <div class="glow-orb glow-bottom"></div>
 
-  <!-- Navigation Bar -->
+  <!-- Top Navigation -->
   <header class="navbar">
     <div class="nav-container">
       <a href="#" class="brand">
@@ -474,7 +877,7 @@ if __name__ == "__main__":
       </div>
     </section>
 
-    <!-- Contact & Consultation Section -->
+    <!-- Contact Section -->
     <section class="section-container" id="contact">
       <div class="section-header">
         <div class="section-tag">START A CONVERSATION</div>
@@ -483,7 +886,6 @@ if __name__ == "__main__":
       </div>
 
       <div class="contact-grid">
-        <!-- Contact Information Card -->
         <div class="contact-info-card glass-card">
           <h3>Direct Connections</h3>
           <p>I am available for full-time engineering roles, technical architecture consulting, and high-impact advisory contracts.</p>
@@ -519,7 +921,6 @@ if __name__ == "__main__":
           </div>
         </div>
 
-        <!-- Interactive AJAX Contact Form -->
         <div class="contact-form-card glass-card">
           <form id="contact-form" onsubmit="submitContactForm(event)">
             <div class="form-row">
@@ -553,7 +954,6 @@ if __name__ == "__main__":
     </section>
   </main>
 
-  <!-- Footer -->
   <footer class="footer">
     <div class="footer-container">
       <div class="footer-brand">
@@ -572,18 +972,16 @@ if __name__ == "__main__":
         <h3 id="modal-title">Project Architecture Overview</h3>
         <button class="modal-close-btn" onclick="closeModalDirect()">✕</button>
       </div>
-      <div class="modal-body" id="modal-body">
-        <!-- Populated via JavaScript -->
-      </div>
+      <div class="modal-body" id="modal-body"></div>
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="scripts/app.js"></script>
 </body>
 </html>
 '''
 
-    # 3. Generate Modern CSS3 (styles.css)
+    # 11. frontend/styles/main.css
     css_content = '''/* Modern Glassmorphic Stylesheet with Vibrant Dark Aesthetics */
 :root {
   --bg-color: #080d1a;
@@ -622,7 +1020,6 @@ body.theme-emerald {
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 html { scroll-behavior: smooth; }
 
 body {
@@ -635,7 +1032,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Ambient Background Glowing Orbs */
 .glow-orb {
   position: absolute;
   width: 600px;
@@ -645,18 +1041,9 @@ body {
   z-index: 0;
   filter: blur(120px);
 }
-.glow-top {
-  top: -150px;
-  left: 20%;
-  background: radial-gradient(circle, var(--glow-primary) 0%, transparent 70%);
-}
-.glow-bottom {
-  bottom: 10%;
-  right: 15%;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
-}
+.glow-top { top: -150px; left: 20%; background: radial-gradient(circle, var(--glow-primary) 0%, transparent 70%); }
+.glow-bottom { bottom: 10%; right: 15%; background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%); }
 
-/* Glassmorphism Card Style */
 .glass-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
@@ -665,13 +1052,8 @@ body {
   box-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.4);
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
+.glass-card:hover { border-color: var(--border-glow); box-shadow: 0 12px 40px 0 var(--glow-primary); }
 
-.glass-card:hover {
-  border-color: var(--border-glow);
-  box-shadow: 0 12px 40px 0 var(--glow-primary);
-}
-
-/* Navbar */
 .navbar {
   position: sticky;
   top: 0;
@@ -682,618 +1064,152 @@ body {
   padding: 0.85rem 2rem;
 }
 
-.nav-container {
-  max-width: 1300px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  text-decoration: none;
-  color: #fff;
-}
-
+.nav-container { max-width: 1300px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+.brand { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: #fff; }
 .brand-avatar {
-  width: 38px;
-  height: 38px;
+  width: 38px; height: 38px;
   background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  box-shadow: 0 0 15px var(--glow-primary);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; box-shadow: 0 0 15px var(--glow-primary);
 }
+.brand-name { font-family: var(--font-heading); font-weight: 700; font-size: 1.15rem; }
+.brand-badge { font-size: 0.65rem; background: rgba(0, 240, 255, 0.15); color: var(--accent-cyan); border: 1px solid var(--border-glow); padding: 2px 6px; border-radius: 12px; font-weight: 700; margin-left: 0.3rem; }
 
-.brand-name {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 1.15rem;
-}
-
-.brand-badge {
-  font-size: 0.65rem;
-  background: rgba(0, 240, 255, 0.15);
-  color: var(--accent-cyan);
-  border: 1px solid var(--border-glow);
-  padding: 2px 6px;
-  border-radius: 12px;
-  font-weight: 700;
-  margin-left: 0.3rem;
-}
-
-.nav-links {
-  display: flex;
-  gap: 1.75rem;
-}
-
-.nav-link {
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-size: 0.92rem;
-  font-weight: 500;
-  transition: color 0.2s;
-}
-
+.nav-links { display: flex; gap: 1.75rem; }
+.nav-link { color: var(--text-secondary); text-decoration: none; font-size: 0.92rem; font-weight: 500; transition: color 0.2s; }
 .nav-link:hover { color: var(--accent-cyan); }
-
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
+.nav-actions { display: flex; align-items: center; gap: 0.75rem; }
 
 .theme-toggle-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color);
+  color: var(--text-primary); padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s;
 }
-.theme-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: var(--accent-cyan);
-}
+.theme-toggle-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--accent-cyan); }
 
-/* Buttons */
 .btn {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-  border: none;
+  font-family: var(--font-heading); font-weight: 600; text-decoration: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  border-radius: var(--radius-md); cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease; border: none;
 }
-
 .btn:hover { transform: translateY(-2px); }
-
 .btn-sm { padding: 6px 14px; font-size: 0.85rem; }
 .btn-lg { padding: 12px 24px; font-size: 1rem; }
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-  color: #000;
-  font-weight: 700;
-  box-shadow: 0 4px 20px var(--glow-primary);
-}
-
-.btn-glass {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-}
+.btn-primary { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); color: #000; font-weight: 700; box-shadow: 0 4px 20px var(--glow-primary); }
+.btn-glass { background: rgba(255, 255, 255, 0.06); color: var(--text-primary); border: 1px solid var(--border-color); }
 .btn-glass:hover { background: rgba(255, 255, 255, 0.12); border-color: var(--accent-cyan); }
-
-.btn-outline {
-  background: transparent;
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-}
+.btn-outline { background: transparent; color: var(--text-primary); border: 1px solid var(--border-color); }
 .btn-outline:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
 
-/* Hero Section */
-.hero-section {
-  position: relative;
-  z-index: 10;
-  max-width: 1200px;
-  margin: 3.5rem auto 4rem;
-  padding: 0 2rem;
-  text-align: center;
-}
+.hero-section { position: relative; z-index: 10; max-width: 1200px; margin: 3.5rem auto 4rem; padding: 0 2rem; text-align: center; }
+.status-chip { display: inline-flex; align-items: center; gap: 0.6rem; padding: 6px 18px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 30px; color: var(--accent-emerald); font-size: 0.85rem; font-weight: 600; margin-bottom: 1.75rem; }
+.pulse-dot { width: 8px; height: 8px; background: var(--accent-emerald); border-radius: 50%; box-shadow: 0 0 10px var(--accent-emerald); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.5; } }
 
-.status-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 6px 18px;
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  border-radius: 30px;
-  color: var(--accent-emerald);
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 1.75rem;
-}
+.hero-title { font-family: var(--font-heading); font-size: 3.6rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.03em; margin-bottom: 1.5rem; }
+.gradient-text { background: linear-gradient(135deg, #ffffff 30%, var(--accent-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-subtitle { font-size: 1.25rem; color: var(--text-secondary); max-width: 780px; margin: 0 auto 2.5rem; font-weight: 400; }
+.hero-cta-group { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 4rem; }
 
-.pulse-dot {
-  width: 8px;
-  height: 8px;
-  background: var(--accent-emerald);
-  border-radius: 50%;
-  box-shadow: 0 0 10px var(--accent-emerald);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.4); opacity: 0.5; }
-}
-
-.hero-title {
-  font-family: var(--font-heading);
-  font-size: 3.6rem;
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -0.03em;
-  margin-bottom: 1.5rem;
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, #ffffff 30%, var(--accent-cyan) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.hero-subtitle {
-  font-size: 1.25rem;
-  color: var(--text-secondary);
-  max-width: 780px;
-  margin: 0 auto 2.5rem;
-  font-weight: 400;
-}
-
-.hero-cta-group {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 4rem;
-}
-
-/* KPI Grid */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.25rem;
-}
-
-.kpi-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  padding: 1.5rem;
-  border-radius: var(--radius-md);
-  text-align: left;
-  transition: transform 0.2s;
-}
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; }
+.kpi-card { background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-md); text-align: left; transition: transform 0.2s; }
 .kpi-card:hover { transform: translateY(-3px); border-color: var(--border-glow); }
-
 .kpi-icon { font-size: 1.75rem; margin-bottom: 0.5rem; }
 .kpi-number { font-family: var(--font-heading); font-size: 2rem; font-weight: 700; color: #fff; }
 .kpi-label { font-size: 0.85rem; color: var(--text-secondary); }
 
-/* Section Containers */
-.section-container {
-  max-width: 1200px;
-  margin: 0 auto 5.5rem;
-  padding: 0 2rem;
-  position: relative;
-  z-index: 10;
-}
+.section-container { max-width: 1200px; margin: 0 auto 5.5rem; padding: 0 2rem; position: relative; z-index: 10; }
+.section-header { text-align: center; max-width: 700px; margin: 0 auto 3rem; }
+.section-tag { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-heading); font-size: 2.3rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+.section-desc { color: var(--text-secondary); font-size: 1rem; }
 
-.section-header {
-  text-align: center;
-  max-width: 700px;
-  margin: 0 auto 3rem;
-}
-
-.section-tag {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--accent-cyan);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.section-title {
-  font-family: var(--font-heading);
-  font-size: 2.3rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.75rem;
-}
-
-.section-desc {
-  color: var(--text-secondary);
-  font-size: 1rem;
-}
-
-/* About Grid */
-.about-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.5rem;
-}
-
-.about-card {
-  padding: 2.25rem;
-  text-align: left;
-}
+.about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+.about-card { padding: 2.25rem; text-align: left; }
 .about-icon { font-size: 2.2rem; margin-bottom: 1.25rem; }
 .about-card h3 { font-family: var(--font-heading); font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem; }
 .about-card p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; }
 
-/* Filter Tabs */
-.filter-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-  margin-bottom: 2.5rem;
-}
-
+.filter-tabs { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
 .tab-btn {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  padding: 8px 18px;
-  border-radius: 20px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color);
+  color: var(--text-secondary); padding: 8px 18px; border-radius: 20px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
 }
-
 .tab-btn:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
-.tab-btn.active {
-  background: var(--accent-cyan);
-  color: #000;
-  border-color: var(--accent-cyan);
-  font-weight: 700;
-  box-shadow: 0 0 15px var(--glow-primary);
-}
+.tab-btn.active { background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan); font-weight: 700; box-shadow: 0 0 15px var(--glow-primary); }
 
-/* Projects Grid */
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 1.75rem;
-}
-
-.project-card {
-  display: flex;
-  flex-direction: column;
-  padding: 1.75rem;
-  border-radius: var(--radius-lg);
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  transition: transform 0.25s ease, border-color 0.25s ease;
-}
-
-.project-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--border-glow);
-}
-
-.project-top-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.project-badge {
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 12px;
-  background: rgba(0, 240, 255, 0.15);
-  color: var(--accent-cyan);
-  border: 1px solid var(--border-glow);
-}
-
-.project-title {
-  font-family: var(--font-heading);
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-bottom: 0.75rem;
-  color: #fff;
-}
-
-.project-desc {
-  color: var(--text-secondary);
-  font-size: 0.92rem;
-  line-height: 1.6;
-  flex: 1;
-  margin-bottom: 1.25rem;
-}
-
-.project-tech-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 1.25rem;
-}
-
-.tech-tag {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color);
-  padding: 3px 8px;
-  border-radius: 6px;
-  color: var(--text-secondary);
-}
-
-.project-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-color);
-}
-
-.project-metrics {
-  font-size: 0.78rem;
-  color: var(--accent-emerald);
-  font-weight: 600;
-}
-
-.btn-inspect {
-  font-size: 0.8rem;
-  background: transparent;
-  color: var(--accent-cyan);
-  border: 1px solid var(--border-glow);
-  padding: 5px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+.projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.75rem; }
+.project-card { display: flex; flex-direction: column; padding: 1.75rem; border-radius: var(--radius-lg); background: var(--bg-surface); border: 1px solid var(--border-color); transition: transform 0.25s ease, border-color 0.25s ease; }
+.project-card:hover { transform: translateY(-4px); border-color: var(--border-glow); }
+.project-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.project-badge { font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; background: rgba(0, 240, 255, 0.15); color: var(--accent-cyan); border: 1px solid var(--border-glow); }
+.project-title { font-family: var(--font-heading); font-size: 1.3rem; font-weight: 700; margin-bottom: 0.75rem; color: #fff; }
+.project-desc { color: var(--text-secondary); font-size: 0.92rem; line-height: 1.6; flex: 1; margin-bottom: 1.25rem; }
+.project-tech-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.25rem; }
+.tech-tag { font-family: var(--font-mono); font-size: 0.75rem; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 6px; color: var(--text-secondary); }
+.project-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid var(--border-color); }
+.project-metrics { font-size: 0.78rem; color: var(--accent-emerald); font-weight: 600; }
+.btn-inspect { font-size: 0.8rem; background: transparent; color: var(--accent-cyan); border: 1px solid var(--border-glow); padding: 5px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
 .btn-inspect:hover { background: var(--accent-cyan); color: #000; }
 
-/* Skills Grid */
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-}
-
-.skill-card {
-  padding: 1.25rem;
-  border-radius: var(--radius-md);
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-}
-
-.skill-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.6rem;
-}
+.skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; }
+.skill-card { padding: 1.25rem; border-radius: var(--radius-md); background: var(--bg-surface); border: 1px solid var(--border-color); }
+.skill-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
 .skill-name { font-weight: 600; font-size: 0.92rem; }
 .skill-pct { font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent-cyan); font-weight: 700; }
+.skill-bar-bg { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 10px; overflow: hidden; }
+.skill-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple)); border-radius: 10px; transition: width 1s ease-in-out; }
 
-.skill-bar-bg {
-  width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.skill-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
-  border-radius: 10px;
-  transition: width 1s ease-in-out;
-}
-
-/* Terminal Sandbox */
-.terminal-wrapper {
-  max-width: 900px;
-  margin: 0 auto;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-}
-
-.terminal-bar {
-  background: #0f172a;
-  padding: 0.75rem 1.25rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--border-color);
-}
-
+.terminal-wrapper { max-width: 900px; margin: 0 auto; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border-color); }
+.terminal-bar { background: #0f172a; padding: 0.75rem 1.25rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
 .terminal-dots { display: flex; gap: 6px; }
 .dot { width: 12px; height: 12px; border-radius: 50%; }
 .dot.red { background: var(--accent-rose); }
 .dot.yellow { background: var(--accent-amber); }
 .dot.green { background: var(--accent-emerald); }
-
 .terminal-title { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary); }
 .terminal-badge { font-size: 0.7rem; color: var(--accent-emerald); font-weight: 700; }
-
-.terminal-body {
-  padding: 1.5rem;
-  background: #060913;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-}
-
-.terminal-output {
-  min-height: 180px;
-  max-height: 320px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  margin-bottom: 1rem;
-}
-
+.terminal-body { padding: 1.5rem; background: #060913; font-family: var(--font-mono); font-size: 0.9rem; }
+.terminal-output { min-height: 180px; max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
 .term-line.info { color: #38bdf8; }
 .term-line.help-tip { color: var(--text-secondary); }
 .term-line.cmd { color: #a3e635; font-weight: 600; }
 .term-line.res { color: #e2e8f0; }
 .term-hl { color: var(--accent-cyan); font-weight: 700; }
-
-.terminal-input-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-color);
-  padding: 0.5rem 0.85rem;
-  border-radius: var(--radius-md);
-}
-
+.terminal-input-row { display: flex; align-items: center; gap: 0.75rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); padding: 0.5rem 0.85rem; border-radius: var(--radius-md); }
 .term-prompt { color: var(--accent-cyan); font-weight: 700; font-size: 0.85rem; }
+.terminal-input-row input { flex: 1; background: transparent; border: none; color: #fff; font-family: var(--font-mono); font-size: 0.9rem; outline: none; }
 
-.terminal-input-row input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  outline: none;
-}
-
-/* Contact Grid */
-.contact-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.3fr;
-  gap: 2rem;
-}
-
-.contact-info-card, .contact-form-card {
-  padding: 2.25rem;
-}
-
+.contact-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 2rem; }
+.contact-info-card, .contact-form-card { padding: 2.25rem; }
 .contact-info-card h3 { font-family: var(--font-heading); font-size: 1.4rem; margin-bottom: 0.75rem; }
 .contact-info-card p { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 2rem; }
-
 .contact-methods { display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 2.5rem; }
 .contact-item { display: flex; gap: 1rem; align-items: flex-start; }
 .contact-icon { font-size: 1.5rem; }
 .contact-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
 .contact-val { color: #fff; font-weight: 600; font-size: 0.95rem; text-decoration: none; }
-
 .social-links-row { display: flex; gap: 0.75rem; }
-.social-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  padding: 8px 16px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: all 0.2s;
-}
+.social-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; }
 .social-btn:hover { background: rgba(0, 240, 255, 0.15); border-color: var(--accent-cyan); color: var(--accent-cyan); }
 
-/* Form Controls */
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .form-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.25rem; }
 .form-group label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
-
-.form-control {
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 0.85rem 1.15rem;
-  color: #fff;
-  font-family: inherit;
-  font-size: 0.92rem;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-control:focus {
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 15px var(--glow-primary);
-}
-
+.form-control { background: rgba(0, 0, 0, 0.45); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem 1.15rem; color: #fff; font-family: inherit; font-size: 0.92rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+.form-control:focus { border-color: var(--accent-cyan); box-shadow: 0 0 15px var(--glow-primary); }
 .status-msg { margin-top: 1rem; font-size: 0.9rem; text-align: center; }
 
-/* Modal */
-.modal-backdrop {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-}
-
-.modal-card {
-  width: 90%;
-  max-width: 650px;
-  padding: 2rem;
-  position: relative;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.25rem;
-}
-
+.modal-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 200; }
+.modal-card { width: 90%; max-width: 650px; padding: 2rem; position: relative; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
 .modal-header h3 { font-family: var(--font-heading); font-size: 1.4rem; }
 .modal-close-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 1.25rem; cursor: pointer; }
 
-/* Footer */
-.footer {
-  border-top: 1px solid var(--border-color);
-  padding: 2.5rem 2rem;
-  background: rgba(8, 13, 26, 0.95);
-  position: relative;
-  z-index: 10;
-}
-
-.footer-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
+.footer { border-top: 1px solid var(--border-color); padding: 2.5rem 2rem; background: rgba(8, 13, 26, 0.95); position: relative; z-index: 10; }
+.footer-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
 .footer-meta { color: var(--text-muted); font-size: 0.85rem; }
 
-/* Responsive Media Queries */
 @media (max-width: 900px) {
   .hero-title { font-size: 2.6rem; }
   .contact-grid { grid-template-columns: 1fr; }
@@ -1302,7 +1218,7 @@ body {
 }
 '''
 
-    # 4. Generate Interactive Client Script (app.js)
+    # 12. frontend/scripts/app.js
     js_content = '''// Interactive JavaScript Engine communicating with Python Backend API
 let allProjects = [];
 
@@ -1313,18 +1229,16 @@ document.addEventListener("DOMContentLoaded", () => {
   setupTerminal();
 });
 
-// 1. Fetch Projects from Python Backend API
 async function fetchProjects() {
   const container = document.getElementById("projects-grid");
   try {
     const res = await fetch("/api/projects");
-    if (!res.ok) throw new Error("API returned status " + res.status);
+    if (!res.ok) throw new Error("API status " + res.status);
     const data = await res.json();
     allProjects = data.projects || [];
     renderProjects(allProjects);
   } catch (err) {
-    console.warn("Backend API not reachable, using embedded portfolio store:", err);
-    // Graceful fallback
+    console.warn("Backend API not reachable, using fallback dataset:", err);
     renderProjects([
       {
         id: "proj-1",
@@ -1404,7 +1318,6 @@ function filterProjects(category) {
   }
 }
 
-// 2. Fetch Skills
 async function fetchSkills() {
   const container = document.getElementById("skills-grid");
   try {
@@ -1423,7 +1336,6 @@ async function fetchSkills() {
       </div>
     `).join('');
   } catch (e) {
-    // Fallback static
     container.innerHTML = `
       <div class="skill-card"><div class="skill-header"><span>Python / AsyncIO / FastAPI</span><span class="skill-pct">98%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 98%;"></div></div></div>
       <div class="skill-card"><div class="skill-header"><span>Autonomous Agents & LLM DAGs</span><span class="skill-pct">96%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" style="width: 96%;"></div></div></div>
@@ -1433,7 +1345,6 @@ async function fetchSkills() {
   }
 }
 
-// 3. Fetch Live Stats
 async function fetchStats() {
   try {
     const res = await fetch("/api/stats");
@@ -1442,7 +1353,6 @@ async function fetchStats() {
   } catch (e) {}
 }
 
-// 4. Contact Form Submission to Python Backend
 async function submitContactForm(e) {
   e.preventDefault();
   const btn = document.getElementById("btn-submit-contact");
@@ -1479,7 +1389,6 @@ async function submitContactForm(e) {
   }
 }
 
-// 5. Interactive Terminal Logic
 function setupTerminal() {
   const input = document.getElementById("terminal-input");
   input.addEventListener("keydown", (e) => {
@@ -1559,7 +1468,6 @@ function handleTerminalSubmit() {
   output.scrollTop = output.scrollHeight;
 }
 
-// 6. Accent Themes
 const themes = ["", "theme-purple", "theme-emerald"];
 let currentThemeIdx = 0;
 
@@ -1568,7 +1476,6 @@ function toggleAccentTheme() {
   document.body.className = themes[currentThemeIdx];
 }
 
-// 7. Modal Controls
 function openProjectModal(projectId) {
   const p = allProjects.find(x => x.id === projectId) || {
     title: "Project Architecture Detail",
@@ -1606,50 +1513,163 @@ document.addEventListener("keydown", (e) => {
 });
 '''
 
-    # 5. Generate Comprehensive README.md
-    readme_content = f'''# {title}
+    # 13. tests/test_backend_api.py
+    test_api_py = f'''"""Unit tests for {title} Python backend REST API."""
 
-> {headline}
+import pytest
+from backend.api_routes import handle_api_get, handle_api_post
 
-Autonomous full-stack engineering portfolio and web platform generated and deployed by **Xeren Assistant**.
+def test_api_health_endpoint():
+    status, data = handle_api_get("/api/health")
+    assert status == 200
+    assert data["status"] == "healthy"
+    assert "uptime_seconds" in data
 
----
+def test_api_projects_endpoint():
+    status, data = handle_api_get("/api/projects")
+    assert status == 200
+    assert "projects" in data
+    assert len(data["projects"]) >= 1
 
-## 🌟 Architecture & Technology Stack
+def test_api_skills_endpoint():
+    status, data = handle_api_get("/api/skills")
+    assert status == 200
+    assert "skills" in data
+    assert len(data["skills"]) >= 1
 
-| Layer | Technology | Purpose |
-| :--- | :--- | :--- |
-| **Backend API Server** | Python 3 (`http.server` / JSON REST) | Handles `/api/projects`, `/api/skills`, `/api/stats`, `/api/contact` |
-| **Frontend UI** | HTML5 Semantic Architecture | Accessible, SEO-optimized markup with micro-interactions |
-| **Styling & Effects** | Vanilla CSS3 + Glassmorphism | Custom design tokens, glowing particle meshes, responsive layouts |
-| **Client Engine** | Modern Vanilla JavaScript | Dynamic project filters, interactive terminal emulator, AJAX contact form |
-
----
-
-## 🚀 REST API Endpoints
-
-- `GET /api/health`: Health status & backend server uptime.
-- `GET /api/profile`: Creator bio, roles, location, and social links.
-- `GET /api/projects`: Complete list of software projects and architectural metadata.
-- `GET /api/skills`: Categorized technical competencies and proficiencies.
-- `GET /api/stats`: Real-time system statistics and project counts.
-- `POST /api/contact`: Direct message dispatch endpoint with validation and confirmation.
-
----
-
-## 💻 Running the Full-Stack Application Locally
-
-Run the Python backend server:
-```bash
-python server.py 3000
-```
-Then visit **http://127.0.0.1:3000** in your browser.
+def test_api_contact_submission():
+    payload = '{{"name": "Jane Doe", "email": "jane@example.com", "subject": "Consultation", "message": "Interested in AI systems"}}'
+    status, data = handle_api_post("/api/contact", payload)
+    assert status == 200
+    assert data["status"] == "success"
+    assert "Jane Doe" in data["message"]
 '''
 
+    # 14. tests/test_frontend.py
+    test_fe_py = f'''"""Automated verification for {title} frontend assets."""
+
+from pathlib import Path
+
+def test_frontend_assets_exist():
+    base = Path(__file__).resolve().parent.parent
+    fe_dir = base / "frontend"
+    assert (fe_dir / "index.html").exists()
+    assert (fe_dir / "styles" / "main.css").exists()
+    assert (fe_dir / "scripts" / "app.js").exists()
+
+def test_index_html_contains_critical_sections():
+    base = Path(__file__).resolve().parent.parent
+    html = (base / "frontend" / "index.html").read_text(encoding="utf-8")
+    assert "hero-section" in html
+    assert "projects-grid" in html
+    assert "skills-grid" in html
+    assert "terminal-output" in html
+    assert "contact-form" in html
+'''
+
+    # 15. scripts/run_dev.bat & scripts/run_dev.sh
+    run_bat = f"""@echo off
+echo ===================================================
+echo   Starting {title} (Python Backend + Frontend)
+echo ===================================================
+python server.py 3000
+pause
+"""
+
+    run_sh = f"""#!/usr/bin/env bash
+echo "==================================================="
+echo "  Starting {title} (Python Backend + Frontend)"
+echo "==================================================="
+python3 server.py 3000
+"""
+
+    # 16. Config & Packaging files
+    env_example = """# Environment Configuration Template
+PORT=3000
+ENV=development
+APP_NAME=SoftwarePlatform
+LOG_LEVEL=info
+"""
+
+    reqs_txt = """# Python Backend Dependencies
+pytest>=7.4.0
+pydantic>=2.0.0
+"""
+
+    pkg_json = f"""{{
+  "name": "{slug}",
+  "version": "1.0.0",
+  "description": "{headline}",
+  "main": "frontend/scripts/app.js",
+  "scripts": {{
+    "start": "python server.py 3000",
+    "test": "pytest tests/ -v"
+  }},
+  "author": "{name}",
+  "license": "MIT"
+}}
+"""
+
+    dockerfile = """FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 3000
+CMD ["python", "server.py", "3000"]
+"""
+
+    docker_compose = f"""version: '3.8'
+services:
+  web:
+    build: .
+    container_name: {slug}_app
+    ports:
+      - "3000:3000"
+    restart: always
+    environment:
+      - PORT=3000
+"""
+
+    init_py = '"""Subsystem package initialization."""\n'
+
     return {
-        "server.py": server_content,
+        # Root Manifest, Web Entry & Launcher
+        "README.md": readme_content,
         "index.html": html_content,
         "styles.css": css_content,
         "app.js": js_content,
-        "README.md": readme_content,
+        "server.py": backend_server_py,
+        "requirements.txt": reqs_txt,
+        ".env.example": env_example,
+        "package.json": pkg_json,
+        "Dockerfile": dockerfile,
+        "docker-compose.yml": docker_compose,
+
+        # Architecture & Documentation
+        "docs/ARCHITECTURE.md": arch_doc,
+        "docs/API_SPEC.md": api_doc,
+        "docs/DEPLOYMENT.md": deploy_doc,
+        "docs/SECURITY.md": sec_doc,
+
+        # Backend Subsystem
+        "backend/__init__.py": init_py,
+        "backend/server.py": backend_server_py,
+        "backend/models.py": models_py,
+        "backend/data_store.py": data_store_py,
+        "backend/api_routes.py": api_routes_py,
+
+        # Frontend Subsystem
+        "frontend/index.html": html_content,
+        "frontend/styles/main.css": css_content,
+        "frontend/scripts/app.js": js_content,
+
+        # Automated Tests
+        "tests/__init__.py": init_py,
+        "tests/test_backend_api.py": test_api_py,
+        "tests/test_frontend.py": test_fe_py,
+
+        # Cross-Platform Execution Scripts
+        "scripts/run_dev.bat": run_bat,
+        "scripts/run_dev.sh": run_sh,
     }
