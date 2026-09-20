@@ -344,6 +344,20 @@ OPERATION_POLICIES: Dict[Tuple[str, str], OperationPolicy] = {
         requires_user_approval=True,
     ),
     # Device and OS Automation operations
+    ("device", "server_health_check"): OperationPolicy(
+        tool_name="device",
+        operation="server_health_check",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Comprehensive server health audit: CPU, RAM, Disk, Uptime, Ports, and Health Score",
+    ),
+    ("device", "check_network_ports"): OperationPolicy(
+        tool_name="device",
+        operation="check_network_ports",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Inspect listening network ports, established connections, and I/O throughput",
+    ),
     ("device", "get_system_info"): OperationPolicy(
         tool_name="device",
         operation="get_system_info",

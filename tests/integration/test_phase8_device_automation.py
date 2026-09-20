@@ -99,6 +99,19 @@ def test_api_device_and_scheduler_endpoints(mock_assistant: XerenAssistant):
   assert "platform" in data
   assert "cpu" in data
 
+  # 1b. Server health check endpoint
+  res_srv = client.get("/system/server-check")
+  assert res_srv.status_code == 200
+  srv_data = res_srv.json()
+  assert "health_score" in srv_data
+  assert "overall_status" in srv_data
+
+  # 1c. Network ports endpoint
+  res_net = client.get("/device/network-ports")
+  assert res_net.status_code == 200
+  net_data = res_net.json()
+  assert "hostname" in net_data
+
   # 2. Device processes endpoint
   res_procs = client.get("/device/processes?limit=5")
   assert res_procs.status_code == 200
@@ -129,3 +142,11 @@ def test_api_device_and_scheduler_endpoints(mock_assistant: XerenAssistant):
   res_cancel = client.delete(f"/scheduler/jobs/{job_id}")
   assert res_cancel.status_code == 200
   assert res_cancel.json()["status"] == "cancelled"
+
+
+@pytest.mark.asyncio
+async def test_assistant_server_check_flow(mock_assistant: XerenAssistant):
+  resp = await mock_assistant.process_request("run a server check on this system")
+  assert resp.success is True
+  assert "Health Audit" in resp.response_text or "Score" in resp.response_text
+

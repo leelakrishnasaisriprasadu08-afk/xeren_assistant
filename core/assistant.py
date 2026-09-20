@@ -329,7 +329,80 @@ class XerenAssistant:
         )
 
       elif action.tool_name == "device":
-        if action.operation == "get_system_info":
+        if action.operation == "server_health_check":
+          score = data.get("health_score", 100) if isinstance(data, dict) else 100
+          status = data.get("overall_status", "HEALTHY") if isinstance(data, dict) else "HEALTHY"
+          alerts = data.get("alerts", []) if isinstance(data, dict) else []
+          cpu = data.get("cpu", {}) if isinstance(data, dict) else {}
+          mem = data.get("memory", {}) if isinstance(data, dict) else {}
+          disks = data.get("disks", []) if isinstance(data, dict) else []
+          uptime = data.get("uptime", {}) if isinstance(data, dict) else {}
+          procs = data.get("top_services", []) if isinstance(data, dict) else []
+          listening = data.get("listening_services", []) if isinstance(data, dict) else []
+
+          status_icon = "🟢" if status == "HEALTHY" else ("🟡" if status == "DEGRADED" else "🔴")
+
+          metrics_rows = [
+              "| Subsystem | Specification / Allocation | Utilization | Status |",
+              "| :--- | :--- | :--- | :--- |",
+              f"| **CPU Core Load** | {cpu.get('physical_cores', 0)} Cores ({cpu.get('logical_cores', 0)} Threads) | {cpu.get('usage_percent', 0)}% | `{(cpu.get('status') or 'OPTIMAL')}` |",
+              f"| **Physical RAM** | {mem.get('total_gb', 0)} GB Total ({mem.get('free_gb', 0)} GB Free) | {mem.get('percent_used', 0)}% | `{(mem.get('status') or 'OPTIMAL')}` |",
+          ]
+          for d in disks[:3]:
+            metrics_rows.append(
+                f"| **Disk Storage ({d.get('mountpoint')})** | {d.get('total_gb', 0)} GB Total ({d.get('free_gb', 0)} GB Free) | {d.get('percent_used', 0)}% | `{(d.get('status') or 'OPTIMAL')}` |"
+            )
+          metrics_rows.append(f"| **System Uptime** | {uptime.get('formatted', 'N/A')} ({uptime.get('uptime_hours', 0)}h) | Continuous | `HEALTHY` |")
+
+          sock_rows = []
+          for s in listening:
+            sock_rows.append(f"- 🌐 `Port {s.get('port')}`: **{s.get('service')}** ({s.get('state')})")
+          sock_str = "\n".join(sock_rows) if sock_rows else "- No active exposed listener ports on inspected ranges."
+
+          proc_rows = []
+          for p in procs[:5]:
+            proc_rows.append(f"- `{p.get('name')}` (PID: {p.get('pid')}) — {p.get('cpu_percent')}% CPU, {p.get('memory_mb')} MB RAM")
+          proc_str = "\n".join(proc_rows) if proc_rows else "- No top process data."
+
+          if alerts:
+            alert_str = "\n".join([f"- ⚠️ {a}" for a in alerts])
+          else:
+            alert_str = "- ✅ All subsystems operating within optimal production tolerances."
+
+          lines.append(
+              f"🛡️ **Infrastructure & Server Health Audit** (Score: **{score}/100** • {status_icon} `{status}`){repaired_badge}:\n\n"
+              f"**Host**: `{data.get('hostname')}` | **Environment**: {data.get('os')}\n\n"
+              + "\n".join(metrics_rows)
+              + f"\n\n**Active Services & Listening Sockets**:\n{sock_str}\n\n"
+              + f"**Top Resource Consumers**:\n{proc_str}\n\n"
+              + f"**Diagnostic Alerts & Telemetry Notes**:\n{alert_str}"
+          )
+
+        elif action.operation == "check_network_ports":
+          io_c = data.get("io_counters", {}) if isinstance(data, dict) else {}
+          listening = data.get("listening_ports", []) if isinstance(data, dict) else []
+          est = data.get("active_established_connections", 0) if isinstance(data, dict) else 0
+
+          io_str = (
+              f"- **Network Throughput**: {io_c.get('bytes_sent_mb', 0)} MB Sent / {io_c.get('bytes_recv_mb', 0)} MB Received\n"
+              f"- **Packets Handled**: {io_c.get('packets_sent', 0):,} Outbound / {io_c.get('packets_recv', 0):,} Inbound\n"
+              f"- **Active Established Connections**: {est}"
+              if io_c else f"- **Active Established Connections**: {est}"
+          )
+
+          port_rows = ["| Port | Bound Address | PID | Status |", "| :--- | :--- | :--- | :--- |"]
+          for p in listening[:12]:
+            port_rows.append(f"| `{p.get('port')}` | `{p.get('ip')}` | {p.get('pid') or '—'} | 🟢 LISTENING |")
+
+          port_table = "\n".join(port_rows) if len(port_rows) > 2 else "_No listening sockets found or elevated permissions needed._"
+
+          lines.append(
+              f"🌐 **Network Sockets & Port Diagnostics**{repaired_badge} (Host: `{data.get('hostname')}`):\n\n"
+              f"{io_str}\n\n"
+              f"**Listening Endpoints ({len(listening)})**:\n{port_table}"
+          )
+
+        elif action.operation == "get_system_info":
           cpu = data.get("cpu", {})
           mem = data.get("memory", {})
           plat = data.get("platform", {})

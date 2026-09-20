@@ -50,6 +50,8 @@ class DeviceTool(BaseTool):
   @property
   def supported_operations(self) -> List[str]:
     return [
+        "server_health_check",
+        "check_network_ports",
         "get_system_info",
         "list_processes",
         "kill_process",
@@ -130,6 +132,166 @@ class DeviceTool(BaseTool):
       info["error"] = "psutil library not available for full telemetry"
 
     return info
+
+  def _server_health_check(
+      self, check_ports: Optional[List[int]] = None
+  ) -> Dict[str, Any]:
+    """Performs an extensive, production-grade server and system health audit."""
+    target_ports = check_ports or [8000, 3000, 5000, 8080, 80, 443, 5432, 27017, 6379]
+    result: Dict[str, Any] = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "hostname": platform.node(),
+        "os": f"{platform.system()} {platform.release()} ({platform.machine()})",
+    }
+
+    score = 100
+    alerts = []
+
+    if psutil:
+      # CPU Audit
+      cpu_percent = psutil.cpu_percent(interval=0.15)
+      logical_cores = psutil.cpu_count(logical=True)
+      physical_cores = psutil.cpu_count(logical=False)
+      if cpu_percent > 85.0:
+        score -= 25
+        alerts.append(f"High CPU utilization: {cpu_percent}%")
+      elif cpu_percent > 65.0:
+        score -= 10
+        alerts.append(f"Elevated CPU usage: {cpu_percent}%")
+
+      result["cpu"] = {
+          "usage_percent": cpu_percent,
+          "physical_cores": physical_cores,
+          "logical_cores": logical_cores,
+          "status": "CRITICAL" if cpu_percent > 85 else ("WARNING" if cpu_percent > 65 else "OPTIMAL"),
+      }
+
+      # Memory & Swap Audit
+      mem = psutil.virtual_memory()
+      swap = psutil.swap_memory()
+      if mem.percent > 90.0:
+        score -= 30
+        alerts.append(f"Critical memory pressure: {mem.percent}% used ({round(mem.used/(1024**3), 1)}GB / {round(mem.total/(1024**3), 1)}GB)")
+      elif mem.percent > 75.0:
+        score -= 15
+        alerts.append(f"Elevated memory consumption: {mem.percent}% used")
+
+      result["memory"] = {
+          "total_gb": round(mem.total / (1024**3), 2),
+          "used_gb": round(mem.used / (1024**3), 2),
+          "free_gb": round(mem.available / (1024**3), 2),
+          "percent_used": mem.percent,
+          "swap_used_mb": round(swap.used / (1024**2), 1),
+          "status": "CRITICAL" if mem.percent > 90 else ("WARNING" if mem.percent > 75 else "OPTIMAL"),
+      }
+
+      # Storage & Disk I/O
+      disks = []
+      for part in psutil.disk_partitions(all=False):
+        try:
+          usage = psutil.disk_usage(part.mountpoint)
+          d_status = "CRITICAL" if usage.percent > 90 else ("WARNING" if usage.percent > 75 else "OPTIMAL")
+          if usage.percent > 90:
+            score -= 20
+            alerts.append(f"Low disk space on {part.mountpoint}: {usage.percent}% full")
+          disks.append({
+              "mountpoint": part.mountpoint,
+              "total_gb": round(usage.total / (1024**3), 2),
+              "used_gb": round(usage.used / (1024**3), 2),
+              "free_gb": round(usage.free / (1024**3), 2),
+              "percent_used": usage.percent,
+              "status": d_status,
+          })
+        except Exception:
+          continue
+      result["disks"] = disks
+
+      # Uptime
+      boot_time = psutil.boot_time()
+      uptime_secs = time.time() - boot_time
+      days = int(uptime_secs // 86400)
+      hours = int((uptime_secs % 86400) // 3600)
+      mins = int((uptime_secs % 3600) // 60)
+      result["uptime"] = {
+          "uptime_hours": round(uptime_secs / 3600, 2),
+          "formatted": f"{days}d {hours}h {mins}m",
+          "boot_timestamp": datetime.fromtimestamp(boot_time, timezone.utc).isoformat(),
+      }
+
+      # Top Resource-Intensive Services / Processes
+      top_procs = self._list_processes(limit=5, sort_by="memory")
+      result["top_services"] = top_procs
+
+      # Local Port Connectivity & Listening Sockets
+      active_sockets = []
+      try:
+        import socket
+        for p in target_ports:
+          with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(0.1)
+            is_open = (s.connect_ex(("127.0.0.1", p)) == 0)
+            if is_open:
+              service_name = {
+                  8000: "Xeren FastAPI REST / Web Dashboard",
+                  3000: "Frontend Dev Server",
+                  5000: "Flask API Service",
+                  8080: "Proxy / HTTP Alt",
+                  80: "HTTP Web Server",
+                  443: "HTTPS Web Server",
+                  5432: "PostgreSQL Database",
+                  27017: "MongoDB Database",
+                  6379: "Redis Cache Store",
+              }.get(p, f"Port {p} Service")
+              active_sockets.append({"port": p, "service": service_name, "state": "LISTENING"})
+      except Exception:
+        pass
+      result["listening_services"] = active_sockets
+
+    result["health_score"] = max(0, min(100, score))
+    if result["health_score"] >= 85:
+      result["overall_status"] = "HEALTHY"
+    elif result["health_score"] >= 60:
+      result["overall_status"] = "DEGRADED"
+    else:
+      result["overall_status"] = "CRITICAL"
+    result["alerts"] = alerts
+    return result
+
+  def _check_network_ports(self) -> Dict[str, Any]:
+    """Inspects active listening network ports, connection counts, and throughput."""
+    data: Dict[str, Any] = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "hostname": platform.node(),
+    }
+    if psutil:
+      try:
+        net_io = psutil.net_io_counters()
+        data["io_counters"] = {
+            "bytes_sent_mb": round(net_io.bytes_sent / (1024**2), 2),
+            "bytes_recv_mb": round(net_io.bytes_recv / (1024**2), 2),
+            "packets_sent": net_io.packets_sent,
+            "packets_recv": net_io.packets_recv,
+            "errin": net_io.errin,
+            "errout": net_io.errout,
+        }
+      except Exception:
+        pass
+
+      try:
+        conns = psutil.net_connections(kind="inet")
+        listening = []
+        established_count = 0
+        for c in conns:
+          if c.status == psutil.CONN_LISTEN and c.laddr:
+            listening.append({"port": c.laddr.port, "ip": c.laddr.ip, "pid": c.pid})
+          elif c.status == psutil.CONN_ESTABLISHED:
+            established_count += 1
+        data["listening_ports"] = listening[:20]
+        data["active_established_connections"] = established_count
+      except Exception:
+        data["note"] = "Elevated permissions required for full socket map inspection."
+
+    return data
 
   def _list_processes(
       self,
@@ -494,7 +656,12 @@ $bitmap.Dispose()
     params = action.parameters or {}
 
     try:
-      if op == "get_system_info":
+      if op == "server_health_check":
+        ports = params.get("ports") or params.get("check_ports")
+        data = self._server_health_check(check_ports=ports)
+      elif op == "check_network_ports":
+        data = self._check_network_ports()
+      elif op == "get_system_info":
         data = self._get_system_info()
       elif op == "list_processes":
         data = self._list_processes(

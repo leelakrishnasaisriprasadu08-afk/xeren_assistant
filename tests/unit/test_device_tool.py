@@ -12,6 +12,40 @@ def device_tool(tmp_path: Path) -> DeviceTool:
 
 
 @pytest.mark.asyncio
+async def test_device_server_health_check(device_tool: DeviceTool):
+  action = Action(
+      action_id="act_srv_01",
+      tool_name="device",
+      operation="server_health_check",
+      parameters={"ports": [8000, 3000, 5000]},
+  )
+  result = await device_tool.execute(action)
+  assert result.success is True
+  assert result.data is not None
+  assert "health_score" in result.data
+  assert "overall_status" in result.data
+  assert result.data["overall_status"] in ["HEALTHY", "DEGRADED", "CRITICAL"]
+  assert "cpu" in result.data
+  assert "memory" in result.data
+  assert "uptime" in result.data
+  assert "listening_services" in result.data
+
+
+@pytest.mark.asyncio
+async def test_device_check_network_ports(device_tool: DeviceTool):
+  action = Action(
+      action_id="act_net_01",
+      tool_name="device",
+      operation="check_network_ports",
+      parameters={},
+  )
+  result = await device_tool.execute(action)
+  assert result.success is True
+  assert result.data is not None
+  assert "hostname" in result.data
+
+
+@pytest.mark.asyncio
 async def test_device_get_system_info(device_tool: DeviceTool):
   action = Action(
       action_id="act_01",

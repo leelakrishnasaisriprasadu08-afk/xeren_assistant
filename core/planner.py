@@ -238,6 +238,58 @@ class TaskPlanner:
 
     # Device and OS Automation Plan
     if intent.intent_type == IntentType.DEVICE:
+      # 0. Server Health Check & Infrastructure Audit
+      if any(
+          kw in q.lower()
+          for kw in [
+              "server check",
+              "check server",
+              "server health",
+              "infrastructure check",
+              "system health check",
+              "system health",
+              "server status",
+              "server audit",
+              "system diagnostics",
+              "diagnostics",
+              "server performance",
+          ]
+      ):
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="device",
+                operation="server_health_check",
+                parameters={},
+                reason="Execute comprehensive production-grade server health and infrastructure audit",
+            )
+        )
+        return graph
+
+      # 0b. Network Port & Socket Inspection
+      if any(
+          kw in q.lower()
+          for kw in [
+              "check ports",
+              "network ports",
+              "open ports",
+              "listening ports",
+              "port check",
+              "network sockets",
+              "active connections",
+          ]
+      ):
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="device",
+                operation="check_network_ports",
+                parameters={},
+                reason="Inspect active listening network ports, socket connection counts, and throughput",
+            )
+        )
+        return graph
+
       # 1. System Info / Telemetry
       if any(
           kw in q.lower()

@@ -350,6 +350,31 @@ def create_app(assistant: Optional[XerenAssistant] = None) -> FastAPI:
       raise HTTPException(status_code=400, detail=error or "Failed to apply patch.")
     return {"status": "applied", "target_file": target_file}
 
+  @app.get("/system/server-check")
+  @app.get("/device/server-check")
+  async def get_server_health_check():
+    """Performs an extensive, production-grade server and infrastructure audit."""
+    dev_tool = _assistant.tool_registry.get_tool("device")
+    if not dev_tool:
+      raise HTTPException(status_code=500, detail="DeviceTool not registered.")
+    from tools.base import Action
+    res = await dev_tool.execute(Action(action_id="srv_check", tool_name="device", operation="server_health_check", parameters={}))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to execute server health check.")
+    return res.data
+
+  @app.get("/device/network-ports")
+  async def get_network_ports():
+    """Inspects active listening network ports, socket connection counts, and throughput."""
+    dev_tool = _assistant.tool_registry.get_tool("device")
+    if not dev_tool:
+      raise HTTPException(status_code=500, detail="DeviceTool not registered.")
+    from tools.base import Action
+    res = await dev_tool.execute(Action(action_id="net_ports", tool_name="device", operation="check_network_ports", parameters={}))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to inspect network ports.")
+    return res.data
+
   @app.get("/device/stats")
   async def get_device_stats():
     """Retrieves real-time CPU, RAM, Disk, Battery, and OS telemetry."""

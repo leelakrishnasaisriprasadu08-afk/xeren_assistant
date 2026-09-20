@@ -179,6 +179,22 @@ class IntentClassifier:
     if any(
         kw in q
         for kw in [
+            "server check",
+            "check server",
+            "server health",
+            "infrastructure check",
+            "system health check",
+            "system health",
+            "server status",
+            "server audit",
+            "system diagnostics",
+            "server performance",
+            "check ports",
+            "network ports",
+            "open ports",
+            "listening ports",
+            "port check",
+            "network sockets",
             "system stats",
             "system info",
             "cpu usage",
@@ -221,11 +237,13 @@ class IntentClassifier:
             "open app",
         ]
     ):
+      sub_type = "server_check" if any(k in q for k in ["server", "infrastructure", "health", "diagnostic"]) else ("network_ports" if any(k in q for k in ["port", "socket"]) else "device")
       return Intent(
           intent_type=IntentType.DEVICE,
-          confidence=0.95,
+          confidence=0.98,
           primary_tool="device",
-          summary="Device and OS level automation request",
+          entities={"sub_type": sub_type},
+          summary="Device, OS, server health, or network automation request",
       )
 
     # Composite detection (e.g. search github / web and save to tasks)
