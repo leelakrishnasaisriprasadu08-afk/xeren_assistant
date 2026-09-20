@@ -19,6 +19,8 @@ class IntentType(str, Enum):
   VISION = "vision"
   BROWSER = "browser"
   CLIENT = "client"
+  VAULT = "vault"
+  WEB_BUILDER = "web_builder"
   COMPOSITE = "composite"
 
 
@@ -41,6 +43,108 @@ class IntentClassifier:
   def _classify_rules(self, query: str) -> Optional[Intent]:
     """Fast deterministic rule-based classifier."""
     q = query.lower().strip()
+
+    # Linux-Grade Security Vault & Account Login Automation
+    if any(
+        kw in q
+        for kw in [
+            "save my login",
+            "store credential",
+            "store login",
+            "save login",
+            "save password",
+            "remember my login",
+            "remember login",
+            "list credentials",
+            "list saved logins",
+            "show saved accounts",
+            "show credentials",
+            "delete credential",
+            "delete saved login",
+            "remove credential",
+            "2fa code",
+            "two factor code",
+            "otp is",
+            "my 2fa",
+            "submit 2fa",
+        ]
+    ) or (
+        any(p in q for p in ["linkedin", "gmail", "upwork", "fiverr", "github", "portal"])
+        and any(action in q for action in ["login with", "login by", "by my gmail", "with password", "using my credentials", "stored login", "account by my"])
+    ):
+      entities = {}
+      # Detect platform
+      for p in ["linkedin", "gmail", "upwork", "fiverr", "github", "discord", "slack", "trello", "notion"]:
+        if p in q:
+          entities["platform"] = p
+          break
+
+      # Detect 2FA code
+      if any(kw in q for kw in ["2fa", "two factor", "otp", "code", "pin", "token", "verification"]):
+        code_match = re.search(r'\b([0-9]{4,8})\b', q)
+        if code_match:
+          entities["code"] = code_match.group(1)
+          entities["sub_type"] = "submit_2fa_code"
+        elif any(kw in q for kw in ["save", "store", "remember"]):
+          entities["sub_type"] = "store_credential"
+        elif any(kw in q for kw in ["list", "show"]):
+          entities["sub_type"] = "list_credentials"
+        elif any(kw in q for kw in ["delete", "remove"]):
+          entities["sub_type"] = "delete_credential"
+        else:
+          entities["sub_type"] = "submit_2fa_code"
+      elif any(kw in q for kw in ["save", "store", "remember"]):
+        entities["sub_type"] = "store_credential"
+      elif any(kw in q for kw in ["list", "show"]):
+        entities["sub_type"] = "list_credentials"
+      elif any(kw in q for kw in ["delete", "remove"]):
+        entities["sub_type"] = "delete_credential"
+      else:
+        entities["sub_type"] = "account_login"
+
+      # Extract email if present
+      email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', query)
+      if email_match:
+        entities["username_or_email"] = email_match.group(0)
+
+      return Intent(
+          intent_type=IntentType.VAULT,
+          confidence=0.98,
+          primary_tool="vault",
+          entities=entities,
+          summary="Linux-grade security vault operation or account login automation",
+      )
+
+    # Autonomous Web Builder & App Deployment
+    if any(
+        kw in q
+        for kw in [
+            "build a website",
+            "build website",
+            "create a website",
+            "create website",
+            "build web app",
+            "create web app",
+            "scaffold website",
+            "scaffold web",
+            "deploy preview",
+            "deploy website",
+            "deploy web app",
+            "start preview server",
+            "stop preview server",
+            "stop web preview",
+            "list web deployments",
+            "show web deployments",
+        ]
+    ):
+      sub = "deploy_preview" if "deploy" in q else ("stop_preview" if "stop" in q else ("list_deployments" if "list" in q else "scaffold_website"))
+      return Intent(
+          intent_type=IntentType.WEB_BUILDER,
+          confidence=0.98,
+          primary_tool="web_builder",
+          entities={"sub_type": sub, "prompt": query},
+          summary="Autonomous website generation, scaffolding, and preview deployment",
+      )
 
     # Client Outreach & Communications
     if any(

@@ -546,6 +546,81 @@ OPERATION_POLICIES: Dict[Tuple[str, str], OperationPolicy] = {
         description="Dispatch a message to an external client webhook",
         requires_user_approval=True,
     ),
+    # Linux-Grade Credential Vault operations
+    ("vault", "store_credential"): OperationPolicy(
+        tool_name="vault",
+        operation="store_credential",
+        permission_level=PermissionLevel.ASK,
+        risk_level=RiskLevel.MEDIUM,
+        description="Store encrypted login credentials for a service",
+        requires_user_approval=True,
+    ),
+    ("vault", "get_credential"): OperationPolicy(
+        tool_name="vault",
+        operation="get_credential",
+        permission_level=PermissionLevel.ASK,
+        risk_level=RiskLevel.HIGH,
+        description="Retrieve credentials and issue single-use Ring 0 lease",
+        requires_user_approval=True,
+    ),
+    ("vault", "list_credentials"): OperationPolicy(
+        tool_name="vault",
+        operation="list_credentials",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="List registered account credentials with masked passwords",
+    ),
+    ("vault", "delete_credential"): OperationPolicy(
+        tool_name="vault",
+        operation="delete_credential",
+        permission_level=PermissionLevel.ASK,
+        risk_level=RiskLevel.MEDIUM,
+        description="Delete account credential from vault",
+        requires_user_approval=True,
+    ),
+    ("vault", "submit_2fa_code"): OperationPolicy(
+        tool_name="vault",
+        operation="submit_2fa_code",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Register latest 2FA/OTP response code",
+    ),
+    # Web Builder & Local Preview Deployment operations
+    ("web_builder", "scaffold_website"): OperationPolicy(
+        tool_name="web_builder",
+        operation="scaffold_website",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Scaffold responsive web application tailored to user ideology",
+    ),
+    ("web_builder", "deploy_preview"): OperationPolicy(
+        tool_name="web_builder",
+        operation="deploy_preview",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Deploy web application to local background preview server",
+    ),
+    ("web_builder", "stop_preview"): OperationPolicy(
+        tool_name="web_builder",
+        operation="stop_preview",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Stop local preview web server",
+    ),
+    ("web_builder", "status_preview"): OperationPolicy(
+        tool_name="web_builder",
+        operation="status_preview",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Check status and uptime of preview web server",
+    ),
+    ("web_builder", "list_deployments"): OperationPolicy(
+        tool_name="web_builder",
+        operation="list_deployments",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="List active web deployments and live URLs",
+    ),
 }
 
 

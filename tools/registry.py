@@ -21,7 +21,9 @@ from .http_tool import HTTPTool
 from .patch_tool import PatchTool
 from .shell_tool import ShellTool
 from .task_tool import TaskTool
+from .vault_tool import VaultTool
 from .vision_tool import VisionTool
+from .web_builder_tool import WebBuilderTool
 from .web_search_tool import WebSearchTool
 
 
@@ -174,5 +176,7 @@ def get_default_registry(settings: Optional[Settings] = None) -> ToolRegistry:
   registry.register_tool(BrowserTool())
   registry.register_tool(VisionTool())
   registry.register_tool(CommunicationTool(client_store=None))
+  registry.register_tool(VaultTool())
+  registry.register_tool(WebBuilderTool())
 
   return registry

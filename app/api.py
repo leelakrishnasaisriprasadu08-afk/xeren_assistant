@@ -65,6 +65,30 @@ class ClientCreateRequest(BaseModel):
   notes: Optional[str] = None
 
 
+class CredentialSaveRequest(BaseModel):
+  platform: str
+  username_or_email: str
+  password: str
+  two_factor_type: Optional[str] = "none"
+  two_factor_secret: Optional[str] = None
+  metadata: Optional[Dict[str, Any]] = None
+
+
+class TwoFactorSubmitRequest(BaseModel):
+  platform: str
+  code: str
+
+
+class WebScaffoldRequest(BaseModel):
+  prompt: str
+  project_name: Optional[str] = None
+
+
+class WebDeployRequest(BaseModel):
+  project_name: Optional[str] = None
+  port: Optional[int] = None
+
+
 def create_app(assistant: Optional[XerenAssistant] = None) -> FastAPI:
   """Factory creating FastAPI application with injected XerenAssistant instance and approval hooks."""
   app = FastAPI(
@@ -597,6 +621,105 @@ def create_app(assistant: Optional[XerenAssistant] = None) -> FastAPI:
     ))
     if not res.success:
       raise HTTPException(status_code=500, detail=res.error or "Failed to create client.")
+    return res.data
+
+  # Linux-Grade Security Vault Endpoints
+  @app.get("/vault/credentials")
+  async def list_vault_credentials_endpoint():
+    """Lists saved account logins with masked passwords."""
+    vault_tool = _assistant.tool_registry.get_tool("vault")
+    if not vault_tool:
+      raise HTTPException(status_code=500, detail="VaultTool not registered.")
+    from tools.base import Action
+    res = await vault_tool.execute(Action(action_id="vault_list", tool_name="vault", operation="list_credentials", parameters={}))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to list credentials.")
+    return res.data
+
+  @app.post("/vault/credentials")
+  async def save_vault_credential_endpoint(req: CredentialSaveRequest):
+    """Saves or updates encrypted platform login credentials."""
+    vault_tool = _assistant.tool_registry.get_tool("vault")
+    if not vault_tool:
+      raise HTTPException(status_code=500, detail="VaultTool not registered.")
+    from tools.base import Action
+    res = await vault_tool.execute(Action(
+        action_id="vault_store",
+        tool_name="vault",
+        operation="store_credential",
+        parameters=req.model_dump()
+    ))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to store credential.")
+    return res.data
+
+  @app.delete("/vault/credentials/{platform}")
+  async def delete_vault_credential_endpoint(platform: str):
+    """Removes a platform credential from the vault."""
+    vault_tool = _assistant.tool_registry.get_tool("vault")
+    if not vault_tool:
+      raise HTTPException(status_code=500, detail="VaultTool not registered.")
+    from tools.base import Action
+    res = await vault_tool.execute(Action(action_id="vault_del", tool_name="vault", operation="delete_credential", parameters={"platform": platform}))
+    if not res.success:
+      raise HTTPException(status_code=404, detail=res.error or "Credential not found.")
+    return res.data
+
+  @app.post("/vault/2fa")
+  async def submit_2fa_code_endpoint(req: TwoFactorSubmitRequest):
+    """Registers the latest 2FA/OTP response code."""
+    vault_tool = _assistant.tool_registry.get_tool("vault")
+    if not vault_tool:
+      raise HTTPException(status_code=500, detail="VaultTool not registered.")
+    from tools.base import Action
+    res = await vault_tool.execute(Action(action_id="vault_2fa", tool_name="vault", operation="submit_2fa_code", parameters=req.model_dump()))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to register 2FA code.")
+    return res.data
+
+  # Autonomous Web Builder & Deployment Endpoints
+  @app.post("/web/scaffold")
+  async def scaffold_website_endpoint(req: WebScaffoldRequest):
+    """Scaffolds a complete responsive web application."""
+    builder_tool = _assistant.tool_registry.get_tool("web_builder")
+    if not builder_tool:
+      raise HTTPException(status_code=500, detail="WebBuilderTool not registered.")
+    from tools.base import Action
+    res = await builder_tool.execute(Action(action_id="web_scaffold", tool_name="web_builder", operation="scaffold_website", parameters=req.model_dump()))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to scaffold website.")
+    return res.data
+
+  @app.post("/web/deploy")
+  async def deploy_web_preview_endpoint(req: WebDeployRequest):
+    """Deploys a local background preview HTTP server."""
+    builder_tool = _assistant.tool_registry.get_tool("web_builder")
+    if not builder_tool:
+      raise HTTPException(status_code=500, detail="WebBuilderTool not registered.")
+    from tools.base import Action
+    res = await builder_tool.execute(Action(action_id="web_deploy", tool_name="web_builder", operation="deploy_preview", parameters=req.model_dump()))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to deploy preview server.")
+    return res.data
+
+  @app.post("/web/stop")
+  async def stop_web_preview_endpoint(data: Dict[str, Any]):
+    """Stops a running preview server."""
+    builder_tool = _assistant.tool_registry.get_tool("web_builder")
+    if not builder_tool:
+      raise HTTPException(status_code=500, detail="WebBuilderTool not registered.")
+    from tools.base import Action
+    res = await builder_tool.execute(Action(action_id="web_stop", tool_name="web_builder", operation="stop_preview", parameters=data))
+    return res.data
+
+  @app.get("/web/deployments")
+  async def list_web_deployments_endpoint():
+    """Lists all scaffolded web projects and active live preview servers."""
+    builder_tool = _assistant.tool_registry.get_tool("web_builder")
+    if not builder_tool:
+      raise HTTPException(status_code=500, detail="WebBuilderTool not registered.")
+    from tools.base import Action
+    res = await builder_tool.execute(Action(action_id="web_list", tool_name="web_builder", operation="list_deployments", parameters={}))
     return res.data
 
   @app.get("/traces")

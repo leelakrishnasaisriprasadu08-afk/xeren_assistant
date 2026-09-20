@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xeren Assistant — Autonomous Enterprise AI</title>
+  <title>Xeren Assistant — Autonomous Enterprise AI & Linux Security</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -20,6 +20,7 @@
       --accent-emerald: #10b981;
       --accent-amber: #f59e0b;
       --accent-rose: #f43f5e;
+      --accent-gold: #fbbf24;
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
       --radius-lg: 16px;
@@ -42,13 +43,13 @@
     }
 
     header {
-      padding: 1rem 2rem;
+      padding: 0.85rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border-card);
       backdrop-filter: blur(16px);
-      background: rgba(7, 10, 18, 0.9);
+      background: rgba(7, 10, 18, 0.92);
       position: sticky;
       top: 0;
       z-index: 50;
@@ -65,14 +66,33 @@
     }
 
     .brand-title {
-      font-size: 1.3rem; font-weight: 700; letter-spacing: -0.02em;
+      font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em;
       background: linear-gradient(to right, #fff, var(--cyan-glow));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
 
     .brand-subtitle {
-      font-size: 0.75rem; color: var(--text-muted); font-weight: 500;
+      font-size: 0.72rem; color: var(--text-muted); font-weight: 500;
     }
+
+    .header-nav { display: flex; gap: 0.5rem; }
+
+    .nav-tab {
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-card);
+      padding: 7px 16px; border-radius: 20px; font-size: 0.82rem; font-weight: 600;
+      color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .nav-tab:hover {
+      background: rgba(255, 255, 255, 0.1); color: #fff;
+    }
+    .nav-tab.active {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(121, 40, 202, 0.3));
+      border-color: var(--cyan-glow); color: #fff;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+    }
+
+    .header-metrics { display: flex; gap: 1.25rem; align-items: center; }
 
     .status-badge {
       display: inline-flex; align-items: center; gap: 0.5rem;
@@ -104,8 +124,6 @@
       50% { transform: scale(1.3); opacity: 0.7; }
     }
 
-    .header-metrics { display: flex; gap: 1.5rem; align-items: center; }
-
     .stat-pill {
       font-size: 0.85rem; color: var(--text-muted);
       display: flex; align-items: center; gap: 0.4rem;
@@ -115,7 +133,12 @@
     /* Main Container Layout */
     .container {
       max-width: 1600px; margin: 0 auto; padding: 1.25rem 1.75rem; flex: 1;
-      display: grid; grid-template-columns: 1fr 440px; gap: 1.5rem; width: 100%;
+      width: 100%;
+    }
+
+    .view-container { width: 100%; }
+    .view-console {
+      display: grid; grid-template-columns: 1fr 440px; gap: 1.5rem;
     }
 
     .main-workspace { display: flex; flex-direction: column; gap: 1.25rem; }
@@ -179,24 +202,40 @@
 
     .chat-input-row { display: flex; gap: 0.75rem; }
 
-    .chat-input {
-      flex: 1; background: rgba(0, 0, 0, 0.45); border: 1px solid var(--border-card);
+    .chat-input, .form-input, .form-select {
+      background: rgba(0, 0, 0, 0.45); border: 1px solid var(--border-card);
       border-radius: var(--radius-md); padding: 0.85rem 1.25rem; color: #fff;
-      font-family: inherit; font-size: 0.95rem; outline: none;
+      font-family: inherit; font-size: 0.92rem; outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    .chat-input:focus {
+    .chat-input { flex: 1; }
+
+    .chat-input:focus, .form-input:focus, .form-select:focus {
       border-color: var(--cyan-glow); box-shadow: 0 0 18px rgba(0, 240, 255, 0.3);
     }
 
-    .btn-send {
+    .btn-send, .btn-action {
       background: linear-gradient(135deg, var(--cyan-glow), var(--accent-purple));
       color: #000; font-weight: 700; border: none; border-radius: var(--radius-md);
-      padding: 0 1.5rem; cursor: pointer; display: flex; align-items: center;
-      gap: 0.5rem; transition: transform 0.15s, opacity 0.15s;
+      padding: 0.75rem 1.5rem; cursor: pointer; display: inline-flex; align-items: center;
+      gap: 0.5rem; transition: transform 0.15s, opacity 0.15s; font-size: 0.88rem;
     }
-    .btn-send:hover { transform: translateY(-1px); opacity: 0.9; }
+    .btn-send:hover, .btn-action:hover { transform: translateY(-1px); opacity: 0.9; }
+
+    .btn-danger {
+      background: rgba(244, 63, 94, 0.15); border: 1px solid var(--accent-rose);
+      color: var(--accent-rose); padding: 5px 12px; border-radius: 6px; cursor: pointer;
+      font-size: 0.78rem; font-weight: 600;
+    }
+    .btn-danger:hover { background: rgba(244, 63, 94, 0.3); }
+
+    .btn-launch {
+      background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent-emerald);
+      color: var(--accent-emerald); padding: 5px 12px; border-radius: 6px; cursor: pointer;
+      font-size: 0.78rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem;
+    }
+    .btn-launch:hover { background: rgba(16, 185, 129, 0.3); }
 
     /* Live Execution Graph (DAG Waves) */
     .dag-graph {
@@ -269,12 +308,53 @@
     .step-title { font-size: 0.85rem; font-weight: 600; color: #fff; display: flex; justify-content: space-between; }
     .step-desc { font-size: 0.75rem; color: var(--text-muted); }
     .step-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--cyan-glow); }
+
     /* Telemetry Stream Log */
     .telemetry-box {
       background: #000; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px;
       padding: 0.75rem; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
       height: 140px; overflow-y: auto; color: #a3e635; display: flex; flex-direction: column; gap: 0.3rem;
     }
+
+    /* Vault & Web Grid Layouts */
+    .dashboard-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    }
+
+    .table-container {
+      width: 100%; overflow-x: auto; margin-top: 0.75rem;
+    }
+
+    .data-table {
+      width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;
+    }
+
+    .data-table th {
+      padding: 10px 14px; background: rgba(0, 0, 0, 0.4); border-bottom: 1px solid var(--border-card);
+      color: var(--cyan-glow); font-weight: 600; text-transform: uppercase; font-size: 0.72rem;
+    }
+
+    .data-table td {
+      padding: 12px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #e5e7eb;
+    }
+
+    .data-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .ring-badge {
+      display: inline-flex; align-items: center; gap: 0.3rem; padding: 3px 8px;
+      border-radius: 12px; font-size: 0.7rem; font-weight: 700;
+    }
+    .ring-0 { background: rgba(251, 191, 36, 0.2); color: var(--accent-gold); border: 1px solid rgba(251, 191, 36, 0.4); }
+    .ring-1 { background: rgba(0, 240, 255, 0.2); color: var(--cyan-glow); border: 1px solid rgba(0, 240, 255, 0.4); }
+    .ring-2 { background: rgba(121, 40, 202, 0.2); color: #d8b4fe; border: 1px solid rgba(121, 40, 202, 0.4); }
+    .ring-3 { background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.4); }
+
+    .form-group {
+      display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.85rem;
+    }
+    .form-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
 
     /* Modal for Approval */
     .modal-overlay {
@@ -308,8 +388,14 @@
       <div class="brand-logo">X</div>
       <div>
         <div class="brand-title">Xeren Assistant</div>
-        <div class="brand-subtitle">Autonomous Multimodal & Multi-Agent Engine</div>
+        <div class="brand-subtitle">Autonomous Multimodal AI & Linux-Grade Security</div>
       </div>
+    </div>
+
+    <div class="header-nav">
+      <button class="nav-tab active" id="tab-btn-console" onclick="switchTab('console')">⚡ Console & Actions</button>
+      <button class="nav-tab" id="tab-btn-vault" onclick="switchTab('vault')">🔐 Security Vault & 2FA</button>
+      <button class="nav-tab" id="tab-btn-web" onclick="switchTab('web')">🚀 Web Builder & Servers</button>
     </div>
 
     <div class="header-metrics">
@@ -325,124 +411,292 @@
   <!-- Unified Main Container -->
   <div class="container">
 
-    <!-- Left / Center: Interactive Command Center & Plan Graph -->
-    <div class="main-workspace">
+    <!-- VIEW 1: Console & Execution -->
+    <div class="view-container view-console" id="view-console">
       
-      <!-- Live Dynamic DAG Wave Visualization -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">⚡ Autonomous Plan & Execution Graph (DAG Waves)</div>
-          <span class="stat-pill" id="dag-wave-info">Idle</span>
-        </div>
-        <div class="dag-graph" id="dag-graph-container">
-          <div class="dag-node">
-            <div class="node-header"><span>Autonomous Engine Ready</span><span class="node-badge badge-allowed">Ready</span></div>
-            <div class="node-op">Awaiting prompt or scheduled task...</div>
+      <!-- Left / Center: Interactive Command Center & Plan Graph -->
+      <div class="main-workspace">
+        
+        <!-- Live Dynamic DAG Wave Visualization -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚡ Autonomous Plan & Execution Graph (DAG Waves)</div>
+            <span class="stat-pill" id="dag-wave-info">Idle</span>
           </div>
+          <div class="dag-graph" id="dag-graph-container">
+            <div class="dag-node">
+              <div class="node-header"><span>Autonomous Engine Ready</span><span class="node-badge badge-allowed">Ready</span></div>
+              <div class="node-op">Awaiting prompt or scheduled task...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Unified Chat & Instruction Console -->
+        <div class="card chat-container">
+          <div class="card-header">
+            <div class="card-title">💬 Live Interaction & Execution Console</div>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Hotkeys: <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Alt+Space</kbd> or Enter</span>
+          </div>
+
+          <div class="chat-messages" id="chat-messages">
+            <div class="message assistant">
+              👋 <strong>Welcome to Xeren Assistant!</strong><br>
+              I am your unified, fully autonomous AI assistant with Linux-grade privilege rings and an autonomous creative web engine. Whatever you need—logging into platforms (LinkedIn, Upwork, Gmail), scaffolding responsive web applications, debugging errors, running server checks, or scheduling tasks—simply type below.
+            </div>
+          </div>
+
+          <!-- Quick Action Prompt Starters -->
+          <div class="quick-starters">
+            <div class="starter-chip" onclick="applyStarter('Save my login for linkedin (email: user@gmail.com, password: secret123, 2fa: prompt)')">🔐 Save LinkedIn Login</div>
+            <div class="starter-chip" onclick="applyStarter('Check my linkedin account by my gmail account and review unread notifications')">🌐 Auto-Login LinkedIn</div>
+            <div class="starter-chip" onclick="applyStarter('Build a futuristic AI Portfolio website with glassmorphism and deploy preview server')">🚀 Build & Deploy Web App</div>
+            <div class="starter-chip" onclick="applyStarter('Inspect recent git commits and check repository health')">🔍 Check Repo Health</div>
+            <div class="starter-chip" onclick="applyStarter('Analyze current desktop screen and diagnose any visible errors')">👁️ Screen Vision</div>
+          </div>
+
+          <div class="chat-input-row">
+            <input type="text" id="chat-input" class="chat-input" placeholder="Give Xeren any instruction (e.g. 'Build an AI portfolio website and start preview')..." autocomplete="off">
+            <button class="btn-send" id="btn-send" onclick="sendQuery()">Execute ➔</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right: Inside-Process Step-by-Step Live Tracker -->
+      <aside class="tracker-aside">
+
+        <!-- 1. Real-time Live State & Progress Pulse -->
+        <div class="pulse-stage-card">
+          <div class="pulse-title-row">
+            <span class="pulse-state-label">LIVE PROCESS STATE</span>
+            <span id="pulse-timer" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted);">0.0s</span>
+          </div>
+          <div class="pulse-now-working" id="pulse-status-text">
+            <span>🟢 Ready for Next Task</span>
+          </div>
+          <div style="font-size: 0.78rem; color: var(--text-muted);" id="pulse-sub-text">
+            Listening on local socket and UI event stream.
+          </div>
+        </div>
+
+        <!-- 2. Step-by-Step Execution Stepper (Real-time Pipeline) -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📍 Step-by-Step Pipeline Tracker</div>
+          </div>
+          <div class="stepper-timeline" id="stepper-container">
+            
+            <div class="step-item" id="step-intent">
+              <div class="step-bullet">1</div>
+              <div class="step-title"><span>Intent Classification</span><span class="step-meta" id="meta-intent">Idle</span></div>
+              <div class="step-desc">Identifies goal category and security boundaries.</div>
+            </div>
+
+            <div class="step-item" id="step-plan">
+              <div class="step-bullet">2</div>
+              <div class="step-title"><span>DAG Task Synthesis</span><span class="step-meta" id="meta-plan">Pending</span></div>
+              <div class="step-desc">Builds topological execution waves and parameter flow.</div>
+            </div>
+
+            <div class="step-item" id="step-exec">
+              <div class="step-bullet">3</div>
+              <div class="step-title"><span>Wave Execution & Tooling</span><span class="step-meta" id="meta-exec">Pending</span></div>
+              <div class="step-desc">Executes sandboxed tools, subagents, and AST patches.</div>
+            </div>
+
+            <div class="step-item" id="step-verify">
+              <div class="step-bullet">4</div>
+              <div class="step-title"><span>Loop-2 Semantic Verification</span><span class="step-meta" id="meta-verify">Pending</span></div>
+              <div class="step-desc">Verifies outputs, catches anomalies, and auto-repairs.</div>
+            </div>
+
+            <div class="step-item" id="step-memory">
+              <div class="step-bullet">5</div>
+              <div class="step-title"><span>Memory & Trace Commit</span><span class="step-meta" id="meta-memory">Pending</span></div>
+              <div class="step-desc">Stores episodic learnings and flamegraph telemetry.</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 3. Inside Process Live Telemetry -->
+        <div class="card" style="flex: 1; display: flex; flex-direction: column;">
+          <div class="card-header">
+            <div class="card-title">📡 Inside Process Live Telemetry</div>
+            <span style="font-size: 0.72rem; color: var(--cyan-glow);">REAL-TIME</span>
+          </div>
+          <div class="telemetry-box" id="telemetry-stream" style="flex: 1; min-height: 240px; max-height: 380px;">
+            <div>[SYSTEM] Xeren Autonomous Engine initialized.</div>
+            <div>[SECURITY] Linux Privilege Rings 0–3 active.</div>
+            <div>[VAULT] AES-256 Fernet Credential Enclave mounted.</div>
+            <div>[WEB] Autonomous Web Builder & Server subsystem online.</div>
+          </div>
+        </div>
+
+      </aside>
+
+    </div>
+
+    <!-- VIEW 2: Security Vault & 2FA Manager -->
+    <div class="view-container" id="view-vault" style="display: none;">
+      
+      <!-- Security Rings Architecture Overview -->
+      <div class="card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(121, 40, 202, 0.12)); border-color: rgba(251, 191, 36, 0.3);">
+        <div class="card-header">
+          <div class="card-title" style="color: var(--accent-gold);">🛡️ Linux-Grade Multi-Level Security Rings Architecture</div>
+          <span class="ring-badge ring-0">AES-256 PBKDF2 Enclave</span>
+        </div>
+        <p style="font-size: 0.85rem; color: #d1d5db; line-height: 1.6;">
+          Xeren enforces multi-tiered Linux kernel security rings: <strong>Ring 0 (Hardware/Crypto Enclave)</strong> stores encrypted credentials & unmasks secrets only into 60-second ephemeral leases; <strong>Ring 1 (Core Policy Gate)</strong> enforces tamper-evident SHA256 audit logs; <strong>Ring 2 (Tool Sandbox)</strong> executes headless browser/terminal isolation; <strong>Ring 3 (User Space)</strong> presents masked telemetry.
+        </p>
+        <div style="display: flex; gap: 0.75rem; margin-top: 0.85rem; flex-wrap: wrap;">
+          <span class="ring-badge ring-0">Ring 0: Zero-Trust Enclave</span>
+          <span class="ring-badge ring-1">Ring 1: Policy Gate & Audit Chaining</span>
+          <span class="ring-badge ring-2">Ring 2: Sandboxed Browser/CLI</span>
+          <span class="ring-badge ring-3">Ring 3: User Space / Masked UI</span>
         </div>
       </div>
 
-      <!-- Main Unified Chat & Instruction Console -->
-      <div class="card chat-container">
-        <div class="card-header">
-          <div class="card-title">💬 Live Interaction & Execution Console</div>
-          <span style="font-size: 0.75rem; color: var(--text-muted);">Hotkeys: <kbd style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">Alt+Space</kbd> or Enter</span>
-        </div>
-
-        <div class="chat-messages" id="chat-messages">
-          <div class="message assistant">
-            👋 <strong>Welcome to Xeren Assistant!</strong><br>
-            I am your unified, fully autonomous AI assistant. Whatever you need—writing or patching code, debugging errors, inspecting the screen, researching the web, drafting client emails, or scheduling background tasks—simply type below. I will automatically detect the goal, generate the execution plan, and run the required tools in real time.
+      <div class="dashboard-grid">
+        <!-- Stored Accounts Table -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔑 Stored Credentials Vault</div>
+            <button class="starter-chip" onclick="loadVaultCredentials()">🔄 Refresh</button>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Platform</th>
+                  <th>Username / Email</th>
+                  <th>Password</th>
+                  <th>2FA Type</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="vault-credentials-tbody">
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading vault accounts...</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
-        <!-- Quick Action Prompt Starters -->
-        <div class="quick-starters">
-          <div class="starter-chip" onclick="applyStarter('Inspect recent git commits and check repository health')">🔍 Check Repo Health</div>
-          <div class="starter-chip" onclick="applyStarter('Analyze current desktop screen and diagnose any visible errors')">👁️ Screen Vision Analysis</div>
-          <div class="starter-chip" onclick="applyStarter('Coordinate multi-agent swarm debate on building resilient retry mechanisms')">🤖 Swarm Debate</div>
-          <div class="starter-chip" onclick="applyStarter('Draft a polite project status reply for our client asking about progress')">✉️ Client Outreach Draft</div>
-          <div class="starter-chip" onclick="applyStarter('Schedule a background repository health watcher every 60 seconds')">⏰ Schedule Task</div>
-        </div>
+        <!-- Add Credential & 2FA Form -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔐 Store Account / Submit 2FA Code</div>
+          </div>
 
-        <div class="chat-input-row">
-          <input type="text" id="chat-input" class="chat-input" placeholder="Give Xeren any instruction or goal (e.g. 'Patch security redactor to support bearer tokens')..." autocomplete="off">
-          <button class="btn-send" id="btn-send" onclick="sendQuery()">Execute ➔</button>
+          <form onsubmit="saveVaultCredential(event)">
+            <div class="form-group">
+              <label class="form-label">Platform (e.g. linkedin, upwork, gmail, github, fiverr)</label>
+              <input type="text" id="vault-form-platform" class="form-input" placeholder="linkedin" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Username or Email Address</label>
+              <input type="text" id="vault-form-user" class="form-input" placeholder="user@gmail.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password (Encrypted at rest with AES-256 Fernet)</label>
+              <input type="password" id="vault-form-pass" class="form-input" placeholder="••••••••••••" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">2FA / MFA Type</label>
+              <select id="vault-form-2fa" class="form-select">
+                <option value="prompt">Prompt (Ask user for code during login)</option>
+                <option value="none">None (Single Factor)</option>
+                <option value="totp">Authenticator App (TOTP)</option>
+                <option value="sms">SMS Verification Code</option>
+                <option value="email">Email OTP Code</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-action">🔒 Store Credential in Ring 0</button>
+          </form>
+
+          <hr style="border: none; border-top: 1px solid var(--border-card); margin: 1.25rem 0;">
+
+          <!-- Submit 2FA / OTP Code -->
+          <div class="card-title" style="margin-bottom: 0.75rem;">📲 Submit Real-time 2FA / OTP Code</div>
+          <form onsubmit="submit2FACode(event)" style="display: flex; gap: 0.75rem;">
+            <input type="text" id="vault-2fa-platform" class="form-input" placeholder="Platform (e.g. linkedin)" style="flex: 1;" required>
+            <input type="text" id="vault-2fa-code" class="form-input" placeholder="6-digit Code (e.g. 849201)" style="flex: 1;" required>
+            <button type="submit" class="btn-action">Submit Code</button>
+          </form>
         </div>
       </div>
 
     </div>
 
-    <!-- Right: Inside-Process Step-by-Step Live Tracker -->
-    <aside class="tracker-aside">
+    <!-- VIEW 3: Autonomous Web Builder & Servers -->
+    <div class="view-container" id="view-web" style="display: none;">
+      
+      <div class="dashboard-grid">
+        
+        <!-- Scaffold New Web Application -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🚀 Autonomous Web Application Builder</div>
+            <span class="node-badge badge-allowed">Modular Subsystem</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Describe any web application or site you envision. Xeren will synthesize responsive HTML5, modern CSS3 styling (glassmorphism, vibrant dark mode, micro-animations), interactive JS logic, and README documentation.
+          </p>
 
-      <!-- 1. Real-time Live State & Progress Pulse -->
-      <div class="pulse-stage-card">
-        <div class="pulse-title-row">
-          <span class="pulse-state-label">LIVE PROCESS STATE</span>
-          <span id="pulse-timer" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted);">0.0s</span>
+          <form onsubmit="scaffoldWebApp(event)">
+            <div class="form-group">
+              <label class="form-label">Project Name / Slug</label>
+              <input type="text" id="web-form-name" class="form-input" placeholder="ai_portfolio_pro" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Creative Vision & Ideology Prompt</label>
+              <textarea id="web-form-prompt" class="form-input" rows="4" style="resize: vertical;" placeholder="Build an ultra-sleek AI Portfolio website with dark glassmorphism, interactive project showcase, contact modal, and live skill radar..." required></textarea>
+            </div>
+            <button type="submit" class="btn-action" id="btn-scaffold">✨ Scaffold & Generate Web App</button>
+          </form>
+
+          <!-- Quick Web Ideas -->
+          <div style="margin-top: 1.25rem;">
+            <span class="form-label">Quick Ideology Starters:</span>
+            <div class="quick-starters" style="margin-top: 0.5rem;">
+              <div class="starter-chip" onclick="setWebPrompt('ai_portfolio', 'Interactive AI Portfolio with futuristic glassmorphism and showcase demo')">💼 AI Portfolio</div>
+              <div class="starter-chip" onclick="setWebPrompt('saas_landing', 'Modern SaaS Cloud Analytics Landing Page with pricing table and feature grid')">☁️ SaaS Landing</div>
+              <div class="starter-chip" onclick="setWebPrompt('crypto_tracker', 'Real-time Crypto & Web3 Asset Tracker with dark cyber aesthetic')">📈 Web3 Dashboard</div>
+              <div class="starter-chip" onclick="setWebPrompt('dev_docs', 'Developer API Documentation Platform with interactive code sandbox')">📚 Developer Hub</div>
+            </div>
+          </div>
         </div>
-        <div class="pulse-now-working" id="pulse-status-text">
-          <span>🟢 Ready for Next Task</span>
+
+        <!-- Active Preview Servers & Deployments -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🌐 Live Preview Servers & Deployments</div>
+            <button class="starter-chip" onclick="loadWebDeployments()">🔄 Refresh</button>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            Local HTTP preview servers running autonomously in background processes.
+          </p>
+
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Project</th>
+                  <th>Status</th>
+                  <th>URL</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="web-deployments-tbody">
+                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Loading active deployments...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div style="font-size: 0.78rem; color: var(--text-muted);" id="pulse-sub-text">
-          Listening on local socket and UI event stream.
-        </div>
+
       </div>
 
-      <!-- 2. Step-by-Step Execution Stepper (Real-time Pipeline) -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">📍 Step-by-Step Pipeline Tracker</div>
-        </div>
-        <div class="stepper-timeline" id="stepper-container">
-          
-          <div class="step-item" id="step-intent">
-            <div class="step-bullet">1</div>
-            <div class="step-title"><span>Intent Classification</span><span class="step-meta" id="meta-intent">Idle</span></div>
-            <div class="step-desc">Identifies goal category and security boundaries.</div>
-          </div>
-
-          <div class="step-item" id="step-plan">
-            <div class="step-bullet">2</div>
-            <div class="step-title"><span>DAG Task Synthesis</span><span class="step-meta" id="meta-plan">Pending</span></div>
-            <div class="step-desc">Builds topological execution waves and parameter flow.</div>
-          </div>
-
-          <div class="step-item" id="step-exec">
-            <div class="step-bullet">3</div>
-            <div class="step-title"><span>Wave Execution & Tooling</span><span class="step-meta" id="meta-exec">Pending</span></div>
-            <div class="step-desc">Executes sandboxed tools, subagents, and AST patches.</div>
-          </div>
-
-          <div class="step-item" id="step-verify">
-            <div class="step-bullet">4</div>
-            <div class="step-title"><span>Loop-2 Semantic Verification</span><span class="step-meta" id="meta-verify">Pending</span></div>
-            <div class="step-desc">Verifies outputs, catches anomalies, and auto-repairs.</div>
-          </div>
-
-          <div class="step-item" id="step-memory">
-            <div class="step-bullet">5</div>
-            <div class="step-title"><span>Memory & Trace Commit</span><span class="step-meta" id="meta-memory">Pending</span></div>
-            <div class="step-desc">Stores episodic learnings and flamegraph telemetry.</div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- 3. Inside Process Live Telemetry -->
-      <div class="card" style="flex: 1; display: flex; flex-direction: column;">
-        <div class="card-header">
-          <div class="card-title">📡 Inside Process Live Telemetry</div>
-          <span style="font-size: 0.72rem; color: var(--cyan-glow);">REAL-TIME</span>
-        </div>
-        <div class="telemetry-box" id="telemetry-stream" style="flex: 1; min-height: 240px; max-height: 380px;">
-          <div>[SYSTEM] Xeren Autonomous Engine initialized.</div>
-          <div>[SECURITY] Risk gate active (ASK & ALLOWED policies enforced).</div>
-          <div>[READY] Awaiting prompt to begin autonomous execution.</div>
-      </div>
-
-    </aside>
+    </div>
 
   </div>
 
@@ -464,8 +718,22 @@
     let timerInterval = null;
     let queryStartTime = 0;
 
+    function switchTab(tab) {
+      document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+      const btn = document.getElementById('tab-btn-' + tab);
+      if (btn) btn.classList.add('active');
+
+      document.getElementById('view-console').style.display = (tab === 'console') ? 'grid' : 'none';
+      document.getElementById('view-vault').style.display = (tab === 'vault') ? 'block' : 'none';
+      document.getElementById('view-web').style.display = (tab === 'web') ? 'block' : 'none';
+
+      if (tab === 'vault') loadVaultCredentials();
+      if (tab === 'web') loadWebDeployments();
+    }
+
     function logTelemetry(msg) {
       const box = document.getElementById('telemetry-stream');
+      if (!box) return;
       const timeStr = new Date().toISOString().substring(11, 19);
       box.innerHTML += `<div>[${timeStr}] ${msg}</div>`;
       box.scrollTop = box.scrollHeight;
@@ -477,15 +745,17 @@
       const pulseStatus = document.getElementById('pulse-status-text');
       const pulseSub = document.getElementById('pulse-sub-text');
 
-      pulseStatus.innerHTML = statusText;
-      pulseSub.innerText = subText;
+      if (pulseStatus) pulseStatus.innerHTML = statusText;
+      if (pulseSub) pulseSub.innerText = subText;
 
-      if (isWorking) {
-        dot.className = 'status-dot working';
-        statusLabel.innerText = 'Executing Task...';
-      } else {
-        dot.className = 'status-dot';
-        statusLabel.innerText = 'Ready & Autonomous';
+      if (dot && statusLabel) {
+        if (isWorking) {
+          dot.className = 'status-dot working';
+          statusLabel.innerText = 'Executing Task...';
+        } else {
+          dot.className = 'status-dot';
+          statusLabel.innerText = 'Ready & Autonomous';
+        }
       }
     }
 
@@ -507,12 +777,19 @@
     }
 
     function applyStarter(text) {
+      switchTab('console');
       document.getElementById('chat-input').value = text;
       sendQuery();
     }
 
+    function setWebPrompt(name, prompt) {
+      document.getElementById('web-form-name').value = name;
+      document.getElementById('web-form-prompt').value = prompt;
+    }
+
     function renderDAG(plan) {
       const container = document.getElementById('dag-graph-container');
+      if (!container) return;
       if (!plan || plan.length === 0) {
         container.innerHTML = '<div class="dag-node"><div class="node-header"><span>Direct Answer Query</span><span class="node-badge badge-allowed">Complete</span></div><div class="node-op">Answered via LLM reasoning</div></div>';
         return;
@@ -550,10 +827,10 @@
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         const sec = ((Date.now() - queryStartTime) / 1000).toFixed(1);
-        document.getElementById('pulse-timer').innerText = `${sec}s`;
+        const timerEl = document.getElementById('pulse-timer');
+        if (timerEl) timerEl.innerText = `${sec}s`;
       }, 100);
 
-      // 1. Intent Stage
       setStepState('step-intent', 'active', 'Analyzing...');
       updatePulseState('🧠 Classifying Intent & Context', `Evaluating: "${query.substring(0, 40)}..."`);
       logTelemetry(`Classifying prompt intent: "${query.substring(0, 35)}..."`);
@@ -566,7 +843,6 @@
         });
         const data = await res.json();
 
-        // 2. DAG Plan Stage
         setStepState('step-intent', 'completed', 'Identified');
         setStepState('step-plan', 'completed', `${(data.tools_used || []).length} Actions`);
         setStepState('step-exec', 'completed', `${(data.tools_used || []).length} Steps`);
@@ -575,12 +851,14 @@
 
         clearInterval(timerInterval);
         const totalElapsed = ((Date.now() - queryStartTime) / 1000).toFixed(2);
-        document.getElementById('pulse-timer').innerText = `${totalElapsed}s`;
+        const timerEl = document.getElementById('pulse-timer');
+        if (timerEl) timerEl.innerText = `${totalElapsed}s`;
 
         updatePulseState('✅ Work Completed Successfully', `Executed in ${totalElapsed}s across ${data.tools_used?.length || 1} action(s).`, false);
         logTelemetry(`Task completed successfully (Trace: ${data.trace_id?.substring(0, 8)}...)`);
 
-        document.getElementById(loadingId).remove();
+        const loader = document.getElementById(loadingId);
+        if (loader) loader.remove();
 
         if (data.execution_result && data.execution_result.step_records) {
           renderDAG(data.execution_result.step_records.map(r => r.action));
@@ -596,7 +874,8 @@
         loadStats();
       } catch (e) {
         clearInterval(timerInterval);
-        document.getElementById(loadingId).innerText = "❌ Error executing task: " + e.message;
+        const loader = document.getElementById(loadingId);
+        if (loader) loader.innerText = "❌ Error executing task: " + e.message;
         updatePulseState('❌ Task Execution Error', e.message, false);
         logTelemetry(`ERROR: ${e.message}`);
       }
@@ -643,6 +922,183 @@
       } catch (e) {}
       document.getElementById('approval-modal').style.display = 'none';
       currentApprovalId = null;
+    }
+
+    /* Vault Management */
+    async function loadVaultCredentials() {
+      const tbody = document.getElementById('vault-credentials-tbody');
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading vault accounts...</td></tr>';
+      try {
+        const res = await fetch('/vault/credentials');
+        const data = await res.json();
+        if (!data.credentials || data.credentials.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No accounts stored in vault yet. Add one using the form on the right.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = data.credentials.map(c => `
+          <tr>
+            <td><strong>${c.platform.toUpperCase()}</strong></td>
+            <td><code>${c.username_or_email}</code></td>
+            <td style="font-family: monospace; letter-spacing: 2px;">••••••••</td>
+            <td><span class="ring-badge ring-1">${c.two_factor_type || 'none'}</span></td>
+            <td>
+              <button class="btn-danger" onclick="deleteVaultCredential('${c.platform}')">Delete</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="5" style="color: var(--accent-rose);">Failed to load credentials: ${e.message}</td></tr>`;
+      }
+    }
+
+    async function saveVaultCredential(e) {
+      e.preventDefault();
+      const platform = document.getElementById('vault-form-platform').value.trim();
+      const user = document.getElementById('vault-form-user').value.trim();
+      const pass = document.getElementById('vault-form-pass').value.trim();
+      const twoFa = document.getElementById('vault-form-2fa').value;
+
+      try {
+        const res = await fetch('/vault/credentials', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            platform: platform,
+            username_or_email: user,
+            password: pass,
+            two_factor_type: twoFa
+          })
+        });
+        const data = await res.json();
+        alert(`✅ Account for ${platform} successfully encrypted and saved to Ring 0 Enclave!`);
+        document.getElementById('vault-form-platform').value = '';
+        document.getElementById('vault-form-user').value = '';
+        document.getElementById('vault-form-pass').value = '';
+        loadVaultCredentials();
+      } catch (err) {
+        alert(`❌ Error saving credential: ${err.message}`);
+      }
+    }
+
+    async function deleteVaultCredential(platform) {
+      if (!confirm(`Are you sure you want to remove ${platform} from the secure vault?`)) return;
+      try {
+        await fetch(`/vault/credentials/${platform}`, { method: 'DELETE' });
+        loadVaultCredentials();
+      } catch (e) {
+        alert(`❌ Failed to delete: ${e.message}`);
+      }
+    }
+
+    async function submit2FACode(e) {
+      e.preventDefault();
+      const platform = document.getElementById('vault-2fa-platform').value.trim();
+      const code = document.getElementById('vault-2fa-code').value.trim();
+      try {
+        const res = await fetch('/vault/2fa', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ platform: platform, code: code })
+        });
+        const data = await res.json();
+        alert(`✅ 2FA Code registered for ${platform}! Xeren will use this for pending logins.`);
+        document.getElementById('vault-2fa-code').value = '';
+      } catch (err) {
+        alert(`❌ Failed to register 2FA code: ${err.message}`);
+      }
+    }
+
+    /* Web Builder & Deployments */
+    async function loadWebDeployments() {
+      const tbody = document.getElementById('web-deployments-tbody');
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Loading deployments...</td></tr>';
+      try {
+        const res = await fetch('/web/deployments');
+        const data = await res.json();
+        const deps = data.deployments || [];
+        if (deps.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No scaffolded web apps yet. Generate one on the left!</td></tr>';
+          return;
+        }
+        tbody.innerHTML = deps.map(d => `
+          <tr>
+            <td><strong>${d.project_name}</strong></td>
+            <td>
+              <span class="ring-badge ${d.is_running ? 'ring-3' : 'ring-0'}">
+                ${d.is_running ? '🟢 RUNNING' : '⚪ STOPPED'}
+              </span>
+            </td>
+            <td>
+              ${d.is_running && d.url ? `<a href="${d.url}" target="_blank" class="btn-launch">🌐 Open ${d.url} ↗</a>` : '<span style="color: var(--text-muted);">Not deployed</span>'}
+            </td>
+            <td>
+              ${d.is_running ? `
+                <button class="btn-danger" onclick="stopWebPreview('${d.project_name}')">⏹️ Stop</button>
+              ` : `
+                <button class="btn-action" style="padding: 4px 10px; font-size: 0.75rem;" onclick="deployWebPreview('${d.project_name}')">▶️ Launch Server</button>
+              `}
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="4" style="color: var(--accent-rose);">Failed to load deployments: ${e.message}</td></tr>`;
+      }
+    }
+
+    async function scaffoldWebApp(e) {
+      e.preventDefault();
+      const name = document.getElementById('web-form-name').value.trim();
+      const prompt = document.getElementById('web-form-prompt').value.trim();
+      const btn = document.getElementById('btn-scaffold');
+
+      btn.innerText = '⚡ Synthesizing HTML/CSS/JS...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/web/scaffold', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project_name: name, prompt: prompt })
+        });
+        const data = await res.json();
+
+        // Auto deploy preview
+        await deployWebPreview(name);
+        alert(`🎉 Website '${name}' scaffolded and launched on local preview server!`);
+        loadWebDeployments();
+      } catch (err) {
+        alert(`❌ Failed to scaffold website: ${err.message}`);
+      } finally {
+        btn.innerText = '✨ Scaffold & Generate Web App';
+        btn.disabled = false;
+      }
+    }
+
+    async function deployWebPreview(projectName) {
+      try {
+        const res = await fetch('/web/deploy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project_name: projectName })
+        });
+        const data = await res.json();
+        loadWebDeployments();
+      } catch (e) {
+        alert(`❌ Failed to deploy server: ${e.message}`);
+      }
+    }
+
+    async function stopWebPreview(projectName) {
+      try {
+        await fetch('/web/stop', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project_name: projectName })
+        });
+        loadWebDeployments();
+      } catch (e) {
+        alert(`❌ Failed to stop server: ${e.message}`);
+      }
     }
 
     document.getElementById('chat-input').addEventListener('keypress', (e) => {

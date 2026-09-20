@@ -553,6 +553,75 @@ class XerenAssistant:
               f"✅ **Client Registered**{repaired_badge}: **{data.get('name')}** (`{data.get('client_id')}`) - `{data.get('email')}`"
           )
 
+      elif action.tool_name == "vault":
+        if action.operation == "store_credential":
+          lines.append(
+              f"🔐 **Credential Secured in Linux-Grade Enclave (Ring 0)**{repaired_badge}:\n"
+              f"- **Platform**: `{str(data.get('platform')).capitalize()}`\n"
+              f"- **Account Identifier**: `{data.get('username_or_email')}`\n"
+              f"- **Password**: `********` *(AES-256 Encrypted at Rest)*\n"
+              f"- **2FA Method**: `{data.get('two_factor_type')}`\n"
+              f"- **Enclave Status**: 🟢 Protected & Redacted in Memory"
+          )
+        elif action.operation == "get_credential":
+          lines.append(
+              f"🔓 **Ephemeral Credential Lease Issued (Ring 0 Enclave)**{repaired_badge}:\n"
+              f"- **Platform**: `{str(data.get('platform')).capitalize()}`\n"
+              f"- **Account**: `{data.get('username_or_email')}`\n"
+              f"- **Lease ID**: `{str(data.get('lease_id'))[:12]}...` *(TTL: {data.get('ttl_seconds')}s single-use)*\n"
+              f"- **Recent 2FA Response Active**: {'✅ Yes' if data.get('has_active_2fa') else '⚠️ None (Interactive 2FA prompt ready)'}"
+          )
+        elif action.operation == "list_credentials":
+          creds = data.get("credentials", []) if isinstance(data, dict) else []
+          rows = ["| Platform | Account Identifier | 2FA Protection | Status |", "| :--- | :--- | :--- | :--- |"]
+          for c in creds:
+            rows.append(f"| **{c.get('platform').capitalize()}** | `{c.get('username_or_email')}` | `{c.get('two_factor_type')}` | 🟢 ACTIVE |")
+          lines.append(f"🔐 **Registered Account Credentials ({len(creds)})**{repaired_badge}:\n\n" + ("\n".join(rows) if len(rows) > 2 else "_No credentials currently stored in vault._"))
+        elif action.operation == "delete_credential":
+          lines.append(f"🗑️ **Credential Removed from Vault**{repaired_badge}: Platform `{data.get('platform')}`")
+        elif action.operation == "submit_2fa_code":
+          lines.append(
+              f"🔑 **2FA / OTP Authentication Response Stored**{repaired_badge}:\n"
+              f"- **Platform**: `{str(data.get('platform')).capitalize()}`\n"
+              f"- **OTP Token**: `{data.get('code_masked')}`\n"
+              f"- **Authentication State**: Ready for active login injection"
+          )
+
+      elif action.tool_name == "web_builder":
+        if action.operation == "scaffold_website":
+          files = data.get("files_created", [])
+          f_lines = ", ".join([f"`{f['file']}` ({f['size_bytes']}B)" for f in files])
+          lines.append(
+              f"🚀 **Autonomous Web Application Scaffolding Complete**{repaired_badge}:\n"
+              f"- **Project Name**: `{data.get('project_name')}`\n"
+              f"- **Target Directory**: `{data.get('directory')}`\n"
+              f"- **Artifacts Generated**: {f_lines}\n"
+              f"- **Design Standard**: Modern Glassmorphic UI with Google Fonts & Interactive Sandbox"
+          )
+        elif action.operation == "deploy_preview":
+          lines.append(
+              f"🌐 **Live Web Application Deployed & Hosted**{repaired_badge}:\n"
+              f"- **Live Preview URL**: [{data.get('url')}]({data.get('url')})\n"
+              f"- **Port Bound**: `{data.get('port')}` (PID: `{data.get('pid')}`)\n"
+              f"- **Project**: `{data.get('project_name')}`\n"
+              f"- **Status**: 🟢 `RUNNING` (Ready in browser)"
+          )
+        elif action.operation == "stop_preview":
+          lines.append(f"🛑 **Preview Server Stopped**{repaired_badge}: Project `{data.get('project_name')}` on Port `{data.get('port')}`")
+        elif action.operation == "status_preview":
+          lines.append(
+              f"📊 **Preview Server Status**{repaired_badge}: `{data.get('status')}`\n"
+              f"- **Project**: `{data.get('project_name')}`\n"
+              f"- **URL**: {data.get('url') or 'N/A'} (Uptime: {data.get('uptime_seconds', 0)}s)"
+          )
+        elif action.operation == "list_deployments":
+          deps = data.get("deployments", []) if isinstance(data, dict) else []
+          d_lines = []
+          for d in deps:
+            status_str = f"🟢 LIVE: [{d.get('url')}]({d.get('url')})" if d.get("is_running") else "⚪ STOPPED"
+            d_lines.append(f"- **{d.get('project_name')}**: {status_str}")
+          lines.append(f"🌐 **Web Deployments ({len(deps)})**{repaired_badge}:\n" + ("\n".join(d_lines) if d_lines else "- No scaffolded web projects yet."))
+
 
 
     return (

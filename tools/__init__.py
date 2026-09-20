@@ -13,7 +13,9 @@ from .registry import ToolRegistry, get_default_registry
 from .shell_tool import ShellTool
 from .subagent_tool import SubagentTool
 from .task_tool import TaskTool
+from .vault_tool import VaultTool
 from .vision_tool import VisionTool
+from .web_builder_tool import WebBuilderTool
 from .web_search_tool import WebSearchTool
 
 __all__ = [
@@ -35,6 +37,8 @@ __all__ = [
     "SubagentTool",
     "PatchTool",
     "VisionTool",
+    "VaultTool",
+    "WebBuilderTool",
 ]
 
 

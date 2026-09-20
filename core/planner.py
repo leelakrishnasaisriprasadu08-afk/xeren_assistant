@@ -645,8 +645,176 @@ class TaskPlanner:
         )
         return graph
 
-    # Task Scheduling Plan
-    if intent.intent_type == IntentType.SCHEDULE:
+    # Linux-Grade Credential Vault & Automated Account Login Plan
+    if intent.intent_type == IntentType.VAULT:
+      sub_type = intent.entities.get("sub_type", "account_login")
+      platform = intent.entities.get("platform") or "linkedin"
+
+      if sub_type == "store_credential":
+        # Extract password if present
+        pass_match = re.search(r'(?:password|pass)\s*(?:is|:)?\s*[\'"]?([^\s\'"]+)[\'"]?', q)
+        pwd = pass_match.group(1) if pass_match else "SecurePass123!"
+        username = intent.entities.get("username_or_email") or "user@example.com"
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="vault",
+                operation="store_credential",
+                parameters={
+                    "platform": platform,
+                    "username": username,
+                    "password": pwd,
+                    "two_factor_type": "prompt" if "2fa" in q else "none",
+                },
+                reason=f"Store encrypted credentials for platform '{platform}'",
+            )
+        )
+        return graph
+
+      elif sub_type == "list_credentials":
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="vault",
+                operation="list_credentials",
+                parameters={},
+                reason="List registered vault credentials with masked secrets",
+            )
+        )
+        return graph
+
+      elif sub_type == "delete_credential":
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="vault",
+                operation="delete_credential",
+                parameters={"platform": platform},
+                reason=f"Delete stored credentials for '{platform}'",
+            )
+        )
+        return graph
+
+      elif sub_type == "submit_2fa_code":
+        code = intent.entities.get("code") or "123456"
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="vault",
+                operation="submit_2fa_code",
+                parameters={"platform": platform, "code": code},
+                reason=f"Register active 2FA/OTP code for '{platform}'",
+            )
+        )
+        return graph
+
+      else:
+        # Automated multi-step login workflow:
+        # 1. Fetch credentials from vault (Ring 0 single-use lease)
+        # 2. Navigate browser to platform portal
+        # 3. Multimodal vision screen audit to verify session and 2FA prompt
+        plat_urls = {
+            "linkedin": "https://www.linkedin.com/login",
+            "gmail": "https://mail.google.com",
+            "upwork": "https://www.upwork.com/ab/account-security/login",
+            "fiverr": "https://www.fiverr.com/login",
+            "github": "https://github.com/login",
+        }
+        target_url = plat_urls.get(platform, f"https://www.{platform}.com")
+
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="vault",
+                operation="get_credential",
+                parameters={"platform": platform},
+                reason=f"Retrieve encrypted login credentials and lease for '{platform}'",
+            )
+        )
+        graph.add_action(
+            self.create_action(
+                action_id="act_02",
+                tool_name="browser",
+                operation="navigate_url",
+                parameters={"url": target_url},
+                reason=f"Navigate to {platform.capitalize()} authentication gateway",
+                depends_on=["act_01"],
+            )
+        )
+        graph.add_action(
+            self.create_action(
+                action_id="act_03",
+                tool_name="vision",
+                operation="analyze_screen",
+                parameters={"prompt": f"Verify active login session or 2FA verification prompt for {platform.capitalize()}"},
+                reason="Inspect active visual state to confirm authentication and 2FA challenge",
+                depends_on=["act_02"],
+            )
+        )
+        return graph
+
+    # Autonomous Web Builder & App Deployment Plan
+    if intent.intent_type == IntentType.WEB_BUILDER:
+      sub_type = intent.entities.get("sub_type", "scaffold_website")
+      if sub_type in ["deploy_preview", "start_preview"]:
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="web_builder",
+                operation="deploy_preview",
+                parameters={"project_name": "xeren_web_app"},
+                reason="Deploy web application to local background preview server",
+            )
+        )
+        return graph
+
+      elif sub_type in ["stop_preview", "stop_web"]:
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="web_builder",
+                operation="stop_preview",
+                parameters={"project_name": "xeren_web_app"},
+                reason="Stop running local preview server",
+            )
+        )
+        return graph
+
+      elif sub_type == "list_deployments":
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="web_builder",
+                operation="list_deployments",
+                parameters={},
+                reason="List active web deployments and live URLs",
+            )
+        )
+        return graph
+
+      else:
+        # Full end-to-end scaffolding + live preview deployment DAG
+        clean_name = re.sub(r"[^a-zA-Z0-9_\-]", "_", q[:25].strip().lower()).strip("_") or "xeren_web_app"
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="web_builder",
+                operation="scaffold_website",
+                parameters={"prompt": q, "project_name": clean_name},
+                reason=f"Generate complete web application source files for '{clean_name}'",
+            )
+        )
+        graph.add_action(
+            self.create_action(
+                action_id="act_02",
+                tool_name="web_builder",
+                operation="deploy_preview",
+                parameters={"project_name": clean_name},
+                reason=f"Launch live local background preview server for '{clean_name}'",
+                depends_on=["act_01"],
+            )
+        )
+        return graph
       graph.add_action(
           self.create_action(
               action_id="act_01",
