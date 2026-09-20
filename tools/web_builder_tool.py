@@ -106,18 +106,29 @@ class WebBuilderTool(BaseTool):
 
     target_port = port or self._find_free_port(3000)
 
-    # Spawn background Python HTTP server process
-    cmd = [
-        sys.executable,
-        "-m",
-        "http.server",
-        str(target_port),
-        "--directory",
-        str(target_dir),
-    ]
+    # Spawn background Python HTTP / API server process
+    server_py = target_dir / "server.py"
+    if server_py.exists():
+      cmd = [
+          sys.executable,
+          str(server_py),
+          str(target_port),
+      ]
+      cwd = str(target_dir)
+    else:
+      cmd = [
+          sys.executable,
+          "-m",
+          "http.server",
+          str(target_port),
+          "--directory",
+          str(target_dir),
+      ]
+      cwd = None
 
     proc = subprocess.Popen(
         cmd,
+        cwd=cwd,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
