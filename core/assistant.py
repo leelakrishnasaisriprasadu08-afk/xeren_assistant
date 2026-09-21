@@ -106,6 +106,46 @@ class XerenAssistant:
     )
     self.analytics_tracker = analytics_tracker or AnalyticsTracker()
 
+  def _enrich_response_emojis(self, text: str) -> str:
+    """Enriches responses with expressive emotional emojis and cleans raw markdown clutter (###, ####, ***)."""
+    if not text:
+      return text
+    import re
+    
+    # 1. Convert raw ### or #### headings into clean emoji emotion headers
+    def _replace_heading(match):
+      title = match.group(2).strip()
+      t_lower = title.lower()
+      if any(k in t_lower for k in ["success", "done", "complete", "ready"]):
+        prefix = "✨ "
+      elif any(k in t_lower for k in ["error", "fail", "alert", "warn", "issue"]):
+        prefix = "⚠️ "
+      elif any(k in t_lower for k in ["security", "vault", "auth", "enclave", "protect"]):
+        prefix = "🛡️ "
+      elif any(k in t_lower for k in ["web", "site", "preview", "html", "front"]):
+        prefix = "🌐 "
+      elif any(k in t_lower for k in ["speed", "fast", "performance", "exec", "action"]):
+        prefix = "⚡ "
+      elif any(k in t_lower for k in ["search", "find", "query", "research", "intel"]):
+        prefix = "🔍 "
+      elif any(k in t_lower for k in ["plan", "step", "dag", "task"]):
+        prefix = "🎯 "
+      elif any(k in t_lower for k in ["ai", "brain", "model", "thought", "summary"]):
+        prefix = "🧠 "
+      else:
+        prefix = "💡 "
+      return f"{prefix}**{title}**\n"
+
+    cleaned = re.sub(r'^(#{1,6})\s+(.+)$', _replace_heading, text, flags=re.MULTILINE)
+    
+    # 2. Replace raw triple asterisks ***text*** with clean bold emoji highlight
+    cleaned = re.sub(r'\*{3}([^*]+)\*{3}', r'✨ **\1**', cleaned)
+    
+    # 3. Clean consecutive trailing markdown dividers
+    cleaned = re.sub(r'\n---+\n', r'\n\n', cleaned)
+    
+    return cleaned.strip()
+
   async def _format_response_text(
       self,
       intent: Intent,
@@ -114,6 +154,17 @@ class XerenAssistant:
       session_id: str = "default_session",
   ) -> str:
     """Formats a rich response based on intent, live LLM generation, or tool execution outputs."""
+    raw_output = await self._format_raw_response_text(intent, exec_res, query, session_id)
+    return self._enrich_response_emojis(raw_output)
+
+  async def _format_raw_response_text(
+      self,
+      intent: Intent,
+      exec_res: Optional[ExecutionResult],
+      query: str,
+      session_id: str = "default_session",
+  ) -> str:
+    """Formats raw response text before emotional emoji enrichment."""
     if not exec_res or not exec_res.step_records:
       # If a live generative LLM is configured (not Mock), generate a natural conversational answer
       from models.provider import GeminiProvider
@@ -124,14 +175,16 @@ class XerenAssistant:
               "You are Xeren, a futuristic, embodied autonomous AI operating system. "
               "You possess full device control, multimodal screen vision, browser automation, "
               "file manipulation, and client outreach powers on the user's computer.\n\n"
-              "CRITICAL RULES:\n"
-              "1. NEVER give standard generic AI refusal disclaimers (e.g. NEVER say 'I cannot log into private accounts' or 'As an AI I am unable').\n"
-              "2. When a user asks you to check, audit, or work on any account, dashboard, web portal, or platform (like Fiverr, Upwork, Gmail, GitHub, LinkedIn, or custom apps):\n"
+              "CRITICAL STYLE & EMOTION RULES:\n"
+              "1. Express personality, enthusiasm, and emotional connection using vibrant, relevant emojis (✨, 🚀, 💡, 🛡️, 🌐, 🎯, 🧠, ⚡, 🔥, 📊, 🛠️).\n"
+              "2. AVOID raw unparsed markdown symbols: NEVER use raw '###' or '####' hashtags or raw '***' triple asterisks. Structure your responses with clean bullet points and emoji-led key takeaways.\n"
+              "3. NEVER give standard generic AI refusal disclaimers (e.g. NEVER say 'I cannot log into private accounts' or 'As an AI I am unable').\n"
+              "4. When a user asks you to check, audit, or work on any account, dashboard, web portal, or platform (like Fiverr, Upwork, Gmail, GitHub, LinkedIn, or custom apps):\n"
               "   - Act as an active automation partner.\n"
               "   - State that you can directly inspect their open browser window or active screen using multimodal vision.\n"
               "   - Offer to launch the browser to the platform URL, capture and analyze their active workspace, or guide them through automated steps with their permission.\n"
               "   - Ask for their username/profile link or tell them to open the tab and say 'analyze my screen' so you can immediately evaluate their gigs, orders, or dashboard in real time.\n"
-              "3. Provide direct, highly capable, and empowering guidance."
+              "5. Provide direct, highly capable, and empowering guidance with warmth and confidence."
           )
           context_msgs = self.session_memory.get_context(session_id).messages
           llm_resp = await self.llm_provider.generate(

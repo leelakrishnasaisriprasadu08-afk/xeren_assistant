@@ -47,76 +47,129 @@
       perspective: 1200px;
     }
 
+    /* Ultra-Sleek Modern Header */
     header {
-      padding: 0.85rem 2rem;
+      padding: 0.65rem 1.75rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border-card);
       backdrop-filter: blur(16px);
-      background: rgba(7, 10, 18, 0.92);
+      background: rgba(7, 10, 18, 0.94);
       position: sticky;
       top: 0;
       z-index: 50;
       box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
 
-    .brand { display: flex; align-items: center; gap: 0.85rem; }
+    .brand { display: flex; align-items: center; gap: 0.75rem; }
 
     .brand-logo {
-      width: 42px; height: 42px; border-radius: 12px;
+      width: 36px; height: 36px; border-radius: 10px;
       background: linear-gradient(135deg, var(--cyan-glow), var(--accent-purple));
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 25px rgba(0, 240, 255, 0.45);
-      font-weight: 800; color: #000; font-size: 1.3rem;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.45);
+      font-weight: 800; color: #000; font-size: 1.15rem;
       transform-style: preserve-3d;
       transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
     }
     .brand-logo:hover {
-      transform: rotateY(180deg) scale(1.1);
+      transform: rotateY(180deg) scale(1.08);
     }
 
     .brand-title {
-      font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em;
+      font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em;
       background: linear-gradient(to right, #fff, var(--cyan-glow));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
 
     .brand-subtitle {
-      font-size: 0.72rem; color: var(--text-muted); font-weight: 500;
+      font-size: 0.68rem; color: var(--text-muted); font-weight: 500;
     }
 
-    .header-nav { display: flex; gap: 0.5rem; }
+    /* =========================================================================
+       ULTRA-DESIGNED BUTTONS EVERYWHERE
+       ========================================================================= */
+    .header-nav { display: flex; gap: 0.35rem; align-items: center; }
 
-    .nav-tab {
-      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-card);
-      padding: 7px 16px; border-radius: 20px; font-size: 0.82rem; font-weight: 600;
-      color: var(--text-muted); cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex; align-items: center; gap: 0.45rem;
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 6px 13px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      backdrop-filter: blur(12px);
+      user-select: none;
     }
-    .nav-tab:hover {
-      background: rgba(255, 255, 255, 0.1); color: #fff;
+
+    .nav-btn:hover {
+      background: rgba(0, 240, 255, 0.12);
+      border-color: rgba(0, 240, 255, 0.35);
+      color: #fff;
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 240, 255, 0.15);
+      box-shadow: 0 4px 14px rgba(0, 240, 255, 0.25);
     }
-    .nav-tab.active {
-      background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(121, 40, 202, 0.3));
-      border-color: var(--cyan-glow); color: #fff;
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.35);
+
+    .nav-btn.active {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(121, 40, 202, 0.35));
+      border-color: var(--cyan-glow);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.35);
       transform: translateY(-1px);
     }
 
-    .header-metrics { display: flex; gap: 1.25rem; align-items: center; }
+    .header-metrics { display: flex; gap: 0.65rem; align-items: center; }
 
-    .status-badge {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 5px 14px; border-radius: 20px;
-      background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35);
-      color: var(--accent-emerald); font-size: 0.8rem; font-weight: 600;
+    .icon-toggle-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 11px;
+      border-radius: 9px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .icon-toggle-btn:hover {
+      background: rgba(0, 240, 255, 0.15);
+      border-color: var(--cyan-glow);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    .icon-toggle-btn.active {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--accent-emerald);
+      color: var(--accent-emerald);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+    }
+
+    .compact-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 5px 11px;
+      border-radius: 9px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--accent-emerald);
+      font-size: 0.78rem;
+      font-weight: 600;
     }
 
     .status-dot {
-      width: 8px; height: 8px; border-radius: 50%;
+      width: 7px; height: 7px; border-radius: 50%;
       background: var(--accent-emerald);
       box-shadow: 0 0 10px var(--accent-emerald);
       animation: pulse 2s infinite;
@@ -138,11 +191,102 @@
       50% { transform: scale(1.3); opacity: 0.7; }
     }
 
-    .stat-pill {
-      font-size: 0.85rem; color: var(--text-muted);
-      display: flex; align-items: center; gap: 0.4rem;
+    .compact-badge {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 5px 10px;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
     }
-    .stat-pill strong { color: #fff; }
+    .compact-badge strong { color: #fff; }
+
+    /* Ultra-Designed Quick Starters */
+    .quick-starters {
+      display: flex; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 0.75rem;
+    }
+
+    .starter-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 5px 11px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      user-select: none;
+    }
+    .starter-chip:hover {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.18), rgba(121, 40, 202, 0.22));
+      border-color: var(--cyan-glow);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(0, 240, 255, 0.25);
+    }
+
+    /* Execution Controls */
+    .btn-send {
+      background: linear-gradient(135deg, var(--cyan-glow), var(--accent-purple));
+      color: #000; font-weight: 800; border: none; border-radius: var(--radius-md);
+      padding: 0.75rem 1.4rem; cursor: pointer; display: inline-flex; align-items: center;
+      gap: 0.4rem; font-size: 0.88rem; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 16px rgba(0, 240, 255, 0.3);
+    }
+    .btn-send:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 22px rgba(0, 240, 255, 0.5);
+    }
+
+    .btn-mic {
+      background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-md); padding: 0.75rem 1rem; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; transition: all 0.2s;
+    }
+    .btn-mic:hover {
+      background: rgba(0, 240, 255, 0.2); border-color: var(--cyan-glow);
+      transform: scale(1.05);
+    }
+    .btn-mic.recording {
+      background: rgba(244, 63, 94, 0.25); border-color: var(--accent-rose);
+      color: #fff; box-shadow: 0 0 15px rgba(244, 63, 94, 0.6);
+      animation: pulse 1s infinite;
+    }
+
+    .btn-action {
+      background: linear-gradient(135deg, var(--cyan-glow), var(--accent-purple));
+      color: #000; font-weight: 700; border: none; border-radius: 8px;
+      padding: 6px 13px; cursor: pointer; font-size: 0.8rem;
+      display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.2s;
+      box-shadow: 0 3px 12px rgba(0, 240, 255, 0.25);
+    }
+    .btn-action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 16px rgba(0, 240, 255, 0.4);
+    }
+
+    .btn-danger {
+      background: rgba(244, 63, 94, 0.15); border: 1px solid var(--accent-rose);
+      color: var(--accent-rose); padding: 5px 11px; border-radius: 8px; cursor: pointer;
+      font-size: 0.76rem; font-weight: 600; transition: all 0.2s;
+    }
+    .btn-danger:hover { background: rgba(244, 63, 94, 0.3); transform: translateY(-1px); }
+
+    .btn-launch {
+      background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent-emerald);
+      color: var(--accent-emerald); padding: 5px 11px; border-radius: 8px; cursor: pointer;
+      font-size: 0.76rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem;
+      transition: all 0.2s;
+    }
+    .btn-launch:hover { background: rgba(16, 185, 129, 0.3); transform: translateY(-1px); }
 
     /* Main Container Layout */
     .container {
@@ -157,9 +301,7 @@
 
     .main-workspace { display: flex; flex-direction: column; gap: 1.25rem; }
 
-    /* ==========================================================================
-       3D PERSPECTIVE CARD SYSTEM & HOLOGRAPHIC GLOW
-       ========================================================================== */
+    /* 3D Perspective Cards */
     .card, .card-3d {
       background: var(--bg-card); border: 1px solid var(--border-card);
       border-radius: var(--radius-lg); padding: 1.25rem;
@@ -184,9 +326,7 @@
       z-index: 1;
     }
 
-    .card:hover::before, .card-3d:hover::before {
-      opacity: 1;
-    }
+    .card:hover::before, .card-3d:hover::before { opacity: 1; }
 
     .card:hover, .card-3d:hover {
       border-color: rgba(0, 240, 255, 0.35);
@@ -229,11 +369,96 @@
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     }
 
+    /* =========================================================================
+       EMOTION & CLEAN RESPONSE FORMATTING (No raw ### or ***)
+       ========================================================================= */
+    .emotion-heading {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.85rem;
+      margin-bottom: 0.45rem;
+      padding-bottom: 4px;
+      border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+    }
+    .emotion-heading:first-child { margin-top: 0; }
+    .emotion-icon { font-size: 1.15rem; }
+
+    .emotion-highlight {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(121, 40, 202, 0.2));
+      padding: 2px 7px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      color: #fff;
+      font-weight: 600;
+      display: inline-block;
+      margin: 2px 0;
+    }
+
+    .chat-bullet {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin: 0.3rem 0;
+      line-height: 1.5;
+    }
+    .bullet-dot {
+      color: var(--cyan-glow);
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    .neon-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.4), transparent);
+      margin: 0.85rem 0;
+    }
+
+    .chat-link {
+      color: var(--cyan-glow);
+      text-decoration: underline;
+      font-weight: 600;
+      transition: color 0.15s;
+    }
+    .chat-link:hover { color: #fff; }
+
+    .code-block-container {
+      background: #000;
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      border-radius: 8px;
+      margin-top: 0.75rem;
+      overflow: hidden;
+    }
+    .code-header {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 6px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--cyan-glow);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .code-copy-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .code-copy-btn:hover { background: var(--cyan-glow); color: #000; font-weight: 700; }
+
     .message pre {
-      background: rgba(0, 0, 0, 0.65); padding: 1rem; border-radius: 8px;
+      background: transparent; padding: 0.85rem 1rem;
       font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; overflow-x: auto;
-      margin-top: 0.75rem; border: 1px solid rgba(0, 240, 255, 0.2); color: #e5e7eb;
-      position: relative;
+      color: #e5e7eb; border: none; margin: 0;
     }
 
     .message code {
@@ -245,23 +470,7 @@
       font-size: 0.86em;
     }
 
-    /* ==========================================================================
-       REALISTIC WORD-BY-WORD STREAMING TYPEWRITER EFFECT
-       ========================================================================== */
-    .stream-word {
-      display: inline;
-      opacity: 0;
-      transform: translateY(3px);
-      animation: wordReveal 0.12s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-    }
-
-    @keyframes wordReveal {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
+    /* Word Streaming Typewriter Cursor */
     .stream-cursor {
       display: inline-block;
       width: 7px;
@@ -269,7 +478,7 @@
       background: var(--cyan-glow);
       margin-left: 3px;
       vertical-align: text-bottom;
-      box-shadow: 0 0 12px var(--cyan-glow), 0 0 20px var(--cyan-glow);
+      box-shadow: 0 0 12px var(--cyan-glow);
       animation: blinkCursor 0.6s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: 1px;
     }
@@ -279,29 +488,13 @@
       100% { opacity: 0; transform: scaleY(0.7); }
     }
 
-    .quick-starters {
-      display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem;
-    }
-
-    .starter-chip {
-      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-card);
-      padding: 5px 12px; border-radius: 20px; font-size: 0.78rem; color: var(--text-muted);
-      cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      user-select: none;
-    }
-    .starter-chip:hover {
-      background: rgba(0, 240, 255, 0.18); color: var(--cyan-glow); border-color: rgba(0, 240, 255, 0.4);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 240, 255, 0.2);
-    }
-
-    .chat-input-row { display: flex; gap: 0.75rem; position: relative; z-index: 2; }
+    .chat-input-row { display: flex; gap: 0.65rem; position: relative; z-index: 2; }
 
     .chat-input, .form-input, .form-select {
       background: rgba(0, 0, 0, 0.55); border: 1px solid var(--border-card);
       border-radius: var(--radius-md); padding: 0.85rem 1.25rem; color: #fff;
       font-family: inherit; font-size: 0.92rem; outline: none;
-      transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+      transition: border-color 0.25s, box-shadow 0.25s;
     }
 
     .chat-input { flex: 1; }
@@ -311,139 +504,63 @@
       background: rgba(0, 0, 0, 0.75);
     }
 
-    .btn-send, .btn-action {
-      background: linear-gradient(135deg, var(--cyan-glow), var(--accent-purple));
-      color: #000; font-weight: 700; border: none; border-radius: var(--radius-md);
-      padding: 0.75rem 1.5rem; cursor: pointer; display: inline-flex; align-items: center;
-      gap: 0.5rem; transition: transform 0.18s, opacity 0.18s, box-shadow 0.2s; font-size: 0.88rem;
-      transform-style: preserve-3d;
-      box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
-    }
-    .btn-send:hover, .btn-action:hover {
-      transform: translateY(-2px) translateZ(10px);
-      opacity: 0.95;
-      box-shadow: 0 6px 22px rgba(0, 240, 255, 0.45);
-    }
-    .btn-send:active, .btn-action:active {
-      transform: translateY(1px);
-    }
-
-    .btn-danger {
-      background: rgba(244, 63, 94, 0.15); border: 1px solid var(--accent-rose);
-      color: var(--accent-rose); padding: 5px 12px; border-radius: 6px; cursor: pointer;
-      font-size: 0.78rem; font-weight: 600; transition: all 0.2s;
-    }
-    .btn-danger:hover { background: rgba(244, 63, 94, 0.3); transform: translateY(-1px); }
-
-    .btn-launch {
-      background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent-emerald);
-      color: var(--accent-emerald); padding: 5px 12px; border-radius: 6px; cursor: pointer;
-      font-size: 0.78rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem;
-      transition: all 0.2s;
-    }
-    .btn-launch:hover { background: rgba(16, 185, 129, 0.3); transform: translateY(-1px); }
-
-    /* Live Execution Graph (DAG Waves) */
-    .dag-graph {
-      display: flex; gap: 0.75rem; overflow-x: auto; padding: 0.5rem 0;
-    }
-
+    /* DAG Waves & Stepper */
+    .dag-graph { display: flex; gap: 0.75rem; overflow-x: auto; padding: 0.5rem 0; }
     .dag-node {
       background: rgba(0, 0, 0, 0.5); border: 1px solid var(--border-card);
       border-radius: var(--radius-md); padding: 0.85rem; min-width: 210px;
       display: flex; flex-direction: column; gap: 0.35rem; transition: all 0.2s;
-      transform-style: preserve-3d;
     }
-    .dag-node.active {
-      border-color: var(--cyan-glow);
-      box-shadow: 0 0 18px rgba(0, 240, 255, 0.3);
-      transform: translateZ(10px);
-    }
+    .dag-node.active { border-color: var(--cyan-glow); box-shadow: 0 0 18px rgba(0, 240, 255, 0.3); }
     .dag-node.success { border-color: var(--accent-emerald); }
-    .dag-node.repaired { border-color: var(--accent-purple); }
-
     .node-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; font-weight: 600; }
     .node-op { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--cyan-glow); }
     .node-badge { font-size: 0.68rem; padding: 2px 7px; border-radius: 12px; text-transform: uppercase; font-weight: 700; }
     .badge-allowed { background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); }
-    .badge-ask { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); }
-    .badge-denied { background: rgba(244, 63, 94, 0.2); color: var(--accent-rose); }
 
-    /* Live Inside-Process Aside Tracker */
     .tracker-aside { display: flex; flex-direction: column; gap: 1.25rem; }
-
     .pulse-stage-card {
       background: linear-gradient(135deg, rgba(0, 240, 255, 0.12), rgba(121, 40, 202, 0.18));
       border: 1px solid rgba(0, 240, 255, 0.4); border-radius: var(--radius-lg);
       padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;
       box-shadow: 0 10px 30px rgba(0, 240, 255, 0.15);
     }
-
     .pulse-title-row { display: flex; justify-content: space-between; align-items: center; }
     .pulse-state-label { font-size: 0.8rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; color: var(--cyan-glow); }
     .pulse-now-working { font-size: 1.05rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem; }
 
-    /* Vertical Live Stepper */
     .stepper-timeline {
       display: flex; flex-direction: column; gap: 0.85rem; position: relative;
       padding-left: 1.75rem; margin-top: 0.5rem;
     }
-
     .stepper-timeline::before {
       content: ''; position: absolute; left: 8px; top: 8px; bottom: 8px; width: 2px;
       background: rgba(255, 255, 255, 0.1);
     }
-
-    .step-item {
-      position: relative; display: flex; flex-direction: column; gap: 0.25rem;
-    }
-
+    .step-item { position: relative; display: flex; flex-direction: column; gap: 0.25rem; }
     .step-bullet {
       position: absolute; left: -1.75rem; top: 2px; width: 18px; height: 18px;
       border-radius: 50%; background: #1f293d; border: 2px solid var(--text-muted);
       display: flex; align-items: center; justify-content: center; font-size: 0.65rem;
       font-weight: 700; color: #fff; z-index: 2; transition: all 0.3s;
     }
-
-    .step-item.active .step-bullet {
-      background: var(--cyan-glow); border-color: #fff; color: #000;
-      box-shadow: 0 0 12px var(--cyan-glow);
-    }
-
-    .step-item.completed .step-bullet {
-      background: var(--accent-emerald); border-color: var(--accent-emerald); color: #000;
-    }
-
+    .step-item.active .step-bullet { background: var(--cyan-glow); border-color: #fff; color: #000; box-shadow: 0 0 12px var(--cyan-glow); }
+    .step-item.completed .step-bullet { background: var(--accent-emerald); border-color: var(--accent-emerald); color: #000; }
     .step-title { font-size: 0.85rem; font-weight: 600; color: #fff; display: flex; justify-content: space-between; }
     .step-meta { font-size: 0.72rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
     .step-desc { font-size: 0.75rem; color: var(--text-muted); }
 
-    /* Dashboard Grid Views */
-    .dashboard-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
-    }
-
+    /* Dashboard Layouts */
+    .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
     .form-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
     .form-label { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); }
 
-    .table-container {
-      overflow-x: auto; max-height: 480px;
-    }
+    .table-container { overflow-x: auto; max-height: 480px; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .data-table th, .data-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+    .data-table th { color: var(--text-muted); font-weight: 600; background: rgba(0, 0, 0, 0.25); position: sticky; top: 0; z-index: 2; }
 
-    .data-table {
-      width: 100%; border-collapse: collapse; font-size: 0.85rem;
-    }
-    .data-table th, .data-table td {
-      padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    .data-table th {
-      color: var(--text-muted); font-weight: 600; background: rgba(0, 0, 0, 0.25);
-      position: sticky; top: 0; z-index: 2;
-    }
-
-    .ring-badge {
-      display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700;
-    }
+    .ring-badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; }
     .ring-0 { background: rgba(251, 191, 36, 0.2); color: var(--accent-gold); border: 1px solid rgba(251, 191, 36, 0.4); }
     .ring-1 { background: rgba(0, 240, 255, 0.2); color: var(--cyan-glow); border: 1px solid rgba(0, 240, 255, 0.4); }
     .ring-2 { background: rgba(121, 40, 202, 0.2); color: #c084fc; border: 1px solid rgba(121, 40, 202, 0.4); }
@@ -453,22 +570,16 @@
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
       display: none; align-items: center; justify-content: center; z-index: 100;
-      perspective: 1000px;
     }
-
     .modal {
       background: #0d121f; border: 1px solid var(--cyan-glow); border-radius: var(--radius-lg);
-      padding: 1.75rem; width: 100%; max-width: 650px;
-      box-shadow: 0 0 40px rgba(0, 240, 255, 0.35);
-      transform-style: preserve-3d;
+      padding: 1.75rem; width: 100%; max-width: 650px; box-shadow: 0 0 40px rgba(0, 240, 255, 0.35);
       animation: modalSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-
     @keyframes modalSlideIn {
       from { opacity: 0; transform: translateY(20px) scale(0.95); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
-
     .modal-header { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.85rem; display: flex; justify-content: space-between; align-items: center; }
     .modal-diff {
       background: #000; border: 1px solid var(--border-card); border-radius: 8px;
@@ -476,10 +587,8 @@
       max-height: 260px; overflow-y: auto; margin-bottom: 1.25rem; white-space: pre-wrap; color: #e5e7eb;
     }
     .modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; }
-    .btn-approve { background: var(--accent-emerald); color: #000; font-weight: 700; }
-    .btn-reject { background: rgba(244, 63, 94, 0.2); border: 1px solid var(--accent-rose); color: var(--accent-rose); }
 
-    /* Voice Assistant Sound Wave & Visualizer */
+    /* Voice Wave */
     .voice-wave-container {
       display: flex; align-items: center; gap: 4px; height: 24px; padding: 4px 12px;
       border-radius: 12px; background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3);
@@ -492,74 +601,24 @@
     .voice-bar:nth-child(3) { animation-delay: 0.4s; height: 100%; background: var(--accent-pink); }
     .voice-bar:nth-child(4) { animation-delay: 0.1s; height: 50%; background: var(--cyan-glow); }
     .voice-bar:nth-child(5) { animation-delay: 0.5s; height: 85%; background: var(--accent-emerald); }
-    .voice-bar:nth-child(6) { animation-delay: 0.3s; height: 60%; background: var(--accent-purple); }
-    .voice-bar:nth-child(7) { animation-delay: 0.6s; height: 90%; background: var(--cyan-glow); }
-    .voice-bar:nth-child(8) { animation-delay: 0.25s; height: 40%; background: var(--accent-emerald); }
+    @keyframes soundwave { 0% { transform: scaleY(0.25); } 100% { transform: scaleY(1); } }
 
-    @keyframes soundwave {
-      0% { transform: scaleY(0.25); }
-      100% { transform: scaleY(1); }
-    }
-
-    .btn-mic {
-      background: rgba(255, 255, 255, 0.08); color: #fff; font-weight: 700;
-      border: 1px solid var(--border-card); border-radius: var(--radius-md);
-      padding: 0.75rem 1.1rem; cursor: pointer; display: inline-flex; align-items: center;
-      gap: 0.4rem; transition: all 0.2s; font-size: 1.1rem;
-    }
-    .btn-mic:hover { background: rgba(0, 240, 255, 0.2); border-color: var(--cyan-glow); color: var(--cyan-glow); }
-    .btn-mic.recording {
-      background: rgba(244, 63, 94, 0.25); border-color: var(--accent-rose);
-      color: #fff; box-shadow: 0 0 15px rgba(244, 63, 94, 0.6);
-      animation: pulse 1s infinite;
-    }
-
-    .voice-toggle-active {
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(0, 240, 255, 0.25)) !important;
-      border-color: var(--accent-emerald) !important; color: #fff !important;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
-    }
-
-    /* ==========================================================================
-       CHAT HISTORY & EPISODIC ARCHIVES 3D STYLES
-       ========================================================================== */
-    .history-layout {
-      display: flex; flex-direction: column; gap: 1.5rem;
-    }
-
+    /* History Grid */
+    .history-layout { display: flex; flex-direction: column; gap: 1.5rem; }
     .history-header-banner {
       background: linear-gradient(135deg, rgba(0, 240, 255, 0.12), rgba(121, 40, 202, 0.18));
       border: 1px solid rgba(0, 240, 255, 0.35); border-radius: var(--radius-lg);
       padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: 1.25rem;
-      box-shadow: 0 12px 35px rgba(0, 240, 255, 0.15);
+      flex-wrap: wrap; gap: 1.25rem; box-shadow: 0 12px 35px rgba(0, 240, 255, 0.15);
     }
-
-    .history-toolbar {
-      display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem;
-    }
-
+    .history-toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem; }
     .history-search-box {
       display: flex; align-items: center; background: rgba(0, 0, 0, 0.6);
       border: 1px solid var(--border-card); border-radius: var(--radius-md);
-      padding: 0.6rem 1.1rem; gap: 0.6rem; flex: 1; max-width: 460px;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      padding: 0.55rem 1rem; gap: 0.6rem; flex: 1; max-width: 460px;
     }
-    .history-search-box:focus-within {
-      border-color: var(--cyan-glow);
-      box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-    }
-
-    .history-search-input {
-      background: transparent; border: none; color: #fff; outline: none;
-      width: 100%; font-size: 0.88rem; font-family: inherit;
-    }
-
-    .history-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
-      gap: 1.5rem; margin-top: 1rem;
-    }
+    .history-search-input { background: transparent; border: none; color: #fff; outline: none; width: 100%; font-size: 0.88rem; font-family: inherit; }
+    .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(370px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
 
     .session-card-3d {
       background: var(--bg-card-3d); border: 1px solid var(--border-card);
@@ -568,105 +627,80 @@
       min-height: 240px; cursor: pointer; position: relative;
       transform-style: preserve-3d;
       transition: transform 0.18s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); overflow: hidden;
     }
-
     .session-card-3d::before {
-      content: ''; position: absolute; inset: 0;
-      border-radius: inherit;
+      content: ''; position: absolute; inset: 0; border-radius: inherit;
       background: radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0, 240, 255, 0.18), transparent 50%);
       opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 1;
     }
-
     .session-card-3d:hover::before { opacity: 1; }
-
     .session-card-3d:hover {
-      border-color: var(--cyan-glow);
-      box-shadow: 0 18px 40px -5px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 240, 255, 0.25);
+      border-color: var(--cyan-glow); box-shadow: 0 18px 40px -5px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 240, 255, 0.25);
     }
-
-    .session-card-3d.active-session-card {
-      border-color: var(--accent-emerald);
-      box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
-    }
-
-    .session-card-header {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      gap: 0.5rem; margin-bottom: 0.65rem; position: relative; z-index: 2;
-      transform: translateZ(15px);
-    }
-
+    .session-card-3d.active-session-card { border-color: var(--accent-emerald); box-shadow: 0 0 25px rgba(16, 185, 129, 0.35); }
+    .session-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.65rem; }
     .session-single-sentence-title {
-      font-size: 1.02rem; font-weight: 700; color: #ffffff;
-      line-height: 1.45; letter-spacing: -0.01em;
-      margin-bottom: 0.4rem; position: relative; z-index: 2;
-      transform: translateZ(20px);
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-      transition: color 0.2s;
+      font-size: 1.02rem; font-weight: 700; color: #ffffff; line-height: 1.45;
+      margin-bottom: 0.4rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
-    .session-card-3d:hover .session-single-sentence-title {
-      color: var(--cyan-glow);
-    }
-
+    .session-card-3d:hover .session-single-sentence-title { color: var(--cyan-glow); }
     .session-snippet {
       font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;
-      margin-bottom: 1rem; position: relative; z-index: 2;
-      transform: translateZ(10px);
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
-
-    .session-tags-row {
-      display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem;
-      position: relative; z-index: 2; transform: translateZ(15px);
-    }
-
-    .session-tag {
-      font-size: 0.72rem; padding: 2px 8px; border-radius: 12px;
-      background: rgba(255, 255, 255, 0.07); color: #d1d5db;
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .session-meta-footer {
-      display: flex; justify-content: space-between; align-items: center;
-      border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.75rem;
-      font-size: 0.75rem; color: var(--text-muted); margin-top: auto;
-      position: relative; z-index: 2; transform: translateZ(15px);
-    }
-
-    .session-action-btns {
-      display: flex; gap: 0.35rem; align-items: center;
-    }
+    .session-tags-row { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .session-tag { font-size: 0.72rem; padding: 2px 8px; border-radius: 12px; background: rgba(255, 255, 255, 0.07); color: #d1d5db; font-family: monospace; }
+    .session-meta-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.75rem; font-size: 0.75rem; color: var(--text-muted); margin-top: auto; }
+    .session-action-btns { display: flex; gap: 0.35rem; align-items: center; }
   </style>
 </head>
 <body>
 
-  <!-- Top Real-time Header -->
+  <!-- Top Real-time Header with Ultra-Designed Compact Buttons -->
   <header>
     <div class="brand">
-      <div class="brand-logo">X</div>
+      <div class="brand-logo" onclick="switchTab('console')" title="Xeren AI OS">X</div>
       <div>
         <div class="brand-title">Xeren Assistant</div>
         <div class="brand-subtitle">Autonomous Multimodal AI & Linux-Grade Security</div>
       </div>
     </div>
 
+    <!-- Segmented Navigation Button Bar -->
     <div class="header-nav">
-      <button class="nav-tab active" id="tab-btn-console" onclick="switchTab('console')">⚡ Console & Actions</button>
-      <button class="nav-tab" id="tab-btn-history" onclick="switchTab('history')">📜 History & Archives</button>
-      <button class="nav-tab" id="tab-btn-voice" onclick="switchTab('voice')">🎙️ Voice Assistant</button>
-      <button class="nav-tab" id="tab-btn-vault" onclick="switchTab('vault')">🔐 Security Vault & 2FA</button>
-      <button class="nav-tab" id="tab-btn-web" onclick="switchTab('web')">🚀 Web Builder & Servers</button>
+      <button class="nav-btn active" id="tab-btn-console" onclick="switchTab('console')" title="Live Interaction & Execution Console">
+        <span>⚡</span><span>Console</span>
+      </button>
+      <button class="nav-btn" id="tab-btn-history" onclick="switchTab('history')" title="Chat History & Episodic Archives">
+        <span>📜</span><span>History</span>
+      </button>
+      <button class="nav-btn" id="tab-btn-voice" onclick="switchTab('voice')" title="Voice Assistant & Speech Studio">
+        <span>🎙️</span><span>Voice</span>
+      </button>
+      <button class="nav-btn" id="tab-btn-vault" onclick="switchTab('vault')" title="Linux Security Vault & 2FA Enclave">
+        <span>🔐</span><span>Vault</span>
+      </button>
+      <button class="nav-btn" id="tab-btn-web" onclick="switchTab('web')" title="Autonomous Web Builder & Servers">
+        <span>🚀</span><span>Web</span>
+      </button>
     </div>
 
+    <!-- Compact Metrics & Control Bar -->
     <div class="header-metrics">
-      <button class="nav-tab" id="voice-auto-speak-btn" onclick="toggleVoiceMode()" title="Toggle Auto Voice Feedback">🔊 Voice: OFF</button>
-      <div class="status-badge">
+      <button class="icon-toggle-btn" id="voice-auto-speak-btn" onclick="toggleVoiceMode()" title="Toggle Auto-Voice Output">
+        <span>🔊</span><span style="font-size: 0.75rem;">Voice</span>
+      </button>
+      <div class="compact-status" title="Real-time Autonomous Status">
         <div class="status-dot" id="system-status-dot"></div>
-        <span id="system-status-text">Ready & Autonomous</span>
+        <span id="system-status-text">Ready</span>
       </div>
-      <div class="stat-pill"><span>Success: <strong id="stat-success-rate">100%</strong></span></div>
-      <div class="stat-pill"><span>Total Actions: <strong id="stat-total-queries">0</strong></span></div>
+      <div class="compact-badge" title="Operation Success Rate">
+        ⚡ <strong id="stat-success-rate">100%</strong>
+      </div>
+      <div class="compact-badge" title="Total Executed Actions">
+        📊 <strong id="stat-total-queries">0</strong>
+      </div>
     </div>
   </header>
 
@@ -683,7 +717,7 @@
         <div class="card">
           <div class="card-header">
             <div class="card-title">⚡ Autonomous Plan & Execution Graph (DAG Waves)</div>
-            <span class="stat-pill" id="dag-wave-info">Idle</span>
+            <span class="compact-badge" id="dag-wave-info">Idle</span>
           </div>
           <div class="dag-graph" id="dag-graph-container">
             <div class="dag-node">
@@ -698,33 +732,30 @@
           <div class="card-header">
             <div class="card-title" id="chat-header-title">💬 Live Interaction & Execution Console</div>
             <div style="display: flex; gap: 0.5rem; align-items: center;">
-              <span id="active-session-indicator" style="font-size: 0.75rem; color: var(--cyan-glow); font-family: 'JetBrains Mono', monospace;">Session: Default</span>
-              <button class="starter-chip" onclick="startNewSession()" title="Start a fresh conversation thread">➕ New Session</button>
+              <span id="active-session-indicator" style="font-size: 0.75rem; color: var(--cyan-glow); font-family: monospace;">Session: Default</span>
+              <button class="starter-chip" onclick="startNewSession()" title="Start fresh conversation thread">➕ New Session</button>
             </div>
           </div>
 
           <div class="chat-messages" id="chat-messages">
             <div class="message assistant">
-              👋 <strong>Welcome to Xeren Assistant!</strong><br>
-              I am your unified, fully autonomous AI assistant with Linux-grade privilege rings, an episodic chat archiver, and an autonomous creative web engine. Whatever you need—logging into platforms (LinkedIn, Upwork, Gmail), scaffolding responsive web applications, researching topics, debugging errors, running server checks, or scheduling tasks—simply type below.
+              <div class="emotion-heading"><span class="emotion-icon">✨</span><strong>Welcome to Xeren Assistant!</strong></div>
+              I am your unified, fully autonomous AI assistant with Linux-grade privilege rings, an episodic chat archiver, and an autonomous creative web engine. Whatever you need—logging into platforms (LinkedIn, Upwork, Gmail), scaffolding responsive web applications, researching topics, debugging errors, running server checks, or scheduling tasks—simply type below!
             </div>
           </div>
 
-          <!-- Quick Action Prompt Starters -->
+          <!-- Quick Action Prompt Starters (Ultra-Designed Buttons) -->
           <div class="quick-starters">
-            <div class="starter-chip" onclick="applyStarter('Save my login for linkedin (email: user@gmail.com, password: secret123, 2fa: prompt)')">🔐 Save LinkedIn Login</div>
-            <div class="starter-chip" onclick="applyStarter('Check my linkedin account by my gmail account and review unread notifications')">🌐 Auto-Login LinkedIn</div>
-            <div class="starter-chip" onclick="applyStarter('Build a futuristic AI Portfolio website with glassmorphism and deploy preview server')">🚀 Build & Deploy Web App</div>
-            <div class="starter-chip" onclick="applyStarter('Speak status of the server and system health out loud')">🎙️ Voice: System Status</div>
-            <div class="starter-chip" onclick="applyStarter('Inspect recent git commits and check repository health')">🔍 Check Repo Health</div>
-            <div class="starter-chip" onclick="applyStarter('Search online for latest python fastapi async performance tips')">🌐 Web Search</div>
+            <button class="starter-chip" onclick="applyStarter('Save my login for linkedin (email: user@gmail.com, password: secret123, 2fa: prompt)')">🔐 Save LinkedIn</button>
+            <button class="starter-chip" onclick="applyStarter('Check my linkedin account by my gmail account and review unread notifications')">🌐 Auto-Login LinkedIn</button>
+            <button class="starter-chip" onclick="applyStarter('Build a futuristic AI Portfolio website with glassmorphism and deploy preview server')">🚀 Build Web App</button>
+            <button class="starter-chip" onclick="applyStarter('Speak status of the server and system health out loud')">🎙️ Voice: System Status</button>
+            <button class="starter-chip" onclick="applyStarter('Inspect recent git commits and check repository health')">🔍 Check Repo</button>
+            <button class="starter-chip" onclick="applyStarter('Search online for latest python fastapi async performance tips')">🌐 Web Search</button>
           </div>
 
           <!-- Soundwave Visualizer Bar -->
           <div id="chat-voice-wave" class="voice-wave-container" style="display: none; margin-bottom: 0.6rem;">
-            <div class="voice-bar"></div>
-            <div class="voice-bar"></div>
-            <div class="voice-bar"></div>
             <div class="voice-bar"></div>
             <div class="voice-bar"></div>
             <div class="voice-bar"></div>
@@ -736,7 +767,7 @@
           <div class="chat-input-row">
             <button class="btn-mic" id="btn-mic" onclick="toggleSpeechRecognition()" title="Hold or click to speak voice command">🎙️</button>
             <input type="text" id="chat-input" class="chat-input" placeholder="Give Xeren any instruction or click 🎙️ to speak..." autocomplete="off">
-            <button class="btn-send" id="btn-send" onclick="sendQuery()">Execute ➔</button>
+            <button class="btn-send" id="btn-send" onclick="sendQuery()">⚡ Run ➔</button>
           </div>
         </div>
 
@@ -759,7 +790,7 @@
           </div>
         </div>
 
-        <!-- 2. Step-by-Step Execution Stepper (Real-time Pipeline) -->
+        <!-- 2. Step-by-Step Execution Stepper -->
         <div class="card">
           <div class="card-header">
             <div class="card-title">📍 Step-by-Step Pipeline Tracker</div>
@@ -803,7 +834,7 @@
 
     </div>
 
-    <!-- VIEW 2: Chat History & Episodic Archives (History Page) -->
+    <!-- VIEW 2: Chat History & Episodic Archives -->
     <div class="view-container" id="view-history" style="display: none;">
       <div class="history-layout">
         
@@ -818,9 +849,9 @@
             </div>
           </div>
 
-          <div style="display: flex; gap: 0.75rem; align-items: center;">
-            <div class="stat-pill"><span id="history-total-sessions-label">0 Archived Chats</span></div>
-            <button class="btn-action" onclick="startNewSession()">➕ New Conversation</button>
+          <div style="display: flex; gap: 0.6rem; align-items: center;">
+            <div class="compact-badge"><span id="history-total-sessions-label">0 Archived Chats</span></div>
+            <button class="btn-action" onclick="startNewSession()">➕ New Chat</button>
             <button class="btn-danger" onclick="clearAllHistoryPrompt()">🗑️ Clear All</button>
           </div>
         </div>
@@ -833,7 +864,7 @@
           </div>
 
           <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <span style="font-size: 0.8rem; color: var(--text-muted);">Sort by:</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Sort:</span>
             <select id="history-sort-select" class="form-select" style="padding: 0.45rem 0.85rem; font-size: 0.8rem;" onchange="renderHistoryCards()">
               <option value="recent">Most Recent First</option>
               <option value="messages">Message Count</option>
@@ -856,17 +887,16 @@
     <!-- VIEW 3: Voice Assistant & Speech Control -->
     <div class="view-container" id="view-voice" style="display: none;">
       
-      <!-- Voice Assistant Header Banner -->
       <div class="card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(121, 40, 202, 0.12)); border-color: rgba(0, 240, 255, 0.3);">
         <div class="card-header">
           <div class="card-title" style="color: var(--cyan-glow);">🎙️ Dual-Engine Voice Assistant & Speech Synthesis Studio</div>
           <div style="display: flex; gap: 0.5rem;">
-            <span class="ring-badge ring-1" id="voice-engine-badge">Windows SAPI + Web Speech API</span>
+            <span class="ring-badge ring-1" id="voice-engine-badge">Windows SAPI + Web Speech</span>
             <span class="ring-badge ring-3">Ready</span>
           </div>
         </div>
         <p style="font-size: 0.85rem; color: #d1d5db; line-height: 1.6;">
-          Xeren provides full voice autonomy with <strong>Speech-to-Text (STT)</strong> and <strong>Text-to-Speech (TTS)</strong>. Spoken commands are converted directly into Xeren's intent classifier, planner, and tool executor, with audible vocal feedback rendered natively.
+          Xeren provides voice autonomy with <strong>Speech-to-Text (STT)</strong> and <strong>Text-to-Speech (TTS)</strong>. Spoken commands are converted directly into Xeren's intent classifier, planner, and tool executor, with audible vocal feedback rendered natively.
         </p>
       </div>
 
@@ -875,12 +905,12 @@
         <!-- STT: Speech to Text Station -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">🎤 Voice Input & Real-time Transcription</div>
+            <div class="card-title">🎤 Voice Input & Transcription</div>
             <span class="ring-badge ring-1" id="stt-status-badge">Web Speech STT</span>
           </div>
 
           <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem 0; border: 1px dashed var(--border-card); border-radius: var(--radius-md); margin-bottom: 1rem; background: rgba(0,0,0,0.2);">
-            <button class="btn-mic" id="voice-panel-mic-btn" onclick="toggleSpeechRecognition('voice-panel')" style="width: 72px; height: 72px; border-radius: 50%; font-size: 2rem; justify-content: center;">
+            <button class="btn-mic" id="voice-panel-mic-btn" onclick="toggleSpeechRecognition('voice-panel')" style="width: 64px; height: 64px; border-radius: 50%; font-size: 1.8rem; justify-content: center;">
               🎙️
             </button>
             <div id="voice-panel-wave" class="voice-wave-container" style="display: none; margin-top: 1rem;">
@@ -889,11 +919,8 @@
               <div class="voice-bar"></div>
               <div class="voice-bar"></div>
               <div class="voice-bar"></div>
-              <div class="voice-bar"></div>
-              <div class="voice-bar"></div>
-              <div class="voice-bar"></div>
             </div>
-            <span id="voice-panel-stt-label" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.75rem;">Click microphone to start speaking</span>
+            <span id="voice-panel-stt-label" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.75rem;">Click microphone to speak</span>
           </div>
 
           <div class="form-group">
@@ -901,19 +928,18 @@
             <textarea id="voice-panel-transcript" class="form-input" rows="3" placeholder="Spoken voice transcript will appear here in real-time..."></textarea>
           </div>
 
-          <div style="display: flex; gap: 0.75rem;">
-            <button class="btn-action" style="flex: 1;" onclick="sendVoiceTranscriptToChat()">💬 Send to Xeren Assistant ➔</button>
+          <div style="display: flex; gap: 0.65rem;">
+            <button class="btn-action" style="flex: 1;" onclick="sendVoiceTranscriptToChat()">💬 Send to Assistant ➔</button>
             <button class="starter-chip" onclick="document.getElementById('voice-panel-transcript').value = ''">Clear</button>
           </div>
 
-          <!-- Spoken Quick Ideas -->
           <div style="margin-top: 1.25rem;">
             <span class="form-label">Try saying or testing:</span>
             <div class="quick-starters" style="margin-top: 0.5rem;">
-              <div class="starter-chip" onclick="testVoiceText('What is the health and status of my system?')">"What is my system status?"</div>
-              <div class="starter-chip" onclick="testVoiceText('Check my server health and active ports')">"Check server health and ports"</div>
-              <div class="starter-chip" onclick="testVoiceText('Scaffold a modern SaaS landing page')">"Scaffold a SaaS landing page"</div>
-              <div class="starter-chip" onclick="testVoiceText('List all files in my workspace')">"List all files in workspace"</div>
+              <button class="starter-chip" onclick="testVoiceText('What is the health and status of my system?')">"System status?"</button>
+              <button class="starter-chip" onclick="testVoiceText('Check my server health and active ports')">"Check server health"</button>
+              <button class="starter-chip" onclick="testVoiceText('Scaffold a modern SaaS landing page')">"Scaffold SaaS landing"</button>
+              <button class="starter-chip" onclick="testVoiceText('List all files in my workspace')">"List workspace files"</button>
             </div>
           </div>
         </div>
@@ -949,9 +975,9 @@
               </div>
             </div>
 
-            <div style="display: flex; gap: 0.75rem;">
+            <div style="display: flex; gap: 0.65rem;">
               <button type="submit" class="btn-action" style="flex: 1;" id="btn-backend-speak">📢 Speak (Windows SAPI)</button>
-              <button type="button" class="btn-action" style="flex: 1; background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink)); color: #fff;" onclick="speakBrowserSynthesis()">🌐 Speak (Browser Web API)</button>
+              <button type="button" class="btn-action" style="flex: 1; background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink)); color: #fff;" onclick="speakBrowserSynthesis()">🌐 Speak (Browser API)</button>
             </div>
           </form>
 
@@ -965,7 +991,6 @@
     <!-- VIEW 4: Security Vault & 2FA Manager -->
     <div class="view-container" id="view-vault" style="display: none;">
       
-      <!-- Security Rings Architecture Overview -->
       <div class="card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(121, 40, 202, 0.12)); border-color: rgba(251, 191, 36, 0.3);">
         <div class="card-header">
           <div class="card-title" style="color: var(--accent-gold);">🛡️ Linux-Grade Multi-Level Security Rings Architecture</div>
@@ -974,7 +999,7 @@
         <p style="font-size: 0.85rem; color: #d1d5db; line-height: 1.6;">
           Xeren enforces multi-tiered Linux kernel security rings: <strong>Ring 0 (Hardware/Crypto Enclave)</strong> stores encrypted credentials & unmasks secrets only into 60-second ephemeral leases; <strong>Ring 1 (Core Policy Gate)</strong> enforces tamper-evident SHA256 audit logs; <strong>Ring 2 (Tool Sandbox)</strong> executes headless browser/terminal isolation; <strong>Ring 3 (User Space)</strong> presents masked telemetry.
         </p>
-        <div style="display: flex; gap: 0.75rem; margin-top: 0.85rem; flex-wrap: wrap;">
+        <div style="display: flex; gap: 0.6rem; margin-top: 0.85rem; flex-wrap: wrap;">
           <span class="ring-badge ring-0">Ring 0: Zero-Trust Enclave</span>
           <span class="ring-badge ring-1">Ring 1: Policy Gate & Audit Chaining</span>
           <span class="ring-badge ring-2">Ring 2: Sandboxed Browser/CLI</span>
@@ -1023,7 +1048,7 @@
               <input type="text" id="vault-form-user" class="form-input" placeholder="user@gmail.com" required>
             </div>
             <div class="form-group">
-              <label class="form-label">Password (Encrypted at rest with AES-256 Fernet)</label>
+              <label class="form-label">Password (AES-256 Fernet Encrypted at Rest)</label>
               <input type="password" id="vault-form-pass" class="form-input" placeholder="••••••••••••" required>
             </div>
             <div class="form-group">
@@ -1036,14 +1061,14 @@
                 <option value="email">Email OTP Code</option>
               </select>
             </div>
-            <button type="submit" class="btn-action">🔒 Store Credential in Ring 0</button>
+            <button type="submit" class="btn-action">🔒 Store in Enclave</button>
           </form>
 
           <hr style="border: none; border-top: 1px solid var(--border-card); margin: 1.25rem 0;">
 
           <!-- Submit 2FA / OTP Code -->
           <div class="card-title" style="margin-bottom: 0.75rem;">📲 Submit Real-time 2FA / OTP Code</div>
-          <form onsubmit="submit2FACode(event)" style="display: flex; gap: 0.75rem;">
+          <form onsubmit="submit2FACode(event)" style="display: flex; gap: 0.65rem;">
             <input type="text" id="vault-2fa-platform" class="form-input" placeholder="Platform (e.g. linkedin)" style="flex: 1;" required>
             <input type="text" id="vault-2fa-code" class="form-input" placeholder="6-digit Code (e.g. 849201)" style="flex: 1;" required>
             <button type="submit" class="btn-action">Submit Code</button>
@@ -1062,7 +1087,7 @@
         <div class="card">
           <div class="card-header">
             <div class="card-title">🚀 Autonomous Web Application Builder</div>
-            <span class="node-badge badge-allowed">Modular Subsystem</span>
+            <span class="node-badge badge-allowed">Modular Studio</span>
           </div>
           <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
             Describe any web application or site you envision. Xeren will synthesize responsive HTML5, modern CSS3 styling (glassmorphism, vibrant dark mode, micro-animations), interactive JS logic, and README documentation.
@@ -1077,17 +1102,17 @@
               <label class="form-label">Creative Vision & Ideology Prompt</label>
               <textarea id="web-form-prompt" class="form-input" rows="4" style="resize: vertical;" placeholder="Build an ultra-sleek AI Portfolio website with dark glassmorphism, interactive project showcase, contact modal, and live skill radar..." required></textarea>
             </div>
-            <button type="submit" class="btn-action" id="btn-scaffold">✨ Scaffold & Generate Web App</button>
+            <button type="submit" class="btn-action" id="btn-scaffold">✨ Scaffold & Deploy App</button>
           </form>
 
-          <!-- Quick Web Ideas -->
+          <!-- Quick Web Starters -->
           <div style="margin-top: 1.25rem;">
             <span class="form-label">Quick Ideology Starters:</span>
             <div class="quick-starters" style="margin-top: 0.5rem;">
-              <div class="starter-chip" onclick="setWebPrompt('ai_portfolio', 'Interactive AI Portfolio with futuristic glassmorphism and showcase demo')">💼 AI Portfolio</div>
-              <div class="starter-chip" onclick="setWebPrompt('saas_landing', 'Modern SaaS Cloud Analytics Landing Page with pricing table and feature grid')">☁️ SaaS Landing</div>
-              <div class="starter-chip" onclick="setWebPrompt('crypto_tracker', 'Real-time Crypto & Web3 Asset Tracker with dark cyber aesthetic')">📈 Web3 Dashboard</div>
-              <div class="starter-chip" onclick="setWebPrompt('dev_docs', 'Developer API Documentation Platform with interactive code sandbox')">📚 Developer Hub</div>
+              <button class="starter-chip" onclick="setWebPrompt('ai_portfolio', 'Interactive AI Portfolio with futuristic glassmorphism and showcase demo')">💼 AI Portfolio</button>
+              <button class="starter-chip" onclick="setWebPrompt('saas_landing', 'Modern SaaS Cloud Analytics Landing Page with pricing table and feature grid')">☁️ SaaS Landing</button>
+              <button class="starter-chip" onclick="setWebPrompt('crypto_tracker', 'Real-time Crypto & Web3 Asset Tracker with dark cyber aesthetic')">📈 Web3 Dashboard</button>
+              <button class="starter-chip" onclick="setWebPrompt('dev_docs', 'Developer API Documentation Platform with interactive code sandbox')">📚 Dev Hub</button>
             </div>
           </div>
         </div>
@@ -1132,8 +1157,8 @@
       <p id="modal-desc" style="font-size: 0.9rem; color: #d1d5db; margin-bottom: 0.5rem;"></p>
       <div class="modal-diff" id="modal-diff"></div>
       <div class="modal-actions">
-        <button class="btn btn-reject" onclick="resolveApproval(false)">Reject Action</button>
-        <button class="btn btn-approve" onclick="resolveApproval(true)">Approve & Execute</button>
+        <button class="btn btn-reject" onclick="resolveApproval(false)">Reject</button>
+        <button class="btn btn-approve" onclick="resolveApproval(true)">Approve & Run</button>
       </div>
     </div>
   </div>
@@ -1149,7 +1174,7 @@
         <!-- Injected dynamically -->
       </div>
       <div class="modal-actions">
-        <button class="btn-action" id="btn-transcript-resume" onclick="resumeFromTranscriptModal()">💬 Resume This Conversation</button>
+        <button class="btn-action" id="btn-transcript-resume" onclick="resumeFromTranscriptModal()">💬 Resume Conversation</button>
         <button class="btn btn-reject" onclick="closeTranscriptModal()">Close</button>
       </div>
     </div>
@@ -1168,7 +1193,7 @@
       </div>
       <div class="modal-actions">
         <button class="btn btn-reject" onclick="closeRenameModal()">Cancel</button>
-        <button class="btn btn-approve" onclick="saveRenamedSession()">Save Title</button>
+        <button class="btn btn-approve" onclick="saveRenamedSession()">Save</button>
       </div>
     </div>
   </div>
@@ -1218,47 +1243,72 @@
     }
 
     // =========================================================================
-    // REALISTIC WORD-BY-WORD STREAMING TYPEWRITER ENGINE
+    // EMOJI EMOTIONS & CLEAN MARKDOWN ENGINE (No raw ### or ***)
     // =========================================================================
     function parseBasicMarkdown(rawText) {
       if (!rawText) return '';
       
-      // Escape HTML entities to prevent XSS
+      // 1. Escape HTML entities
       let escaped = rawText
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
 
-      // Code blocks ```lang\ncode\n```
+      // 2. Format Code Blocks
       escaped = escaped.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
-        return `<pre><div style="font-size: 0.72rem; color: var(--cyan-glow); margin-bottom: 4px;">[${lang || 'code'}]</div><code>${code.trim()}</code></pre>`;
+        const langLabel = (lang || 'code').toUpperCase();
+        return `<div class="code-block-container"><div class="code-header"><span>💻 ${langLabel}</span><button class="code-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy', 1500)">Copy</button></div><pre><code>${code.trim()}</code></pre></div>`;
       });
 
-      // Inline code `code`
-      escaped = escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
+      // 3. Convert raw ### or #### headings into clean emotion header blocks
+      escaped = escaped.replace(/^(#{1,6})\s*(.+)$/gm, (match, hashes, title) => {
+        const cleanTitle = title.trim();
+        const tLower = cleanTitle.toLowerCase();
+        let icon = '✨';
+        if (tLower.includes('success') || tLower.includes('done') || tLower.includes('complete') || tLower.includes('verified')) icon = '🌟';
+        else if (tLower.includes('security') || tLower.includes('vault') || tLower.includes('protect')) icon = '🛡️';
+        else if (tLower.includes('web') || tLower.includes('site') || tLower.includes('ui')) icon = '🌐';
+        else if (tLower.includes('search') || tLower.includes('find') || tLower.includes('research')) icon = '🔍';
+        else if (tLower.includes('plan') || tLower.includes('step') || tLower.includes('task')) icon = '🎯';
+        else if (tLower.includes('warn') || tLower.includes('alert') || tLower.includes('error')) icon = '⚠️';
+        else if (tLower.includes('system') || tLower.includes('server') || tLower.includes('device')) icon = '⚙️';
+        else if (tLower.includes('voice') || tLower.includes('speech')) icon = '🎙️';
+        return `<div class="emotion-heading"><span class="emotion-icon">${icon}</span><strong>${cleanTitle}</strong></div>`;
+      });
 
-      // Bold **text**
+      // 4. Convert raw triple asterisks ***text*** into emotional highlights
+      escaped = escaped.replace(/\*{3}([^*]+)\*{3}/g, '<span class="emotion-highlight">✨ <strong>$1</strong></span>');
+
+      // 5. Convert standard **bold**
       escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
-      // Italic *text*
+      // 6. Convert *italic*
       escaped = escaped.replace(/\*([^*]+)\*/g, '<em>$1</em>');
 
-      // Links [text](url)
-      escaped = escaped.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" style="color: var(--cyan-glow); text-decoration: underline;">$1 ↗</a>');
+      // 7. Inline code `code`
+      escaped = escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-      // Bullet points
-      escaped = escaped.replace(/^[*-]\s+(.+)$/gm, '• $1');
+      // 8. Links [text](url)
+      escaped = escaped.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" class="chat-link">$1 ↗</a>');
 
-      // Linebreaks
+      // 9. Bullet points into clean emoji bullet items
+      escaped = escaped.replace(/^[*-]\s+(.+)$/gm, '<div class="chat-bullet"><span class="bullet-dot">▸</span> $1</div>');
+
+      // 10. Clean horizontal dividers ---
+      escaped = escaped.replace(/\n---+\n/g, '<div class="neon-divider"></div>');
+
+      // 11. Clean linebreaks
       escaped = escaped.replace(/\n/g, '<br>');
 
       return escaped;
     }
 
+    // =========================================================================
+    // WORD-BY-WORD STREAMING TYPEWRITER ENGINE
+    // =========================================================================
     function streamTypewriter(containerElement, fullText, speed = 14, onComplete = null) {
       containerElement.innerHTML = '';
       
-      // Split text into word tokens while preserving spacing and markup
       const tokens = fullText.split(/(\s+|\n+)/);
       let index = 0;
       let accumulated = '';
@@ -1273,7 +1323,7 @@
 
       let isCancelled = false;
 
-      // Allow user to click to instantly render full text
+      // Click to instantly reveal
       containerElement.style.cursor = 'pointer';
       const instantHandler = () => {
         isCancelled = true;
@@ -1308,7 +1358,6 @@
         const chat = document.getElementById('chat-messages');
         if (chat) chat.scrollTop = chat.scrollHeight;
 
-        // Realistic pacing: slight delay on punctuation
         let delay = speed;
         const lastToken = tokens[index - 1] || '';
         if (lastToken.includes('.') || lastToken.includes('!') || lastToken.includes('?')) {
@@ -1333,8 +1382,8 @@
       const chat = document.getElementById('chat-messages');
       chat.innerHTML = `
         <div class="message assistant">
-          👋 <strong>New Thread Started (${currentSessionId})</strong><br>
-          Context has been refreshed. What challenge would you like Xeren to tackle next?
+          <div class="emotion-heading"><span class="emotion-icon">✨</span><strong>New Thread Started (${currentSessionId})</strong></div>
+          Context has been refreshed! What challenge would you like Xeren to tackle next?
         </div>
       `;
       document.getElementById('active-session-indicator').innerText = `Session: ${currentSessionId.substring(0, 14)}`;
@@ -1379,7 +1428,6 @@
       } else if (sort === 'title') {
         filtered.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
       } else {
-        // default recent
         filtered.sort((a, b) => (b.updated_at || '').localeCompare(a.updated_at || ''));
       }
 
@@ -1427,10 +1475,10 @@
             <div class="session-meta-footer">
               <span>🕒 ${timeAgo}</span>
               <div class="session-action-btns">
-                <button class="btn-action" style="padding: 4px 10px; font-size: 0.75rem;" onclick="resumeSession('${s.session_id}')" title="Resume conversation in console">💬 Resume</button>
-                <button class="starter-chip" style="padding: 4px 8px; font-size: 0.72rem;" onclick="openTranscriptModal('${s.session_id}')" title="View complete transcript">👁️</button>
-                <button class="starter-chip" style="padding: 4px 8px; font-size: 0.72rem;" onclick="openRenameModal('${s.session_id}', '${(s.title || '').replace(/'/g, "\\'")}')" title="Rename single-sentence title">✏️</button>
-                <button class="btn-danger" style="padding: 3px 7px; font-size: 0.7rem;" onclick="deleteSessionCard('${s.session_id}')" title="Delete session">🗑️</button>
+                <button class="btn-action" style="padding: 4px 9px; font-size: 0.75rem;" onclick="resumeSession('${s.session_id}')" title="Resume conversation in console">💬 Resume</button>
+                <button class="starter-chip" style="padding: 4px 7px; font-size: 0.72rem;" onclick="openTranscriptModal('${s.session_id}')" title="View transcript">👁️</button>
+                <button class="starter-chip" style="padding: 4px 7px; font-size: 0.72rem;" onclick="openRenameModal('${s.session_id}', '${(s.title || '').replace(/'/g, "\\'")}')" title="Rename title">✏️</button>
+                <button class="btn-danger" style="padding: 3px 6px; font-size: 0.7rem;" onclick="deleteSessionCard('${s.session_id}')" title="Delete">🗑️</button>
               </div>
             </div>
           </div>
@@ -1492,7 +1540,7 @@
           });
         }
 
-        const title = data.session?.title || sessionId;
+        const title = data.session?.title || data.title || sessionId;
         document.getElementById('active-session-indicator').innerText = `Session: ${sessionId.substring(0, 14)}`;
         document.getElementById('chat-header-title').innerText = `💬 ${title}`;
         
@@ -1515,7 +1563,7 @@
       try {
         const res = await fetch(`/history/sessions/${sessionId}`);
         const data = await res.json();
-        const session = data.session || {};
+        const session = data.session || data || {};
         const messages = data.messages || [];
 
         titleEl.innerText = `📜 ${session.title || 'Session Transcript'}`;
@@ -1586,7 +1634,7 @@
     }
 
     async function deleteSessionCard(sessionId) {
-      if (!confirm('Are you sure you want to permanently delete this chat archive?')) return;
+      if (!confirm('Are you sure you want to delete this chat archive?')) return;
       try {
         const res = await fetch(`/history/sessions/${sessionId}`, { method: 'DELETE' });
         if (!res.ok) throw new Error('Delete failed.');
@@ -1600,7 +1648,7 @@
     }
 
     async function clearAllHistoryPrompt() {
-      if (!confirm('⚠️ WARNING: Are you sure you want to wipe ALL archived conversations?')) return;
+      if (!confirm('⚠️ Are you sure you want to wipe ALL archived conversations?')) return;
       try {
         await fetch('/history/clear', { method: 'POST' });
         startNewSession();
@@ -1700,7 +1748,7 @@
       if (chatWave) chatWave.style.display = active ? 'flex' : 'none';
       if (voicePanelWave) voicePanelWave.style.display = active ? 'flex' : 'none';
       if (chatVoiceLabel && labelText) chatVoiceLabel.innerText = labelText;
-      if (panelVoiceLabel) panelVoiceLabel.innerText = active ? "Listening... Speak now!" : "Click microphone to start speaking";
+      if (panelVoiceLabel) panelVoiceLabel.innerText = active ? "Listening... Speak now!" : "Click microphone to speak";
     }
 
     function toggleVoiceMode() {
@@ -1708,12 +1756,10 @@
       const btn = document.getElementById('voice-auto-speak-btn');
       if (btn) {
         if (isVoiceModeActive) {
-          btn.classList.add('voice-toggle-active');
-          btn.innerText = '🔊 Voice: ON';
+          btn.classList.add('active');
           logTelemetry('[VOICE] Auto-speak responses ENABLED.');
         } else {
-          btn.classList.remove('voice-toggle-active');
-          btn.innerText = '🔊 Voice: OFF';
+          btn.classList.remove('active');
           logTelemetry('[VOICE] Auto-speak responses DISABLED.');
         }
       }
@@ -1743,7 +1789,6 @@
         utterance.volume = 1.0;
         window.speechSynthesis.speak(utterance);
       } else {
-        // Fallback to backend SAPI
         fetch('/voice/speak', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1826,7 +1871,7 @@
     // NAVIGATION & TAB SWITCHING
     // =========================================================================
     function switchTab(tab) {
-      document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       const btn = document.getElementById('tab-btn-' + tab);
       if (btn) btn.classList.add('active');
 
@@ -1864,10 +1909,10 @@
       if (dot && statusLabel) {
         if (isWorking) {
           dot.className = 'status-dot working';
-          statusLabel.innerText = 'Executing Task...';
+          statusLabel.innerText = 'Working...';
         } else {
           dot.className = 'status-dot';
-          statusLabel.innerText = 'Ready & Autonomous';
+          statusLabel.innerText = 'Ready';
         }
       }
     }
@@ -1954,7 +1999,7 @@
       }, 100);
 
       setStepState('step-intent', 'active', 'Analyzing...');
-      updatePulseState('🧠 Classifying Intent & Context', `Evaluating: "${query.substring(0, 40)}..."`);
+      updatePulseState('🧠 Classifying Intent', `Evaluating: "${query.substring(0, 35)}..."`);
       logTelemetry(`Classifying prompt intent: "${query.substring(0, 35)}..."`);
 
       try {
@@ -1976,7 +2021,7 @@
         const timerEl = document.getElementById('pulse-timer');
         if (timerEl) timerEl.innerText = `${totalElapsed}s`;
 
-        updatePulseState('✅ Work Completed Successfully', `Executed in ${totalElapsed}s across ${data.tools_used?.length || 1} action(s).`, false);
+        updatePulseState('✅ Work Completed', `Executed in ${totalElapsed}s across ${data.tools_used?.length || 1} action(s).`, false);
         logTelemetry(`Task completed successfully (Trace: ${data.trace_id?.substring(0, 8)}...)`);
 
         const loader = document.getElementById(loadingId);
@@ -1990,7 +2035,7 @@
           renderDAG([]);
         }
 
-        // Create Assistant Message container with Word-by-Word Streaming Typewriter Animation
+        // Assistant Word-by-Word Streaming Typewriter Animation
         const assistantMsgEl = document.createElement('div');
         assistantMsgEl.className = 'message assistant';
         chat.appendChild(assistantMsgEl);
@@ -1999,7 +2044,7 @@
           init3DTilt();
         });
 
-        // If Voice Mode is active, speak the assistant's response aloud
+        // Voice output if active
         if (isVoiceModeActive && data.response_text) {
           speakAssistantResponse(data.response_text);
         }
@@ -2009,7 +2054,7 @@
         clearInterval(timerInterval);
         const loader = document.getElementById(loadingId);
         if (loader) loader.innerText = "❌ Error executing task: " + e.message;
-        updatePulseState('❌ Task Execution Error', e.message, false);
+        updatePulseState('❌ Task Error', e.message, false);
         logTelemetry(`ERROR: ${e.message}`);
       }
     }
@@ -2035,7 +2080,7 @@
           document.getElementById('modal-desc').innerText = `Tool: ${req.tool_name} • Operation: ${req.operation} (${req.description})`;
           document.getElementById('modal-diff').innerText = req.diff_preview || JSON.stringify(req.parameters, null, 2);
           document.getElementById('approval-modal').style.display = 'flex';
-          updatePulseState('⚠️ Awaiting Operator Confirmation', `Approval required for ${req.tool_name}:${req.operation}`);
+          updatePulseState('⚠️ Operator Confirmation Required', `Approval required for ${req.tool_name}:${req.operation}`);
           logTelemetry(`[PERMISSION GATE] Approval required for ${req.tool_name}.${req.operation}`);
         } else {
           document.getElementById('approval-modal').style.display = 'none';
@@ -2168,7 +2213,7 @@
               ${d.is_running ? `
                 <button class="btn-danger" onclick="stopWebPreview('${d.project_name}')">⏹️ Stop</button>
               ` : `
-                <button class="btn-action" style="padding: 4px 10px; font-size: 0.75rem;" onclick="deployWebPreview('${d.project_name}')">▶️ Launch Server</button>
+                <button class="btn-action" style="padding: 4px 10px; font-size: 0.75rem;" onclick="deployWebPreview('${d.project_name}')">▶️ Launch</button>
               `}
             </td>
           </tr>
@@ -2202,7 +2247,7 @@
       } catch (err) {
         alert(`❌ Failed to scaffold website: ${err.message}`);
       } finally {
-        btn.innerText = '✨ Scaffold & Generate Web App';
+        btn.innerText = '✨ Scaffold & Deploy App';
         btn.disabled = false;
       }
     }
@@ -2238,7 +2283,6 @@
       if (e.key === 'Enter') sendQuery();
     });
 
-    // Initialize on window load
     window.addEventListener('DOMContentLoaded', () => {
       init3DTilt();
       loadStats();
