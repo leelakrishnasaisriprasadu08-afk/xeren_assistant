@@ -280,9 +280,39 @@ class XerenAssistant:
 
       elif action.tool_name == "web_search":
         results = data.get("results", []) if isinstance(data, dict) else []
-        lines.append(f"🌐 **Web Search Results for '{data.get('query')}'**{repaired_badge}:")
-        for r in results[:3]:
-          lines.append(f"- **[{r.get('title')}]({r.get('url')})**\n  {r.get('snippet')}")
+        query_searched = data.get("query", query) if isinstance(data, dict) else query
+
+        # If live LLM is active, synthesize the retrieved snippets into a cohesive answer
+        synthesized = None
+        from models.provider import GeminiProvider
+        if isinstance(self.llm_provider, GeminiProvider) and results:
+          try:
+            snippets_context = "\n\n".join([
+                f"Source: {r.get('title')}\nURL: {r.get('url')}\nSnippet: {r.get('snippet')}"
+                for r in results[:5]
+            ])
+            synthesis_prompt = (
+                f"User Question: {query}\n\n"
+                f"Web Search Results:\n{snippets_context}\n\n"
+                "Provide a direct, informative, and well-structured answer explaining the facts to the user. "
+                "Cite relevant sources with markdown links [Source Title](URL)."
+            )
+            llm_synth = await self.llm_provider.generate(
+                messages=[LLMMessage(role="user", content=synthesis_prompt)],
+                temperature=0.3,
+            )
+            if llm_synth.text and len(llm_synth.text.strip()) > 20:
+              synthesized = llm_synth.text.strip()
+          except Exception:
+            synthesized = None
+
+        if synthesized:
+          lines.append(f"🌐 **Web Insights & Direct Answer for '{query_searched}'**{repaired_badge}:\n\n{synthesized}")
+        else:
+          lines.append(f"🌐 **Web Search Results for '{query_searched}'**{repaired_badge}:")
+          for r in results[:5]:
+            src_tag = f" `[{r.get('source')}]`" if r.get("source") else ""
+            lines.append(f"- **[{r.get('title')}]({r.get('url')})**{src_tag}\n  {r.get('snippet')}")
 
       elif action.tool_name == "tasks":
         if action.operation == "create_task":
@@ -507,8 +537,12 @@ class XerenAssistant:
           )
         elif action.operation == "search_and_summarize":
           results = data.get("results", [])
-          res_lines = "\n".join([f"- **[{r.get('title')}]({r.get('url')})**" for r in results[:5]])
-          lines.append(f"🔎 **Browser Search Results for '{data.get('query')}'**{repaired_badge}:\n\n{res_lines}")
+          res_lines = []
+          for r in results[:5]:
+            src_tag = f" `[{r.get('source')}]`" if r.get("source") else ""
+            snip = f"\n  {r.get('snippet')}" if r.get("snippet") else ""
+            res_lines.append(f"- **[{r.get('title')}]({r.get('url')})**{src_tag}{snip}")
+          lines.append(f"🔎 **Browser Search Results for '{data.get('query')}'**{repaired_badge}:\n\n" + "\n".join(res_lines))
 
       elif action.tool_name == "communication":
         if action.operation == "draft_client_reply":

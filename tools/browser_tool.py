@@ -148,29 +148,14 @@ class BrowserTool(BaseTool):
     }
 
   def _search_and_summarize(self, query: str) -> Dict[str, Any]:
-    # Use DuckDuckGo / HTML search endpoint
-    search_url = f"https://html.duckduckgo.com/html/?q={urllib.parse.quote(query)}"
-    try:
-      html = self._fetch_url(search_url)
-      parser = WebContentExtractor()
-      parser.feed(html)
-      results = []
-      for link in parser.links:
-        href = link.get("href", "")
-        text = link.get("text", "")
-        if "duckduckgo.com" not in href and text and len(text) > 10:
-          results.append({"title": text, "url": href})
-      return {
-          "query": query,
-          "results": results[:5],
-          "count": len(results),
-      }
-    except Exception:
-      return {
-          "query": query,
-          "results": [{"title": f"Search results for {query}", "url": f"https://www.google.com/search?q={urllib.parse.quote(query)}"}],
-          "count": 1,
-      }
+    from .web_search_tool import WebSearchTool
+    search_tool = WebSearchTool(session=self.session)
+    results = search_tool._multi_engine_search(query=query, max_results=5)
+    return {
+        "query": query,
+        "results": results,
+        "count": len(results),
+    }
 
   async def execute(self, action: Action) -> ToolResult:
     start_time = time.perf_counter()

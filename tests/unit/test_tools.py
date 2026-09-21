@@ -101,3 +101,41 @@ async def test_task_tool_crud(temp_workspace):
   assert l_res.success is True
   assert len(l_res.data) == 1
   assert l_res.data[0]["id"] == task_id
+
+
+@pytest.mark.asyncio
+async def test_web_search_tool():
+  from tools.web_search_tool import WebSearchTool
+
+  search_tool = WebSearchTool()
+  action = Action(
+      action_id="act_ws1",
+      tool_name="web_search",
+      operation="search",
+      parameters={"query": "python programming language", "max_results": 3},
+  )
+  res = await search_tool.execute(action)
+  assert res.success is True
+  assert "results" in res.data
+  assert len(res.data["results"]) > 0
+  first_result = res.data["results"][0]
+  assert "title" in first_result
+  assert "url" in first_result
+  assert len(first_result["title"]) > 0
+
+
+@pytest.mark.asyncio
+async def test_browser_tool_search():
+  from tools.browser_tool import BrowserTool
+
+  browser_tool = BrowserTool()
+  action = Action(
+      action_id="act_b1",
+      tool_name="browser",
+      operation="search_and_summarize",
+      parameters={"query": "FastAPI framework"},
+  )
+  res = await browser_tool.execute(action)
+  assert res.success is True
+  assert "results" in res.data
+  assert len(res.data["results"]) > 0
