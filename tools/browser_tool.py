@@ -118,6 +118,10 @@ class BrowserTool(BaseTool):
       raise
 
   def _navigate_url(self, url: str) -> Dict[str, Any]:
+    from .web_search_tool import WebSearchTool
+    search_tool = WebSearchTool(session=self.session)
+    trust_eval = search_tool.evaluate_trust({"url": url, "title": "", "snippet": ""})
+
     html = self._fetch_url(url)
     parser = WebContentExtractor()
     parser.feed(html)
@@ -131,9 +135,17 @@ class BrowserTool(BaseTool):
         "links": parser.links[:15],
         "content_snippet": content_summary[:2000] or f"Inspected gateway for {url}",
         "total_paragraphs": len(parser.paragraphs),
+        "domain_trust_score": trust_eval.get("trust_score", 50),
+        "trust_badge": trust_eval.get("trust_badge", "🌐 General Web Result"),
+        "trust_rationale": trust_eval.get("trust_rationale", "Direct URL Navigation"),
+        "is_official": trust_eval.get("is_official", False),
     }
 
   def _extract_page_content(self, url: str) -> Dict[str, Any]:
+    from .web_search_tool import WebSearchTool
+    search_tool = WebSearchTool(session=self.session)
+    trust_eval = search_tool.evaluate_trust({"url": url, "title": "", "snippet": ""})
+
     html = self._fetch_url(url)
     parser = WebContentExtractor()
     parser.feed(html)
@@ -145,16 +157,22 @@ class BrowserTool(BaseTool):
         "text_content": clean_text[:5000],
         "headings": [f"{h['level']}: {h['text']}" for h in parser.headings[:15]],
         "word_count": len(clean_text.split()),
+        "domain_trust_score": trust_eval.get("trust_score", 50),
+        "trust_badge": trust_eval.get("trust_badge", "🌐 General Web Result"),
+        "trust_rationale": trust_eval.get("trust_rationale", "Direct URL Navigation"),
     }
 
   def _search_and_summarize(self, query: str) -> Dict[str, Any]:
     from .web_search_tool import WebSearchTool
     search_tool = WebSearchTool(session=self.session)
     results = search_tool._multi_engine_search(query=query, max_results=5)
+    top_trusted = [r for r in results if r.get("trust_score", 0) >= 70]
     return {
         "query": query,
         "results": results,
         "count": len(results),
+        "top_trusted_count": len(top_trusted),
+        "highest_trust_score": results[0].get("trust_score", 0) if results else 0,
     }
 
   async def execute(self, action: Action) -> ToolResult:

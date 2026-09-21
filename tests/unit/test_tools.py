@@ -139,3 +139,39 @@ async def test_browser_tool_search():
   assert res.success is True
   assert "results" in res.data
   assert len(res.data["results"]) > 0
+
+
+@pytest.mark.asyncio
+async def test_web_search_credibility_and_trusted_target():
+  from tools.web_search_tool import WebSearchTool
+
+  search_tool = WebSearchTool()
+
+  # 1. Test evaluate_trust on official authority domain
+  eval_action = Action(
+      action_id="act_eval1",
+      tool_name="web_search",
+      operation="evaluate_trust",
+      parameters={
+          "url": "https://fastapi.tiangolo.com/tutorial/",
+          "title": "FastAPI Tutorial - Official",
+          "query": "fastapi python",
+      },
+  )
+  eval_res = await search_tool.execute(eval_action)
+  assert eval_res.success is True
+  assert eval_res.data["trust_score"] >= 85
+  assert "Official" in eval_res.data["trust_rationale"]
+  assert eval_res.data["is_official"] is True
+
+  # 2. Test get_trusted_target selection
+  target_action = Action(
+      action_id="act_tgt1",
+      tool_name="web_search",
+      operation="get_trusted_target",
+      parameters={"query": "Python documentation", "min_trust_score": 75},
+  )
+  tgt_res = await search_tool.execute(target_action)
+  assert tgt_res.success is True
+  assert tgt_res.data["target"] is not None
+  assert tgt_res.data["target"]["trust_score"] >= 75

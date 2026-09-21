@@ -282,19 +282,20 @@ class XerenAssistant:
         results = data.get("results", []) if isinstance(data, dict) else []
         query_searched = data.get("query", query) if isinstance(data, dict) else query
 
-        # If live LLM is active, synthesize the retrieved snippets into a cohesive answer
+        # If live LLM is active, synthesize the retrieved snippets prioritizing verified sources
         synthesized = None
         from models.provider import GeminiProvider
         if isinstance(self.llm_provider, GeminiProvider) and results:
           try:
             snippets_context = "\n\n".join([
-                f"Source: {r.get('title')}\nURL: {r.get('url')}\nSnippet: {r.get('snippet')}"
+                f"Source: {r.get('title')}\nURL: {r.get('url')}\nTrust Score: {r.get('trust_score', 50)}% ({r.get('trust_badge', 'Standard')})\nRationale: {r.get('trust_rationale', '')}\nSnippet: {r.get('snippet')}"
                 for r in results[:5]
             ])
             synthesis_prompt = (
                 f"User Question: {query}\n\n"
-                f"Web Search Results:\n{snippets_context}\n\n"
-                "Provide a direct, informative, and well-structured answer explaining the facts to the user. "
+                f"Verified Web Search & Intelligence Results:\n{snippets_context}\n\n"
+                "Provide a direct, informative, and well-structured answer explaining the accurate facts to the user. "
+                "Emphasize the most authoritative, official, and trusted findings. "
                 "Cite relevant sources with markdown links [Source Title](URL)."
             )
             llm_synth = await self.llm_provider.generate(
@@ -307,12 +308,22 @@ class XerenAssistant:
             synthesized = None
 
         if synthesized:
-          lines.append(f"🌐 **Web Insights & Direct Answer for '{query_searched}'**{repaired_badge}:\n\n{synthesized}")
+          sources_summary = "\n".join([
+              f"- {r.get('trust_badge', '🌐')} **[{r.get('title')}]({r.get('url')})** `[Trust: {r.get('trust_score', 50)}%]` — _{r.get('trust_rationale', 'Verified')}_"
+              for r in results[:3]
+          ])
+          lines.append(
+              f"🌐 **Verified Web Intelligence & Answer for '{query_searched}'**{repaired_badge}:\n\n"
+              f"{synthesized}\n\n"
+              f"**🛡️ Top Trusted & Verified References**:\n{sources_summary}"
+          )
         else:
-          lines.append(f"🌐 **Web Search Results for '{query_searched}'**{repaired_badge}:")
+          lines.append(f"🌐 **Verified Web Search Results for '{query_searched}'** (Ranked by Trust & Accuracy){repaired_badge}:")
           for r in results[:5]:
-            src_tag = f" `[{r.get('source')}]`" if r.get("source") else ""
-            lines.append(f"- **[{r.get('title')}]({r.get('url')})**{src_tag}\n  {r.get('snippet')}")
+            badge = r.get("trust_badge", "🌐 General Web Result")
+            score = r.get("trust_score", 50)
+            rat = f"  *Trust Rationale: {r.get('trust_rationale')}*\n" if r.get("trust_rationale") else ""
+            lines.append(f"- {badge} **[{r.get('title')}]({r.get('url')})** `[{score}% Trust]`\n{rat}  {r.get('snippet')}")
 
       elif action.tool_name == "tasks":
         if action.operation == "create_task":
@@ -525,24 +536,32 @@ class XerenAssistant:
         if action.operation == "navigate_url":
           headings_list = data.get("headings", [])
           h_str = "\n".join([f"- **{h.get('level')}**: {h.get('text')}" for h in headings_list[:5]])
+          badge = data.get("trust_badge", "🌐 Web Gateway")
+          score = data.get("domain_trust_score", 50)
+          rat = data.get("trust_rationale", "Direct Navigation")
           lines.append(
-              f"🌐 **Web Page Navigated**{repaired_badge}: [{data.get('title')}]({data.get('url')})\n\n"
+              f"🌐 **Web Page Navigated**{repaired_badge}: [{data.get('title')}]({data.get('url')})\n"
+              f"**Domain Security & Trust**: {badge} `[{score}% Trust Score]` ({rat})\n\n"
               f"**Key Headings**:\n{h_str or '- None'}\n\n"
               f"**Page Summary**:\n> {data.get('content_snippet', '')[:500]}"
           )
         elif action.operation == "extract_page_content":
+          badge = data.get("trust_badge", "🌐 Web Page")
+          score = data.get("domain_trust_score", 50)
           lines.append(
-              f"📄 **Extracted Page Content**{repaired_badge}: [{data.get('title')}]({data.get('url')}) ({data.get('word_count')} words)\n\n"
+              f"📄 **Extracted Page Content**{repaired_badge}: [{data.get('title')}]({data.get('url')}) `[{score}% Trust • {badge}]` ({data.get('word_count')} words)\n\n"
               f"{data.get('text_content', '')[:1200]}"
           )
         elif action.operation == "search_and_summarize":
           results = data.get("results", [])
           res_lines = []
           for r in results[:5]:
-            src_tag = f" `[{r.get('source')}]`" if r.get("source") else ""
+            badge = r.get("trust_badge", "🌐")
+            score = r.get("trust_score", 50)
             snip = f"\n  {r.get('snippet')}" if r.get("snippet") else ""
-            res_lines.append(f"- **[{r.get('title')}]({r.get('url')})**{src_tag}{snip}")
-          lines.append(f"🔎 **Browser Search Results for '{data.get('query')}'**{repaired_badge}:\n\n" + "\n".join(res_lines))
+            rat = f"\n  *Trust Rationale: {r.get('trust_rationale')}*" if r.get("trust_rationale") else ""
+            res_lines.append(f"- {badge} **[{r.get('title')}]({r.get('url')})** `[{score}% Trust]`{rat}{snip}")
+          lines.append(f"🔎 **Browser Search Results for '{data.get('query')}'** (Ranked by Trust & Accuracy){repaired_badge}:\n\n" + "\n".join(res_lines))
 
       elif action.tool_name == "communication":
         if action.operation == "draft_client_reply":
