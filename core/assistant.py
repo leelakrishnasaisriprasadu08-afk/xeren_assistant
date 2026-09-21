@@ -29,6 +29,7 @@ class AssistantResponse(BaseModel):
   query: str
   response_text: str
   intent: Intent
+  tools_used: List[str] = Field(default_factory=list)
   execution_result: Optional[ExecutionResult] = None
   semantic_verification: Optional[SemanticVerificationResult] = None
   trace_id: str = ""
@@ -622,6 +623,42 @@ class XerenAssistant:
             d_lines.append(f"- **{d.get('project_name')}**: {status_str}")
           lines.append(f"🌐 **Web Deployments ({len(deps)})**{repaired_badge}:\n" + ("\n".join(d_lines) if d_lines else "- No scaffolded web projects yet."))
 
+      elif action.tool_name == "voice":
+        if action.operation == "speak":
+          lines.append(
+              f"🎙️ **Voice Speech Synthesized & Spoken Aloud**{repaired_badge}:\n"
+              f"- **Spoken Text**: \"{data.get('text')}\"\n"
+              f"- **Audio Engine**: `{data.get('backend')}`\n"
+              f"- **Voice**: `{data.get('voice')}` (Volume: {data.get('volume', 100)}%, Rate: {data.get('rate', 0)})\n"
+              f"- **Status**: 🟢 `ACTIVE`"
+          )
+        elif action.operation == "synthesize_speech":
+          lines.append(
+              f"🔊 **Speech Audio Synthesized**{repaired_badge}:\n"
+              f"- **Text**: \"{data.get('text')}\"\n"
+              f"- **Word Count**: {data.get('word_count')} words\n"
+              f"- **Estimated Duration**: {data.get('estimated_duration_seconds')}s\n"
+              f"- **Sample Rate**: {data.get('sample_rate')} Hz ({data.get('encoding')})"
+          )
+        elif action.operation == "list_voices":
+          voices = data.get("voices", []) if isinstance(data, dict) else []
+          v_lines = "\n".join([f"- 🗣️ **{v.get('name')}** ({v.get('gender')}, `{v.get('culture')}`)" for v in voices[:8]])
+          lines.append(f"🎙️ **Installed System Voices ({len(voices)})**{repaired_badge}:\n{v_lines}")
+        elif action.operation == "get_voice_status":
+          lines.append(
+              f"🎙️ **Voice Subsystem Status**{repaired_badge}:\n"
+              f"- **Engine**: `{data.get('engine')}`\n"
+              f"- **TTS Status**: 🟢 Active\n"
+              f"- **STT Status**: 🟢 Active\n"
+              f"- **Voices Available**: {data.get('total_voices')} voice profile(s)"
+          )
+        elif action.operation == "transcribe_audio":
+          lines.append(
+              f"📝 **Audio Transcribed to Text**{repaired_badge}:\n"
+              f"- **Transcript**: \"{data.get('transcript')}\"\n"
+              f"- **Confidence**: {round(data.get('confidence', 1.0) * 100, 1)}%"
+          )
+
 
 
     return (
@@ -731,6 +768,7 @@ class XerenAssistant:
         query=query,
         response_text=response_text,
         intent=intent,
+        tools_used=tools_used,
         execution_result=exec_result,
         semantic_verification=semantic_verif,
         trace_id=trace_id,

@@ -15,6 +15,7 @@ from .subagent_tool import SubagentTool
 from .task_tool import TaskTool
 from .vault_tool import VaultTool
 from .vision_tool import VisionTool
+from .voice_tool import VoiceTool
 from .web_builder_tool import WebBuilderTool
 from .web_search_tool import WebSearchTool
 
@@ -38,6 +39,7 @@ __all__ = [
     "PatchTool",
     "VisionTool",
     "VaultTool",
+    "VoiceTool",
     "WebBuilderTool",
 ]
 

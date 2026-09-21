@@ -1,23 +1,38 @@
-# Xeren Assistant — Phase 1 Core
+# Xeren Assistant — Autonomous Enterprise AI & Linux Security
 
-> **Your Personal AI Automation Assistant**  
-> *Build Today • Power Xeren Tomorrow*
+> **Your Personal Autonomous Multimodal AI & Voice Assistant**  
+> *Embodied Automation • Linux-Grade Ring 0 Security • Real-time Voice Studio • Web Builder*
 
 ---
 
-## 🏛️ Phase 1 Architecture
+## 🏛️ Comprehensive Architecture
 
 ```
-User ──► Intent ──► Planner ──► Controller ──► Permission Gate ──► Tool Registry ──► Execution ──► Trust Boundary ──► Verifier ──► Response ──► Trace & Memory
+User Voice / Text ──► Speech Recognition (STT) ──► Intent Classifier ──► DAG Task Planner ──► Execution Controller
+                                                                                                    │
+               ┌────────────────────────────────────────────────────────────────────────────────────┤
+               ▼                                                    ▼                               ▼
+       [Security Rings 0-3]                                [Multimodal Engine]              [Voice Engine (TTS)]
+   • AES-256 Vault Enclave                              • Vision Screen Analysis         • Windows SAPI Synth
+   • Single-Use Credential Leases                       • Browser Automation / Scraping  • Web Speech API Bridge
+   • SHA256 Chained Audit Logs                          • AST Codebase Index & Patch     • Dual-Loop Verifier
 ```
 
 ### Key Highlights
-- **Strict Security Gate**: Operation-level permissions (`ALLOWED`, `ASK`, `DENIED`). Deletions are hard-blocked in Phase 1.
-- **Deterministic Path Containment**: Resolves all file access inside `workspace_root`, strictly defeating path traversal attacks.
-- **Trust Boundary Layer**: Treats all external web/GitHub data as untrusted with zero instruction authority.
-- **Secret Isolation**: In-memory secret store with automatic redaction from all logs and traces.
-- **Bounded Controller**: Capped at 10 max steps, max 2 retries on verification failure, per-tool timeout, overall timeout, and cancellation token support.
-- **Deterministic Verification**: Validates structure, schemas, and return sanity before returning responses.
+- **🎙️ Real-time Voice Assistant**:
+  - **Speech-to-Text (STT)**: Instant push-to-talk microphone button (`🎙️`) with real-time speech recognition and glowing sound wave visualizer.
+  - **Text-to-Speech (TTS)**: Dual audio engine with native Windows SAPI PowerShell speech synthesis + zero-latency Web Speech `SpeechSynthesis` bridge.
+  - **Voice Mode**: Automatic vocal response reading with clean markdown stripping and voice profile customization.
+- **🛡️ Linux-Grade Security Rings (0–3)**:
+  - **Ring 0 (Hardware/Crypto Enclave)**: AES-256 PBKDF2 vault, encrypted platform credentials (LinkedIn, Upwork, Gmail, GitHub), 60-second ephemeral leases, and real-time 2FA/OTP code handling.
+  - **Ring 1 (Core Policy Gate)**: Tamper-evident SHA-256 audit chaining and human-in-the-loop permission gating.
+  - **Ring 2 (Tool Sandbox)**: Isolated subprocess execution, AST code indexing, and terminal sandboxing.
+  - **Ring 3 (User Space / Masked Telemetry)**: Real-time UI metrics, masked passwords, and flamegraphs.
+- **🚀 Autonomous Web Builder & Servers**:
+  - Scaffolds complete HTML5/CSS3/JS responsive web apps from natural language prompts.
+  - Background HTTP live preview servers with instant launch and status controls.
+- **⚡ Deterministic DAG Pipeline & Dual-Loop Verification**:
+  - Topological waves, dependency resolution, self-healing replanning, and semantic response verification.
 
 ---
 
@@ -29,34 +44,37 @@ pip install -r requirements.txt
 ```
 
 ### 2. Configuration
-Copy `.env.example` to `.env` and add your keys:
+Copy `.env.example` to `.env` and add your optional keys:
 ```bash
 GEMINI_API_KEY=your_gemini_api_key_here
 GITHUB_TOKEN=your_optional_github_token_here
 ```
 
-### 3. Interactive CLI
+### 3. Interactive Web Dashboard & REST API
+```bash
+python main.py api --port 8000
+```
+- Open `http://127.0.0.1:8000/` for the interactive Xeren Web Dashboard with Voice Assistant, Security Vault, and Web Builder.
+- Open `http://127.0.0.1:8000/docs` for interactive Swagger API documentation.
+
+### 4. Interactive Voice & Command CLI
 ```bash
 python main.py cli
 ```
 
-### 4. REST API Server
+### 5. One-Shot Query / Speech
 ```bash
-python main.py api --port 8000
-```
-- Open `http://127.0.0.1:8000/docs` for interactive Swagger documentation.
-
-### 5. One-Shot Query
-```bash
-python main.py run "read file README.md"
+python main.py run "speak all systems operational out loud"
 ```
 
 ---
 
 ## 🧪 Running Acceptance Tests
 
-Run the complete Phase-1 acceptance test suite across unit, integration, and security boundaries:
+Run the complete test suite across unit, integration, voice workflows, and security boundaries:
 
 ```bash
-pytest
+pytest -v
 ```
+*(160 passing tests across all modules)*
+

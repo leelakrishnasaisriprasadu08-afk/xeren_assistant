@@ -815,6 +815,67 @@ class TaskPlanner:
             )
         )
         return graph
+
+    # Voice Assistant & Speech Synthesis Plan
+    if intent.intent_type == IntentType.VOICE:
+      sub_type = intent.entities.get("sub_type", "speak")
+      if sub_type == "list_voices":
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="voice",
+                operation="list_voices",
+                parameters={},
+                reason="List available Text-to-Speech system voices",
+            )
+        )
+        return graph
+
+      elif sub_type == "get_voice_status":
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="voice",
+                operation="get_voice_status",
+                parameters={},
+                reason="Check voice synthesis engine status and voice profiles",
+            )
+        )
+        return graph
+
+      elif sub_type == "synthesize_speech":
+        clean_text = q
+        for prefix in ["synthesize speech for", "synthesize voice for", "synthesize speech", "synthesize"]:
+          if q.lower().startswith(prefix):
+            clean_text = q[len(prefix):].strip()
+            break
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="voice",
+                operation="synthesize_speech",
+                parameters={"text": clean_text or "Speech synthesis test"},
+                reason="Synthesize speech audio metadata and phonetic parameters",
+            )
+        )
+        return graph
+
+      else:
+        clean_text = q
+        for prefix in ["speak response", "speak aloud", "read aloud", "read out loud", "say out loud", "speak this", "speak", "say"]:
+          if q.lower().startswith(prefix):
+            clean_text = q[len(prefix):].strip()
+            break
+        graph.add_action(
+            self.create_action(
+                action_id="act_01",
+                tool_name="voice",
+                operation="speak",
+                parameters={"text": clean_text or "Hello! Xeren voice assistant active."},
+                reason="Speak response aloud using system audio synthesis",
+            )
+        )
+        return graph
       graph.add_action(
           self.create_action(
               action_id="act_01",

@@ -89,6 +89,22 @@ class WebDeployRequest(BaseModel):
   port: Optional[int] = None
 
 
+class VoiceSpeakRequest(BaseModel):
+  text: str = Field(description="Text to synthesize and speak aloud")
+  voice: Optional[str] = Field(default=None, description="Voice identifier or name")
+  rate: Optional[int] = Field(default=None, description="Speech rate offset (-10 to 10)")
+  volume: Optional[int] = Field(default=None, description="Speech volume (0 to 100)")
+  async_mode: bool = Field(default=True, description="Run speech asynchronously in background")
+
+
+class VoiceSynthesizeRequest(BaseModel):
+  text: str = Field(description="Text to convert to speech")
+
+
+class VoiceTranscribeRequest(BaseModel):
+  audio_text: Optional[str] = Field(default=None, description="Transcribed voice text payload")
+
+
 def create_app(assistant: Optional[XerenAssistant] = None) -> FastAPI:
   """Factory creating FastAPI application with injected XerenAssistant instance and approval hooks."""
   app = FastAPI(
@@ -720,6 +736,92 @@ def create_app(assistant: Optional[XerenAssistant] = None) -> FastAPI:
       raise HTTPException(status_code=500, detail="WebBuilderTool not registered.")
     from tools.base import Action
     res = await builder_tool.execute(Action(action_id="web_list", tool_name="web_builder", operation="list_deployments", parameters={}))
+    return res.data
+
+  # Autonomous Voice Assistant Endpoints
+  @app.post("/voice/speak")
+  async def voice_speak_endpoint(req: VoiceSpeakRequest):
+    """Speaks text aloud using native speech synthesis."""
+    voice_tool = _assistant.tool_registry.get_tool("voice")
+    if not voice_tool:
+      raise HTTPException(status_code=500, detail="VoiceTool not registered.")
+    from tools.base import Action
+    res = await voice_tool.execute(Action(
+        action_id="voice_speak",
+        tool_name="voice",
+        operation="speak",
+        parameters=req.model_dump()
+    ))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to speak text.")
+    return res.data
+
+  @app.post("/voice/synthesize")
+  async def voice_synthesize_endpoint(req: VoiceSynthesizeRequest):
+    """Synthesizes text into speech response data."""
+    voice_tool = _assistant.tool_registry.get_tool("voice")
+    if not voice_tool:
+      raise HTTPException(status_code=500, detail="VoiceTool not registered.")
+    from tools.base import Action
+    res = await voice_tool.execute(Action(
+        action_id="voice_synth",
+        tool_name="voice",
+        operation="synthesize_speech",
+        parameters=req.model_dump()
+    ))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to synthesize speech.")
+    return res.data
+
+  @app.post("/voice/transcribe")
+  async def voice_transcribe_endpoint(req: VoiceTranscribeRequest):
+    """Transcribes voice query and processes intent."""
+    voice_tool = _assistant.tool_registry.get_tool("voice")
+    if not voice_tool:
+      raise HTTPException(status_code=500, detail="VoiceTool not registered.")
+    from tools.base import Action
+    res = await voice_tool.execute(Action(
+        action_id="voice_transcribe",
+        tool_name="voice",
+        operation="transcribe_audio",
+        parameters=req.model_dump()
+    ))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to transcribe audio.")
+    return res.data
+
+  @app.get("/voice/voices")
+  async def list_voices_endpoint():
+    """Lists available system voices for speech synthesis."""
+    voice_tool = _assistant.tool_registry.get_tool("voice")
+    if not voice_tool:
+      raise HTTPException(status_code=500, detail="VoiceTool not registered.")
+    from tools.base import Action
+    res = await voice_tool.execute(Action(
+        action_id="voice_list",
+        tool_name="voice",
+        operation="list_voices",
+        parameters={}
+    ))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to list voices.")
+    return res.data
+
+  @app.get("/voice/status")
+  async def get_voice_status_endpoint():
+    """Returns the operational status of the Voice Assistant engine."""
+    voice_tool = _assistant.tool_registry.get_tool("voice")
+    if not voice_tool:
+      raise HTTPException(status_code=500, detail="VoiceTool not registered.")
+    from tools.base import Action
+    res = await voice_tool.execute(Action(
+        action_id="voice_stat",
+        tool_name="voice",
+        operation="get_voice_status",
+        parameters={}
+    ))
+    if not res.success:
+      raise HTTPException(status_code=500, detail=res.error or "Failed to get voice status.")
     return res.data
 
   @app.get("/traces")

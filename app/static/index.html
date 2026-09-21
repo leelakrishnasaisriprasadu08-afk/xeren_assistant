@@ -378,6 +378,47 @@
     .btn { padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: none; }
     .btn-approve { background: var(--accent-emerald); color: #000; }
     .btn-reject { background: rgba(244, 63, 94, 0.2); border: 1px solid var(--accent-rose); color: var(--accent-rose); }
+
+    /* Voice Assistant Sound Wave & Visualizer */
+    .voice-wave-container {
+      display: flex; align-items: center; gap: 4px; height: 24px; padding: 4px 12px;
+      border-radius: 12px; background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3);
+    }
+    .voice-bar {
+      width: 4px; height: 100%; background: var(--cyan-glow); border-radius: 2px;
+      animation: soundwave 1.2s ease-in-out infinite alternate;
+    }
+    .voice-bar:nth-child(2) { animation-delay: 0.2s; height: 70%; background: var(--accent-purple); }
+    .voice-bar:nth-child(3) { animation-delay: 0.4s; height: 100%; background: var(--accent-pink); }
+    .voice-bar:nth-child(4) { animation-delay: 0.1s; height: 50%; background: var(--cyan-glow); }
+    .voice-bar:nth-child(5) { animation-delay: 0.5s; height: 85%; background: var(--accent-emerald); }
+    .voice-bar:nth-child(6) { animation-delay: 0.3s; height: 60%; background: var(--accent-purple); }
+    .voice-bar:nth-child(7) { animation-delay: 0.6s; height: 90%; background: var(--cyan-glow); }
+    .voice-bar:nth-child(8) { animation-delay: 0.25s; height: 40%; background: var(--accent-emerald); }
+
+    @keyframes soundwave {
+      0% { transform: scaleY(0.25); }
+      100% { transform: scaleY(1); }
+    }
+
+    .btn-mic {
+      background: rgba(255, 255, 255, 0.08); color: #fff; font-weight: 700;
+      border: 1px solid var(--border-card); border-radius: var(--radius-md);
+      padding: 0.75rem 1.1rem; cursor: pointer; display: inline-flex; align-items: center;
+      gap: 0.4rem; transition: all 0.2s; font-size: 1.1rem;
+    }
+    .btn-mic:hover { background: rgba(0, 240, 255, 0.2); border-color: var(--cyan-glow); color: var(--cyan-glow); }
+    .btn-mic.recording {
+      background: rgba(244, 63, 94, 0.25); border-color: var(--accent-rose);
+      color: #fff; box-shadow: 0 0 15px rgba(244, 63, 94, 0.6);
+      animation: pulse 1s infinite;
+    }
+
+    .voice-toggle-active {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(0, 240, 255, 0.25)) !important;
+      border-color: var(--accent-emerald) !important; color: #fff !important;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+    }
   </style>
 </head>
 <body>
@@ -394,11 +435,13 @@
 
     <div class="header-nav">
       <button class="nav-tab active" id="tab-btn-console" onclick="switchTab('console')">⚡ Console & Actions</button>
+      <button class="nav-tab" id="tab-btn-voice" onclick="switchTab('voice')">🎙️ Voice Assistant</button>
       <button class="nav-tab" id="tab-btn-vault" onclick="switchTab('vault')">🔐 Security Vault & 2FA</button>
       <button class="nav-tab" id="tab-btn-web" onclick="switchTab('web')">🚀 Web Builder & Servers</button>
     </div>
 
     <div class="header-metrics">
+      <button class="nav-tab" id="voice-auto-speak-btn" onclick="toggleVoiceMode()" title="Toggle Auto Voice Feedback">🔊 Voice: OFF</button>
       <div class="status-badge">
         <div class="status-dot" id="system-status-dot"></div>
         <span id="system-status-text">Ready & Autonomous</span>
@@ -450,12 +493,27 @@
             <div class="starter-chip" onclick="applyStarter('Save my login for linkedin (email: user@gmail.com, password: secret123, 2fa: prompt)')">🔐 Save LinkedIn Login</div>
             <div class="starter-chip" onclick="applyStarter('Check my linkedin account by my gmail account and review unread notifications')">🌐 Auto-Login LinkedIn</div>
             <div class="starter-chip" onclick="applyStarter('Build a futuristic AI Portfolio website with glassmorphism and deploy preview server')">🚀 Build & Deploy Web App</div>
+            <div class="starter-chip" onclick="applyStarter('Speak status of the server and system health out loud')">🎙️ Voice: System Status</div>
             <div class="starter-chip" onclick="applyStarter('Inspect recent git commits and check repository health')">🔍 Check Repo Health</div>
             <div class="starter-chip" onclick="applyStarter('Analyze current desktop screen and diagnose any visible errors')">👁️ Screen Vision</div>
           </div>
 
+          <!-- Soundwave Visualizer Bar -->
+          <div id="chat-voice-wave" class="voice-wave-container" style="display: none; margin-bottom: 0.6rem;">
+            <div class="voice-bar"></div>
+            <div class="voice-bar"></div>
+            <div class="voice-bar"></div>
+            <div class="voice-bar"></div>
+            <div class="voice-bar"></div>
+            <div class="voice-bar"></div>
+            <div class="voice-bar"></div>
+            <div class="voice-bar"></div>
+            <span id="chat-voice-label" style="font-size: 0.78rem; font-weight: 600; color: var(--cyan-glow); margin-left: 0.5rem;">Listening for voice command...</span>
+          </div>
+
           <div class="chat-input-row">
-            <input type="text" id="chat-input" class="chat-input" placeholder="Give Xeren any instruction (e.g. 'Build an AI portfolio website and start preview')..." autocomplete="off">
+            <button class="btn-mic" id="btn-mic" onclick="toggleSpeechRecognition()" title="Hold or click to speak voice command">🎙️</button>
+            <input type="text" id="chat-input" class="chat-input" placeholder="Give Xeren any instruction or click 🎙️ to speak..." autocomplete="off">
             <button class="btn-send" id="btn-send" onclick="sendQuery()">Execute ➔</button>
           </div>
         </div>
@@ -537,7 +595,116 @@
 
     </div>
 
-    <!-- VIEW 2: Security Vault & 2FA Manager -->
+    <!-- VIEW 2: Voice Assistant & Speech Control -->
+    <div class="view-container" id="view-voice" style="display: none;">
+      
+      <!-- Voice Assistant Header Banner -->
+      <div class="card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(121, 40, 202, 0.12)); border-color: rgba(0, 240, 255, 0.3);">
+        <div class="card-header">
+          <div class="card-title" style="color: var(--cyan-glow);">🎙️ Dual-Engine Voice Assistant & Speech Synthesis Studio</div>
+          <div style="display: flex; gap: 0.5rem;">
+            <span class="ring-badge ring-1" id="voice-engine-badge">Windows SAPI + Web Speech API</span>
+            <span class="ring-badge ring-3">Ready</span>
+          </div>
+        </div>
+        <p style="font-size: 0.85rem; color: #d1d5db; line-height: 1.6;">
+          Xeren provides full voice autonomy with <strong>Speech-to-Text (STT)</strong> and <strong>Text-to-Speech (TTS)</strong>. Spoken commands are converted directly into Xeren's intent classifier, planner, and tool executor, with audible vocal feedback rendered natively.
+        </p>
+      </div>
+
+      <div class="dashboard-grid">
+        
+        <!-- STT: Speech to Text Station -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🎤 Voice Input & Real-time Transcription</div>
+            <span class="ring-badge ring-1" id="stt-status-badge">Web Speech STT</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem 0; border: 1px dashed var(--border-card); border-radius: var(--radius-md); margin-bottom: 1rem; background: rgba(0,0,0,0.2);">
+            <button class="btn-mic" id="voice-panel-mic-btn" onclick="toggleSpeechRecognition('voice-panel')" style="width: 72px; height: 72px; border-radius: 50%; font-size: 2rem; justify-content: center;">
+              🎙️
+            </button>
+            <div id="voice-panel-wave" class="voice-wave-container" style="display: none; margin-top: 1rem;">
+              <div class="voice-bar"></div>
+              <div class="voice-bar"></div>
+              <div class="voice-bar"></div>
+              <div class="voice-bar"></div>
+              <div class="voice-bar"></div>
+              <div class="voice-bar"></div>
+              <div class="voice-bar"></div>
+              <div class="voice-bar"></div>
+            </div>
+            <span id="voice-panel-stt-label" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.75rem;">Click microphone to start speaking</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Live Spoken Transcript / Voice Query:</label>
+            <textarea id="voice-panel-transcript" class="form-input" rows="3" placeholder="Spoken voice transcript will appear here in real-time..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <button class="btn-action" style="flex: 1;" onclick="sendVoiceTranscriptToChat()">💬 Send to Xeren Assistant ➔</button>
+            <button class="starter-chip" onclick="document.getElementById('voice-panel-transcript').value = ''">Clear</button>
+          </div>
+
+          <!-- Spoken Quick Ideas -->
+          <div style="margin-top: 1.25rem;">
+            <span class="form-label">Try saying or testing:</span>
+            <div class="quick-starters" style="margin-top: 0.5rem;">
+              <div class="starter-chip" onclick="testVoiceText('What is the health and status of my system?')">"What is my system status?"</div>
+              <div class="starter-chip" onclick="testVoiceText('Check my server health and active ports')">"Check server health and ports"</div>
+              <div class="starter-chip" onclick="testVoiceText('Scaffold a modern SaaS landing page')">"Scaffold a SaaS landing page"</div>
+              <div class="starter-chip" onclick="testVoiceText('List all files in my workspace')">"List all files in workspace"</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TTS: Text to Speech Synthesizer -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔊 Text-to-Speech Output & Synthesis</div>
+            <button class="starter-chip" onclick="loadAvailableVoices()">🔄 Refresh Voices</button>
+          </div>
+
+          <form onsubmit="speakCustomText(event)">
+            <div class="form-group">
+              <label class="form-label">Text to Speak / Synthesize:</label>
+              <textarea id="tts-input-text" class="form-input" rows="3" placeholder="Hello! I am Xeren, your autonomous multimodal AI assistant. All systems are operational." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">System Voice:</label>
+              <select id="tts-voice-select" class="form-select">
+                <option value="">Default System Voice (Auto-detect)</option>
+              </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Speed / Rate (-10 to 10): <span id="tts-rate-label">0</span></label>
+                <input type="range" id="tts-rate-slider" min="-10" max="10" value="0" class="form-input" style="padding: 0;" oninput="document.getElementById('tts-rate-label').innerText = this.value">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Volume (0 to 100): <span id="tts-vol-label">100</span>%</label>
+                <input type="range" id="tts-vol-slider" min="0" max="100" value="100" class="form-input" style="padding: 0;" oninput="document.getElementById('tts-vol-label').innerText = this.value">
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem;">
+              <button type="submit" class="btn-action" style="flex: 1;" id="btn-backend-speak">📢 Speak (Windows SAPI)</button>
+              <button type="button" class="btn-action" style="flex: 1; background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink)); color: #fff;" onclick="speakBrowserSynthesis()">🌐 Speak (Browser Web API)</button>
+            </div>
+          </form>
+
+          <div id="tts-status-msg" style="margin-top: 0.85rem; font-size: 0.8rem; color: var(--accent-emerald); display: none;"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- VIEW 3: Security Vault & 2FA Manager -->
     <div class="view-container" id="view-vault" style="display: none;">
       
       <!-- Security Rings Architecture Overview -->
@@ -628,7 +795,7 @@
 
     </div>
 
-    <!-- VIEW 3: Autonomous Web Builder & Servers -->
+    <!-- VIEW 4: Autonomous Web Builder & Servers -->
     <div class="view-container" id="view-web" style="display: none;">
       
       <div class="dashboard-grid">
@@ -717,6 +884,220 @@
     let currentApprovalId = null;
     let timerInterval = null;
     let queryStartTime = 0;
+    let isVoiceModeActive = false;
+    let isRecording = false;
+    let speechRecognition = null;
+    let availableSystemVoices = [];
+
+    // Initialize Web Speech Recognition
+    function initSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        logTelemetry("[VOICE] Web Speech Recognition not supported in this browser.");
+        return null;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        isRecording = true;
+        updateVoiceVisualizers(true, "Listening to your voice...");
+        logTelemetry("[VOICE] Microphone listening...");
+      };
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        const chatInput = document.getElementById('chat-input');
+        const voiceTranscript = document.getElementById('voice-panel-transcript');
+        if (chatInput) chatInput.value = transcript;
+        if (voiceTranscript) voiceTranscript.value = transcript;
+      };
+
+      recognition.onerror = (event) => {
+        logTelemetry(`[VOICE ERROR] Recognition error: ${event.error}`);
+        stopSpeechRecognition();
+      };
+
+      recognition.onend = () => {
+        stopSpeechRecognition();
+      };
+
+      return recognition;
+    }
+
+    function toggleSpeechRecognition(context = 'chat') {
+      if (!speechRecognition) {
+        speechRecognition = initSpeechRecognition();
+      }
+      if (!speechRecognition) {
+        alert("Web Speech Recognition is not supported or permitted in this browser.");
+        return;
+      }
+
+      if (isRecording) {
+        speechRecognition.stop();
+        stopSpeechRecognition();
+      } else {
+        try {
+          speechRecognition.start();
+        } catch (e) {
+          logTelemetry(`[VOICE ERROR] ${e.message}`);
+          stopSpeechRecognition();
+        }
+      }
+    }
+
+    function stopSpeechRecognition() {
+      isRecording = false;
+      updateVoiceVisualizers(false);
+    }
+
+    function updateVoiceVisualizers(active, labelText = "") {
+      const chatMicBtn = document.getElementById('btn-mic');
+      const voicePanelMicBtn = document.getElementById('voice-panel-mic-btn');
+      const chatWave = document.getElementById('chat-voice-wave');
+      const voicePanelWave = document.getElementById('voice-panel-wave');
+      const chatVoiceLabel = document.getElementById('chat-voice-label');
+      const panelVoiceLabel = document.getElementById('voice-panel-stt-label');
+
+      if (chatMicBtn) {
+        if (active) chatMicBtn.classList.add('recording');
+        else chatMicBtn.classList.remove('recording');
+      }
+      if (voicePanelMicBtn) {
+        if (active) voicePanelMicBtn.classList.add('recording');
+        else voicePanelMicBtn.classList.remove('recording');
+      }
+
+      if (chatWave) chatWave.style.display = active ? 'flex' : 'none';
+      if (voicePanelWave) voicePanelWave.style.display = active ? 'flex' : 'none';
+      if (chatVoiceLabel && labelText) chatVoiceLabel.innerText = labelText;
+      if (panelVoiceLabel) panelVoiceLabel.innerText = active ? "Listening... Speak now!" : "Click microphone to start speaking";
+    }
+
+    function toggleVoiceMode() {
+      isVoiceModeActive = !isVoiceModeActive;
+      const btn = document.getElementById('voice-auto-speak-btn');
+      if (btn) {
+        if (isVoiceModeActive) {
+          btn.classList.add('voice-toggle-active');
+          btn.innerText = '🔊 Voice: ON';
+          logTelemetry('[VOICE] Auto-speak responses ENABLED.');
+        } else {
+          btn.classList.remove('voice-toggle-active');
+          btn.innerText = '🔊 Voice: OFF';
+          logTelemetry('[VOICE] Auto-speak responses DISABLED.');
+        }
+      }
+    }
+
+    function cleanTextForSpeech(text) {
+      if (!text) return '';
+      return text
+        .replace(/```[\s\S]*?```/g, 'Code block omitted.')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/[*_~#]/g, '')
+        .replace(/\n+/g, ' ')
+        .trim();
+    }
+
+    function speakAssistantResponse(text) {
+      if (!text) return;
+      const clean = cleanTextForSpeech(text);
+      if (!clean) return;
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(clean);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        window.speechSynthesis.speak(utterance);
+      } else {
+        // Fallback to backend SAPI
+        fetch('/voice/speak', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: clean, async_mode: true })
+        }).catch(() => {});
+      }
+    }
+
+    async function loadAvailableVoices() {
+      try {
+        const res = await fetch('/voice/voices');
+        const data = await res.json();
+        availableSystemVoices = data.voices || [];
+        const select = document.getElementById('tts-voice-select');
+        if (select) {
+          select.innerHTML = '<option value="">Default System Voice (Auto-detect)</option>' +
+            availableSystemVoices.map(v => `<option value="${v.name || v.id}">${v.name} (${v.gender || 'Standard'})</option>`).join('');
+        }
+      } catch (e) {
+        logTelemetry(`[VOICE] Could not fetch system voices: ${e.message}`);
+      }
+    }
+
+    async function speakCustomText(e) {
+      if (e) e.preventDefault();
+      const text = document.getElementById('tts-input-text').value.trim();
+      const voice = document.getElementById('tts-voice-select').value;
+      const rate = parseInt(document.getElementById('tts-rate-slider').value) || 0;
+      const volume = parseInt(document.getElementById('tts-vol-slider').value) || 100;
+      const statusMsg = document.getElementById('tts-status-msg');
+
+      if (!text) return;
+
+      try {
+        const res = await fetch('/voice/speak', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text, voice: voice || null, rate: rate, volume: volume, async_mode: true })
+        });
+        const data = await res.json();
+        if (statusMsg) {
+          statusMsg.innerText = `📢 Speaking via Windows SAPI: "${text.substring(0, 50)}..."`;
+          statusMsg.style.display = 'block';
+          setTimeout(() => { statusMsg.style.display = 'none'; }, 4000);
+        }
+        logTelemetry(`[VOICE TTS] Backend synthesis active: "${text.substring(0, 40)}..."`);
+      } catch (err) {
+        alert(`❌ Failed to speak: ${err.message}`);
+      }
+    }
+
+    function speakBrowserSynthesis() {
+      const text = document.getElementById('tts-input-text').value.trim();
+      if (!text) return;
+      if (!('speechSynthesis' in window)) {
+        alert('Browser SpeechSynthesis is not supported in this environment.');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(cleanTextForSpeech(text));
+      utterance.rate = 1.0;
+      window.speechSynthesis.speak(utterance);
+      logTelemetry(`[VOICE BROWSER] Speaking via Web Speech Synthesis: "${text.substring(0, 40)}..."`);
+    }
+
+    function testVoiceText(text) {
+      document.getElementById('voice-panel-transcript').value = text;
+      document.getElementById('chat-input').value = text;
+    }
+
+    function sendVoiceTranscriptToChat() {
+      const transcript = document.getElementById('voice-panel-transcript').value.trim();
+      if (!transcript) return;
+      switchTab('console');
+      document.getElementById('chat-input').value = transcript;
+      sendQuery();
+    }
 
     function switchTab(tab) {
       document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
@@ -724,9 +1105,11 @@
       if (btn) btn.classList.add('active');
 
       document.getElementById('view-console').style.display = (tab === 'console') ? 'grid' : 'none';
+      document.getElementById('view-voice').style.display = (tab === 'voice') ? 'block' : 'none';
       document.getElementById('view-vault').style.display = (tab === 'vault') ? 'block' : 'none';
       document.getElementById('view-web').style.display = (tab === 'web') ? 'block' : 'none';
 
+      if (tab === 'voice') loadAvailableVoices();
       if (tab === 'vault') loadVaultCredentials();
       if (tab === 'web') loadWebDeployments();
     }
@@ -870,6 +1253,11 @@
 
         chat.innerHTML += `<div class="message assistant">${data.response_text.replace(/\n/g, '<br>')}</div>`;
         chat.scrollTop = chat.scrollHeight;
+
+        // If Voice Mode is active, speak the assistant's response aloud
+        if (isVoiceModeActive && data.response_text) {
+          speakAssistantResponse(data.response_text);
+        }
 
         loadStats();
       } catch (e) {

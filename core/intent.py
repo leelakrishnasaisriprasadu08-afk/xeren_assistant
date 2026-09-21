@@ -21,6 +21,7 @@ class IntentType(str, Enum):
   CLIENT = "client"
   VAULT = "vault"
   WEB_BUILDER = "web_builder"
+  VOICE = "voice"
   COMPOSITE = "composite"
 
 
@@ -144,6 +145,43 @@ class IntentClassifier:
           primary_tool="web_builder",
           entities={"sub_type": sub, "prompt": query},
           summary="Autonomous website generation, scaffolding, and preview deployment",
+      )
+
+    # Voice Assistant & Speech Synthesis
+    if any(
+        kw in q
+        for kw in [
+            "speak",
+            "say ",
+            "say out loud",
+            "read aloud",
+            "read out loud",
+            "out loud",
+            "talk to me",
+            "synthesize speech",
+            "synthesize voice",
+            "speech synthesis",
+            "text to speech",
+            "speech to text",
+            "transcribe audio",
+            "transcribe voice",
+            "voice assistant",
+            "voice mode",
+            "list voices",
+            "system voices",
+            "available voices",
+            "voice status",
+        ]
+    ) or (
+        "voice" in q and any(w in q for w in ["assistant", "mode", "output", "speak", "synthesis", "engine", "status", "list", "test"])
+    ):
+      sub = "list_voices" if "voices" in q and ("list" in q or "available" in q or "show" in q) else ("get_voice_status" if "status" in q else ("synthesize_speech" if "synthesize" in q else "speak"))
+      return Intent(
+          intent_type=IntentType.VOICE,
+          confidence=0.98,
+          primary_tool="voice",
+          entities={"sub_type": sub, "text": query},
+          summary="Voice synthesis and speech output operation",
       )
 
     # Client Outreach & Communications

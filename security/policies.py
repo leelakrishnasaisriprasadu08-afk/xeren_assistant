@@ -621,6 +621,42 @@ OPERATION_POLICIES: Dict[Tuple[str, str], OperationPolicy] = {
         risk_level=RiskLevel.LOW,
         description="List active web deployments and live URLs",
     ),
+    # Voice Assistant Operations
+    ("voice", "speak"): OperationPolicy(
+        tool_name="voice",
+        operation="speak",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Speak text aloud using system text-to-speech audio synthesis",
+    ),
+    ("voice", "synthesize_speech"): OperationPolicy(
+        tool_name="voice",
+        operation="synthesize_speech",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Synthesize speech audio metadata and phonetic parameters",
+    ),
+    ("voice", "transcribe_audio"): OperationPolicy(
+        tool_name="voice",
+        operation="transcribe_audio",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Transcribe spoken voice audio into text",
+    ),
+    ("voice", "list_voices"): OperationPolicy(
+        tool_name="voice",
+        operation="list_voices",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="List available system text-to-speech voices",
+    ),
+    ("voice", "get_voice_status"): OperationPolicy(
+        tool_name="voice",
+        operation="get_voice_status",
+        permission_level=PermissionLevel.ALLOWED,
+        risk_level=RiskLevel.LOW,
+        description="Get status of audio and voice synthesis engine",
+    ),
 }
 
 
