@@ -841,6 +841,48 @@ def create_app(assistant: Optional[XerenAssistant] = None) -> FastAPI:
     flamegraph = TraceSpanTree.from_trace_dict(trace.model_dump())
     return flamegraph.model_dump()
 
+  # ============================================================================
+  # CHAT SESSIONS & HISTORICAL ARCHIVE ENDPOINTS
+  # ============================================================================
+
+  @app.get("/history/sessions")
+  async def list_chat_sessions(limit: int = 50):
+    """Lists all archived chat sessions with single-sentence episodic summaries."""
+    sessions = _assistant.session_storage.list_sessions(limit=limit)
+    return {"sessions": sessions, "total": len(sessions)}
+
+  @app.get("/history/sessions/{session_id}")
+  async def get_chat_session_details(session_id: str):
+    """Returns conversation messages and metadata for a specific chat session."""
+    session_data = _assistant.session_storage.get_session_details(session_id)
+    if not session_data:
+      raise HTTPException(status_code=404, detail=f"Session '{session_id}' not found.")
+    return session_data
+
+  @app.post("/history/sessions/{session_id}/title")
+  async def rename_chat_session(session_id: str, payload: Dict[str, str]):
+    """Updates the custom single-sentence title of a chat session."""
+    new_title = payload.get("title") or payload.get("new_title")
+    if not new_title:
+      raise HTTPException(status_code=400, detail="Parameter 'title' is required.")
+    success = _assistant.session_storage.rename_session(session_id, new_title)
+    if not success:
+      raise HTTPException(status_code=404, detail=f"Session '{session_id}' not found.")
+    return {"status": "renamed", "session_id": session_id, "title": new_title}
+
+  @app.delete("/history/sessions/{session_id}")
+  async def delete_chat_session(session_id: str):
+    """Deletes a chat session and all its stored messages."""
+    success = _assistant.session_storage.delete_session(session_id)
+    if not success:
+      raise HTTPException(status_code=404, detail=f"Session '{session_id}' not found.")
+    return {"status": "deleted", "session_id": session_id}
+
+  @app.post("/history/clear")
+  async def clear_all_chat_history():
+    """Wipes all archived chat history."""
+    count = _assistant.session_storage.clear_all_history()
+    return {"status": "cleared", "sessions_cleared": count}
 
   @app.websocket("/ws/stream")
   async def websocket_stream(websocket: WebSocket):

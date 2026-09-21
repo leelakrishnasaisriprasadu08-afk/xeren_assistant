@@ -777,7 +777,10 @@ class XerenAssistant:
         "assistant", response_text, session_id=session_id
     )
     self.session_storage.save_message(
-        session_id, LLMMessage(role="assistant", content=response_text)
+        session_id,
+        LLMMessage(role="assistant", content=response_text),
+        intent_str=intent.intent_type.value,
+        tools_used=tools_used,
     )
 
     if success and semantic_verif.verified and len(query.strip()) > 3:
